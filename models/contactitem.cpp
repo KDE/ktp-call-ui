@@ -27,7 +27,7 @@ QVariant ContactItem::data(int role) const
     case Qt::DisplayRole:
         return m_contact->alias();
     case Qt::DecorationRole:
-        return iconForPresence(m_contact->presenceType());
+        return iconForPresence((Tp::ConnectionPresenceType)m_contact->presenceType());
     case ContactsModel::ItemTypeRole:
         return QByteArray("contact");
     case ContactsModel::ObjectPtrRole:

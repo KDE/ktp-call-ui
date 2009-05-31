@@ -19,6 +19,7 @@
 
 #include "treemodel.h"
 #include <KIcon>
+#include <TelepathyQt4/Constants>
 
 class ContactsModelItem : public QObject, public TreeModelItem
 {
@@ -27,7 +28,7 @@ public:
     ContactsModelItem(TreeModelItem *parent, TreeModel *model);
 
 protected:
-    KIcon iconForPresence(uint presenceType) const;
+    KIcon iconForPresence(Tp::ConnectionPresenceType presenceType) const;
 
 protected slots:
     //make emitDataChange available as a slot

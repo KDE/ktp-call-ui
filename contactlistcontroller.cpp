@@ -99,11 +99,12 @@ void ContactListController::callContact()
 
 void ContactListController::setStatus(int statusIndex)
 {
-    enum ConnectionPresenceType { CPT_Offline = 1, CPT_Available = 2, CPT_Away = 3,
-                                  CPT_Extended_Away = 4, CPT_Hidden = 5, CPT_Busy = 6  };
     static const char *statuses[] = { "available", "away", "brb", "busy", "dnd", "xa", "hidden", "offline" };
-    static uint types[] = { CPT_Available, CPT_Away, CPT_Away, CPT_Busy, CPT_Busy,
-                           CPT_Extended_Away, CPT_Hidden, CPT_Offline };
+    static Tp::ConnectionPresenceType types[] =
+                        { Tp::ConnectionPresenceTypeAvailable, Tp::ConnectionPresenceTypeAway,
+                          Tp::ConnectionPresenceTypeAway, Tp::ConnectionPresenceTypeBusy,
+                          Tp::ConnectionPresenceTypeBusy, Tp::ConnectionPresenceTypeExtendedAway,
+                          Tp::ConnectionPresenceTypeHidden, Tp::ConnectionPresenceTypeOffline };
 
     Q_ASSERT(statusIndex >= 0 && statusIndex <= 7);
     Tp::SimplePresence presence;

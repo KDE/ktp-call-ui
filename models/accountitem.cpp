@@ -43,7 +43,7 @@ QVariant AccountItem::data(int role) const
         case Qt::DisplayRole:
             return m_account->displayName();
         case Qt::DecorationRole:
-            return iconForPresence(m_account->currentPresence().type);
+            return iconForPresence((Tp::ConnectionPresenceType)m_account->currentPresence().type);
         case ContactsModel::ItemTypeRole:
             return QByteArray("account");
         case ContactsModel::ObjectPtrRole:

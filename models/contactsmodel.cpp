@@ -23,20 +23,20 @@ ContactsModelItem::ContactsModelItem(TreeModelItem *parent, TreeModel *model)
 {
 }
 
-KIcon ContactsModelItem::iconForPresence(uint presenceType) const
+KIcon ContactsModelItem::iconForPresence(Tp::ConnectionPresenceType presenceType) const
 {
     switch (presenceType) {
-    case 1:
+    case Tp::ConnectionPresenceTypeOffline:
         return KIcon("user-offline");
-    case 2:
+    case Tp::ConnectionPresenceTypeAvailable:
         return KIcon("user-online");
-    case 3:
+    case Tp::ConnectionPresenceTypeAway:
         return KIcon("user-away");
-    case 4:
+    case Tp::ConnectionPresenceTypeExtendedAway:
         return KIcon("user-away-extended");
-    case 5:
+    case Tp::ConnectionPresenceTypeHidden:
         return KIcon("user-invisible");
-    case 6:
+    case Tp::ConnectionPresenceTypeBusy:
         return KIcon("user-busy");
     default:
         kWarning() << "presence type is unset/unknown/invalid. value:" << presenceType;

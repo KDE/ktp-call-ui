@@ -19,6 +19,9 @@
 ContactItem::ContactItem(Tp::ContactPtr contact, TreeModelItem *parent, TreeModel *model)
     : ContactsModelItem(parent, model), m_contact(contact)
 {
+    connect(m_contact.data(), SIGNAL(aliasChanged(QString)), SLOT(emitDataChange()));
+    connect(m_contact.data(), SIGNAL(simplePresenceChanged(QString, uint, QString)),
+            SLOT(emitDataChange()));
 }
 
 QVariant ContactItem::data(int role) const

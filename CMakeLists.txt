@@ -26,4 +26,4 @@ kde4_add_executable(kcall ${kcall_SRCS})
 target_link_libraries(kcall ${KDE4_KDEUI_LIBS} ${TELEPATHY_QT4_LIBRARIES})
 
 install(TARGETS kcall ${INSTALL_TARGETS_DEFAULT_ARGS})
-install(FILES kcallui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall)
+#install(FILES kcallui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall)

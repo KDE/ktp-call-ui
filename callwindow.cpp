@@ -15,77 +15,102 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "callwindow.h"
-#include <QtGui/QStackedWidget>
+#include <QtCore/QMetaObject>
+#include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
 #include <KDebug>
-#include <TelepathyQt4/Connection>
-#include <TelepathyQt4/ContactManager>
-#include <TelepathyQt4/PendingChannel>
-#include <TelepathyQt4/StreamedMediaChannel>
+#include <KLocalizedString>
+#include <KPluginLoader>
+#include <KPluginFactory>
+#include <KParts/Part>
 
 struct CallWindow::Private
 {
-    QStackedWidget *videoStackedWidget;
-    QLabel *videoPlaceHolder;
-    Tp::StreamedMediaChannelPtr channel;
+    KPluginLoader *loader;
+    KParts::Part *part;
 };
 
-CallWindow::CallWindow()
-    : KXmlGuiWindow(), d(new Private)
+/*! This constructor is used to make an outgoing call to the specified \a contact */
+CallWindow::CallWindow(Tp::ContactPtr contact)
+    : KParts::MainWindow(), d(new Private)
 {
-    d->videoStackedWidget = new QStackedWidget(this);
-    d->videoPlaceHolder = new QLabel;
-    d->videoStackedWidget->addWidget(d->videoPlaceHolder);
+    init();
+    if ( d->part ) {
+        QMetaObject::invokeMethod(d->part, "callContact", Q_ARG(Tp::ContactPtr, contact));
+    }
+}
 
-    setCentralWidget(d->videoStackedWidget);
-
-    setAutoSaveSettings(QLatin1String("CallWindow"));
-    setupGUI(QSize(320, 260), KXmlGuiWindow::Default, QLatin1String("callwindowui.rc"));
+/*! This constructor is used to handle an incoming call, in which case
+ * the specified \a channel must be ready and the call must have been accepted.
+ */
+CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
+    : KParts::MainWindow(), d(new Private)
+{
+    init();
+    if ( d->part ) {
+        QMetaObject::invokeMethod(d->part, "handleStreamedMediaChannel",
+                                  Q_ARG(Tp::StreamedMediaChannelPtr, channel));
+    }
 }
 
 CallWindow::~CallWindow()
 {
+    kDebug() << "Deleting CallWindow";
     delete d;
 }
 
-void CallWindow::callContact(Tp::ContactPtr contact)
+void CallWindow::init()
 {
-    setWindowTitle(contact->alias());
+    d->part = NULL;
+    d->loader = new KPluginLoader("kcall_callwindowpart", KGlobal::mainComponent(), this);
+    KPluginFactory *factory = d->loader->factory();
+    if ( factory ) {
+        d->part = factory->create<KParts::Part>(this, this);
+        //version check
+        int index = d->part->metaObject()->indexOfClassInfo("Interface version");
+        const char *version = d->part->metaObject()->classInfo(index).value();
+        if ( !version || version[0] != '0' ) {
+            kWarning() << "Incompatible plugin version loaded";
+            d->part->deleteLater();
+            d->part = NULL;
+        }
+    }
 
-    Tp::ConnectionPtr connection = contact->manager()->connection();
-    kDebug() << "Connection is ready" << connection->isReady();
+    if ( d->part ) {
+        setCentralWidget(d->part->widget());
+    } else {
+        QLabel *label = new QLabel(i18nc("@info:status", "Could not load call window part. "
+                                                         "Please check your installation."), this);
+        label->setWordWrap(true);
+        setCentralWidget(label);
+    }
 
-    QVariantMap request;
-    request.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".ChannelType"), QString("StreamedMedia"));
-    request.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"), Tp::HandleTypeContact);
-    request.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle"), contact->handle()[0]);
-
-    Tp::PendingChannel *pendChan = connection->ensureChannel(request);
-    connect(pendChan, SIGNAL(finished(Tp::PendingOperation*)),
-            SLOT(callRequestFinished(Tp::PendingOperation*)));
+    setAutoSaveSettings(QLatin1String("CallWindow"));
+    setupGUI(QSize(320, 260), ToolBar | Keys | StatusBar | Save, QLatin1String("callwindowui.rc"));
+    if ( d->part ) {
+        createGUI(d->part);
+    } else {
+        KXmlGuiWindow::createGUI(QLatin1String("callwindowui.rc"));
+    }
 }
 
-void CallWindow::callRequestFinished(Tp::PendingOperation *op)
+void CallWindow::onCallEnded(bool hasError)
 {
-    if ( op->isError() ) {
-        kDebug() << "Failed to call contact" << op->errorName() << op->errorMessage();
-        return;
+}
+
+void CallWindow::closeEvent(QCloseEvent *event)
+{
+    if ( d->part ) {
+        bool canClose;
+        if ( QMetaObject::invokeMethod(d->part, "requestClose", Q_RETURN_ARG(bool, canClose)) ) {
+            if ( !canClose ) {
+                kDebug() << "Ignoring close event";
+                connect(d->part, SIGNAL(callEnded(bool)), SLOT(close()));
+                event->ignore();
+            }
+        }
     }
-
-    Tp::PendingChannel *pendChan = qobject_cast<Tp::PendingChannel*>(op);
-    Q_ASSERT(pendChan);
-
-    if ( pendChan->yours() ) {
-        Tp::StreamedMediaChannelPtr channel(qobject_cast<Tp::StreamedMediaChannel*>(pendChan->channel().data()));
-        Q_ASSERT(!channel.isNull());
-        d->channel = channel;
-
-        kDebug() << "Channel is ready" << channel->isReady();
-        kDebug() << "Awaiting answer" << channel->awaitingRemoteAnswer();
-        kDebug() << "Handler required" << channel->handlerStreamingRequired();
-    } else {
-        kDebug() << "Channel is not ours";
-    }
+    KParts::MainWindow::closeEvent(event);
 }
 
 #include "callwindow.moc"

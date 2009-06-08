@@ -17,20 +17,25 @@
 #ifndef CALLWINDOW_H
 #define CALLWINDOW_H
 
-#include <KXmlGuiWindow>
+#include <KParts/MainWindow>
 #include <TelepathyQt4/Contact>
 
-class CallWindow : public KXmlGuiWindow
+class CallWindow : public KParts::MainWindow
 {
     Q_OBJECT
 public:
-    CallWindow();
+    CallWindow(Tp::ContactPtr contact);
+    CallWindow(Tp::StreamedMediaChannelPtr channel);
     virtual ~CallWindow();
 
-    void callContact(Tp::ContactPtr contact);
+private:
+    void init();
 
 private slots:
-    void callRequestFinished(Tp::PendingOperation *op);
+    void onCallEnded(bool hasError);
+
+protected:
+    virtual void closeEvent(QCloseEvent *event);
 
 private:
     struct Private;

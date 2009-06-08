@@ -8,6 +8,8 @@ find_package(TelepathyQt4 REQUIRED)
 include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 add_definitions(${KDE4_DEFINITIONS})
 
+add_subdirectory(callwindowpart)
+
 set(kcall_SRCS
     main.cpp
     kcallapplication.cpp
@@ -23,7 +25,7 @@ set(kcall_SRCS
 
 kde4_add_ui_files(kcall_SRCS mainwindow.ui)
 kde4_add_executable(kcall ${kcall_SRCS})
-target_link_libraries(kcall ${KDE4_KDEUI_LIBS} ${TELEPATHY_QT4_LIBRARIES})
+target_link_libraries(kcall ${KDE4_KPARTS_LIBS} ${TELEPATHY_QT4_LIBRARIES})
 
 install(TARGETS kcall ${INSTALL_TARGETS_DEFAULT_ARGS})
 #install(FILES kcallui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall)

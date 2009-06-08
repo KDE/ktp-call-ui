@@ -92,9 +92,8 @@ void ContactListController::callContact()
     Tp::ContactPtr contact = d->currentIndex.data(ContactsModel::ObjectPtrRole).value<Tp::ContactPtr>();
     Q_ASSERT( !contact.isNull() );
 
-    CallWindow *cw = new CallWindow();
+    CallWindow *cw = new CallWindow(contact);
     cw->show();
-    cw->callContact(contact);
 }
 
 void ContactListController::setStatus(int statusIndex)

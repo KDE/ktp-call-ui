@@ -1,5 +1,7 @@
 [Desktop Entry]
 Name=KCall Call Window Part
+Name[sv]=Kcall-samtalsfönsterdel
+Name[uk]=Модуль вікна дзвінка KCall
 X-KDE-ServiceTypes=KParts/Part
 X-KDE-Library=kcall_callwindowpart
 Type=Service

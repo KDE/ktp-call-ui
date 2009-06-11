@@ -1,5 +1,8 @@
 [Desktop Entry]
 Name=KCall Call Window Part
+Name[km]=ផ្នែក​បង្អួច​នៃ​ការ​ហៅ​របស់ KCall
+Name[pt]=Componente da Janela de Chamadas do KCall
+Name[pt_BR]=Componente da Janela de Chamadas do KCall
 Name[sv]=Kcall-samtalsfönsterdel
 Name[uk]=Модуль вікна дзвінка KCall
 X-KDE-ServiceTypes=KParts/Part

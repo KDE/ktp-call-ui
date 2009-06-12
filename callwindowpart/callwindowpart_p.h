@@ -46,12 +46,21 @@ private:
 private slots:
     void pendingOutgoingCallFinished(Tp::PendingOperation *op);
     void onChannelReady(Tp::PendingOperation *op);
+    void onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
+                              const QString &errorMessage);
+    void onStreamAdded(const Tp::MediaStreamPtr & stream);
+    void onStreamRemoved(const Tp::MediaStreamPtr & stream);
+    void onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
+                                  Tp::MediaStreamDirection direction,
+                                  Tp::MediaStreamPendingSend pendingSend);
+    void onStreamStateChanged(const Tp::MediaStreamPtr & stream, Tp::MediaStreamState state);
     void hangupCall();
     void onChannelClosed(Tp::PendingOperation *op);
 
 private:
     CallWindowPart *const q_ptr;
 
+    Tp::ContactPtr m_contact;
     Tp::StreamedMediaChannelPtr m_channel;
     State m_state;
     KAction *m_hangupAction;

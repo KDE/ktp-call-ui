@@ -15,14 +15,18 @@ if (TELEPATHY_QT4_INCLUDE_DIR AND TELEPATHY_QT4_LIBRARIES)
 endif (TELEPATHY_QT4_INCLUDE_DIR AND TELEPATHY_QT4_LIBRARIES)
 
 find_path (TELEPATHY_QT4_INCLUDE_DIR
-          NAMES TelepathyQt4/Client/Channel TelepathyQt4/Client/Connection TelepathyQt4/Types
+          NAMES TelepathyQt4/Channel TelepathyQt4/Connection TelepathyQt4/Types
           PATHS ${CMAKE_INSTALL_PREFIX}/include/telepathy-1.0
 )
 find_library (TELEPATHY_QT4_LIBRARIES
              NAMES telepathy-qt4
              PATHS ${CMAKE_INSTALL_PREFIX}/lib
 )
+find_library (TELEPATHY_QT4_FARSIGHT_LIBRARIES
+             NAMES telepathy-qt4-farsight
+             PATHS ${CMAKE_INSTALL_PREFIX}/lib
+)
 
 include (FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS (TELEPATHY_QT4 DEFAULT_MSG
-                                   TELEPATHY_QT4_LIBRARIES TELEPATHY_QT4_INCLUDE_DIR)
+                                   TELEPATHY_QT4_LIBRARIES TELEPATHY_QT4_FARSIGHT_LIBRARIES TELEPATHY_QT4_INCLUDE_DIR)

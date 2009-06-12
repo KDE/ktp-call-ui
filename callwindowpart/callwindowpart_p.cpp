@@ -16,6 +16,7 @@
 */
 #include "callwindowpart_p.h"
 #include "pendingoutgoingcall.h"
+#include "abstractmediahandler.h"
 #include <KDebug>
 #include <KLocalizedString>
 #include <KAction>
@@ -83,6 +84,7 @@ void CallWindowPartPrivate::callContact(Tp::ContactPtr contact)
     connect(new PendingOutgoingCall(contact, this),
             SIGNAL(finished(Tp::PendingOperation*)),
             SLOT(pendingOutgoingCallFinished(Tp::PendingOperation*)));
+    m_contact = contact;
 }
 
 void CallWindowPartPrivate::pendingOutgoingCallFinished(Tp::PendingOperation *op)
@@ -106,6 +108,9 @@ void CallWindowPartPrivate::handleChannel(Tp::StreamedMediaChannelPtr channel)
 
     connect(pr, SIGNAL(finished(Tp::PendingOperation*)),
             SLOT(onChannelReady(Tp::PendingOperation*)));
+    connect(m_channel.data(),
+            SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
+            SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
 }
 
 void CallWindowPartPrivate::onChannelReady(Tp::PendingOperation *op)
@@ -117,12 +122,89 @@ void CallWindowPartPrivate::onChannelReady(Tp::PendingOperation *op)
         return;
     }
 
+    if ( m_channel->handlerStreamingRequired() ) {
+        kDebug() << "Creating farsight channel";
+        AbstractMediaHandler::create(m_channel, this);
+    }
+
+    connect(m_channel.data(),
+            SIGNAL(streamAdded(Tp::MediaStreamPtr)),
+            SLOT(onStreamAdded(Tp::MediaStreamPtr)));
+    connect(m_channel.data(),
+            SIGNAL(streamRemoved(Tp::MediaStreamPtr)),
+            SLOT(onStreamRemoved(Tp::MediaStreamPtr)));
+    connect(m_channel.data(),
+            SIGNAL(streamDirectionChanged(Tp::MediaStreamPtr, Tp::MediaStreamDirection,
+                                          Tp::MediaStreamPendingSend)),
+            SLOT(onStreamDirectionChanged(Tp::MediaStreamPtr, Tp::MediaStreamDirection,
+                                          Tp::MediaStreamPendingSend)));
+    connect(m_channel.data(),
+            SIGNAL(streamStateChanged(Tp::MediaStreamPtr, Tp::MediaStreamState)),
+            SLOT(onStreamStateChanged(Tp::MediaStreamPtr, Tp::MediaStreamState)));
+
+    Tp::MediaStreams streams = m_channel->streams();
+    kDebug() << streams.size();
+
+    foreach (const Tp::MediaStreamPtr &stream, streams) {
+        kDebug() << "  type:" <<
+            (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video");
+        kDebug() << "  direction:" << stream->direction();
+        kDebug() << "  state:" << stream->state();
+
+       // onStreamDirectionChanged(stream, stream->direction(), stream->pendingSend());
+       // onStreamStateChanged(stream, stream->state());
+    }
+
+    if ( streams.size() == 0 && !m_contact.isNull() ) {
+        //HACK remove this from here
+        m_channel->requestStream(m_contact, Tp::MediaStreamTypeAudio);
+    }
+
     if ( m_channel->awaitingRemoteAnswer() ) {
         setState(Ringing);
     } else {
         setState(InCall);
     }
 }
+
+void CallWindowPartPrivate::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
+                                                 const QString &errorMessage)
+{
+    Q_UNUSED(proxy);
+    kDebug() << "channel became invalid:" << errorName << errorMessage;
+    setState(Error, errorMessage);
+}
+
+void CallWindowPartPrivate::onStreamAdded(const Tp::MediaStreamPtr & stream)
+{
+    kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream created";
+    kDebug() << " direction:" << stream->direction();
+    kDebug() << " state:" << stream->state();
+    kDebug() << " pending send:" << stream->pendingSend();
+}
+
+void CallWindowPartPrivate::onStreamRemoved(const Tp::MediaStreamPtr & stream)
+{
+    kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream removed";
+}
+
+void CallWindowPartPrivate::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
+                                                     Tp::MediaStreamDirection direction,
+                                                     Tp::MediaStreamPendingSend pendingSend)
+{
+    kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
+                "stream direction changed to" << direction;
+    kDebug() << "pending send:" << pendingSend;
+}
+
+void CallWindowPartPrivate::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
+                                                 Tp::MediaStreamState state)
+{
+    kDebug() <<  (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
+                "stream state changed to" << state;
+    kDebug() << " pending send:" << stream->pendingSend();
+}
+
 
 void CallWindowPartPrivate::hangupCall()
 {

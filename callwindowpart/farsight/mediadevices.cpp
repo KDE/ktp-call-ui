@@ -1,5 +1,9 @@
 /*
-    Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
+    This file is based on code from the TelepathyQt4 library.
+
+    Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
+    Copyright (C) 2009 Nokia Corporation
+    Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
 
     This library is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published

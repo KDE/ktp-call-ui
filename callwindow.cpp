@@ -30,16 +30,6 @@ struct CallWindow::Private
     KParts::Part *part;
 };
 
-/*! This constructor is used to make an outgoing call to the specified \a contact */
-CallWindow::CallWindow(Tp::ContactPtr contact)
-    : KParts::MainWindow(), d(new Private)
-{
-    init();
-    if ( d->part ) {
-        QMetaObject::invokeMethod(d->part, "callContact", Q_ARG(Tp::ContactPtr, contact));
-    }
-}
-
 /*! This constructor is used to handle an incoming call, in which case
  * the specified \a channel must be ready and the call must have been accepted.
  */

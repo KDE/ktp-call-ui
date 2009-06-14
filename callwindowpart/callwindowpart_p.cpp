@@ -15,7 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "callwindowpart_p.h"
-#include "pendingoutgoingcall.h"
 #include "abstractmediahandler.h"
 #include <KDebug>
 #include <KLocalizedString>
@@ -78,27 +77,6 @@ void CallWindowPartPrivate::setStatus(const QString & msg, const QString & extra
     emit q->setStatusBarText(QString("%1 %2").arg(msg).arg(extraMsg));
 }
 
-void CallWindowPartPrivate::callContact(Tp::ContactPtr contact)
-{
-    setState(Connecting);
-    connect(new PendingOutgoingCall(contact, this),
-            SIGNAL(finished(Tp::PendingOperation*)),
-            SLOT(pendingOutgoingCallFinished(Tp::PendingOperation*)));
-    m_contact = contact;
-}
-
-void CallWindowPartPrivate::pendingOutgoingCallFinished(Tp::PendingOperation *op)
-{
-    if ( op->isError() ) {
-        setState(Error, op->errorMessage());
-        return;
-    }
-
-    PendingOutgoingCall *pc = qobject_cast<PendingOutgoingCall*>(op);
-    Q_ASSERT(pc);
-    handleChannel(pc->channel());
-}
-
 void CallWindowPartPrivate::handleChannel(Tp::StreamedMediaChannelPtr channel)
 {
     m_channel = channel;
@@ -153,11 +131,6 @@ void CallWindowPartPrivate::onChannelReady(Tp::PendingOperation *op)
 
        // onStreamDirectionChanged(stream, stream->direction(), stream->pendingSend());
        // onStreamStateChanged(stream, stream->state());
-    }
-
-    if ( streams.size() == 0 && !m_contact.isNull() ) {
-        //HACK remove this from here
-        m_channel->requestStream(m_contact, Tp::MediaStreamTypeAudio);
     }
 
     if ( m_channel->awaitingRemoteAnswer() ) {

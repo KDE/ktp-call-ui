@@ -54,7 +54,6 @@ if (BUILD_KCALL_CALLWINDOWPART)
     set(callwindowpart_SRCS
         callwindowpart.cpp
         callwindowpart_p.cpp
-        pendingoutgoingcall.cpp
         abstractmediahandler.cpp
         farsight/mediadevices.cpp
         farsight/mediahandler.cpp

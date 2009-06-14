@@ -51,13 +51,6 @@ CallWindowPart::CallWindowPart(QWidget *parentWidget, QObject *parent, const QVa
     setWidget(d->videoStackedWidget);
 }
 
-void CallWindowPart::callContact(Tp::ContactPtr contact)
-{
-    emit setWindowCaption(contact->alias());
-    Q_D(CallWindowPart);
-    d->callContact(contact);
-}
-
 void CallWindowPart::handleStreamedMediaChannel(Tp::StreamedMediaChannelPtr channel)
 {
     Q_D(CallWindowPart);

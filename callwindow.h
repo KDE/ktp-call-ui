@@ -24,7 +24,6 @@ class CallWindow : public KParts::MainWindow
 {
     Q_OBJECT
 public:
-    CallWindow(Tp::ContactPtr contact);
     CallWindow(Tp::StreamedMediaChannelPtr channel);
     virtual ~CallWindow();
 

@@ -16,16 +16,20 @@
 */
 #include "kcallapplication.h"
 #include "mainwindow.h"
+#include "callhandler.h"
 #include "models/contactsmodel.h"
 #include <KDebug>
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/PendingReady>
+#include <TelepathyQt4/ClientRegistrar>
 
 struct KCallApplication::Private
 {
     MainWindow *mainWindow;
     ContactsModel *contactsModel;
     Tp::AccountManagerPtr accountManager;
+    Tp::ClientRegistrarPtr registrar;
+    Tp::SharedPtr<CallHandler> callHandler;
 };
 
 KCallApplication::KCallApplication()
@@ -37,6 +41,10 @@ KCallApplication::KCallApplication()
     connect(d->accountManager->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onAccountManagerReady(Tp::PendingOperation *)));
+
+    d->registrar = Tp::ClientRegistrar::create();
+    d->callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
+    d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->callHandler), "kcall");
 }
 
 KCallApplication::~KCallApplication()

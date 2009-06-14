@@ -16,6 +16,7 @@ set(kcall_SRCS
     mainwindow.cpp
     contactlistcontroller.cpp
     callwindow.cpp
+    callhandler.cpp
     models/treemodel.cpp
     models/contactsmodel.cpp
     models/pendingcontacts.cpp

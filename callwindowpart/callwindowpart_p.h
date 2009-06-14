@@ -31,7 +31,6 @@ public:
 
     enum State { Connecting, Ringing, InCall, HangingUp, Disconnected, Error };
     void setupActions();
-    void callContact(Tp::ContactPtr contact);
     void handleChannel(Tp::StreamedMediaChannelPtr channel);
     bool requestClose();
 
@@ -44,7 +43,6 @@ private:
     void setStatus(const QString & msg, const QString & extraMsg);
 
 private slots:
-    void pendingOutgoingCallFinished(Tp::PendingOperation *op);
     void onChannelReady(Tp::PendingOperation *op);
     void onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
                               const QString &errorMessage);
@@ -60,7 +58,6 @@ private slots:
 private:
     CallWindowPart *const q_ptr;
 
-    Tp::ContactPtr m_contact;
     Tp::StreamedMediaChannelPtr m_channel;
     State m_state;
     KAction *m_hangupAction;

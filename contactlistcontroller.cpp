@@ -18,13 +18,13 @@
 #include "models/contactsmodel.h"
 #include "models/accountitem.h" //for Q_DECLARE_METATYPE
 #include "models/contactitem.h" //for Q_DECLARE_METATYPE
-#include "callwindow.h"
 #include <QtGui/QAbstractItemView>
 #include <KDebug>
 #include <KIcon>
 #include <KSelectAction>
 #include <KMenu>
 #include <KLocalizedString>
+#include <TelepathyQt4/ReferencedHandles>
 
 struct ContactListController::Private
 {
@@ -92,8 +92,17 @@ void ContactListController::callContact()
     Tp::ContactPtr contact = d->currentIndex.data(ContactsModel::ObjectPtrRole).value<Tp::ContactPtr>();
     Q_ASSERT( !contact.isNull() );
 
-    CallWindow *cw = new CallWindow(contact);
-    cw->show();
+    //TODO this should be removed when Tp::Contact has support for requesting channels directly
+    Tp::AccountPtr account = d->currentIndex.parent().data(ContactsModel::ObjectPtrRole).value<Tp::AccountPtr>();
+    Q_ASSERT( !account.isNull() );
+
+    QVariantMap request;
+    request.insert(TELEPATHY_INTERFACE_CHANNEL ".ChannelType",
+                   TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
+    request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType", Tp::HandleTypeContact);
+    request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle", contact->handle()[0]);
+    request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialAudio", true);
+    account->ensureChannel(request, QDateTime::currentDateTime(), "org.freedesktop.Telepathy.Client.kcall");
 }
 
 void ContactListController::setStatus(int statusIndex)

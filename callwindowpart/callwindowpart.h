@@ -31,9 +31,6 @@ public:
     CallWindowPart(QWidget *parentWidget, QObject *parent, const QVariantList &args);
 
 public Q_SLOTS:
-    /** Makes an outgoing call to the specified @a contact */
-    void callContact(Tp::ContactPtr contact);
-
     /** Handles an existing Tp::StreamedMediaChannel. This can be used
      * to handle an incoming call, in which case it is assumed that the call
      * has already been accepted. It can also be used for outgoing calls.

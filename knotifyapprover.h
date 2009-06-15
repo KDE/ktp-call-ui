@@ -14,32 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef KCALLAPPLICATION_H
-#define KCALLAPPLICATION_H
+#ifndef KNOTIFYAPPROVER_H
+#define KNOTIFYAPPROVER_H
 
-#include <KUniqueApplication>
-namespace Tp { class PendingOperation; }
-class ContactsModel;
+#include "abstractclientapprover.h"
 
-class KCallApplication : public KUniqueApplication
+class KNotifyApprover : public AbstractClientApprover
 {
     Q_OBJECT
 public:
-    KCallApplication();
-    virtual ~KCallApplication();
+    KNotifyApprover();
+    virtual ~KNotifyApprover();
 
-    virtual int newInstance();
-    ContactsModel *contactsModel() const;
-
-    static inline KCallApplication *instance()
-    { return static_cast<KCallApplication*>(QCoreApplication::instance()); }
-
-public slots:
-    void showHideMainWindow();
-
-private slots:
-    void onAccountManagerReady(Tp::PendingOperation *op);
-    void onAccountCreated(const QString & path);
+protected slots:
+    virtual void newRequest(ApproverRequest *request);
+    virtual void requestFinished(ApproverRequest *request);
 
 private:
     struct Private;

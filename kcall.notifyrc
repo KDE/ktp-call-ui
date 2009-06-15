@@ -1,0 +1,10 @@
+[Global]
+IconName=internet-telephony
+Comment=KCall
+Name=KCall
+
+[Event/newcall]
+Name=Incoming Call
+Sound=KDE-Im-Phone-Ring.ogg
+Action=Popup|Sound
+Flags=Persistent

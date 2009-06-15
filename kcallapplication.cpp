@@ -17,6 +17,8 @@
 #include "kcallapplication.h"
 #include "mainwindow.h"
 #include "callhandler.h"
+#include "systrayicon.h"
+#include "knotifyapprover.h"
 #include "models/contactsmodel.h"
 #include <KDebug>
 #include <TelepathyQt4/AccountManager>
@@ -25,11 +27,13 @@
 
 struct KCallApplication::Private
 {
-    MainWindow *mainWindow;
+    QPointer<MainWindow> mainWindow;
     ContactsModel *contactsModel;
     Tp::AccountManagerPtr accountManager;
     Tp::ClientRegistrarPtr registrar;
     Tp::SharedPtr<CallHandler> callHandler;
+    Tp::SharedPtr<SystrayIcon> systrayIcon;
+    Tp::SharedPtr<KNotifyApprover> knotifyApprover;
 };
 
 KCallApplication::KCallApplication()
@@ -45,6 +49,10 @@ KCallApplication::KCallApplication()
     d->registrar = Tp::ClientRegistrar::create();
     d->callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
     d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->callHandler), "kcall");
+    d->systrayIcon = Tp::SharedPtr<SystrayIcon>(new SystrayIcon());
+    d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->systrayIcon), "kcall_approver_systray");
+    d->knotifyApprover = Tp::SharedPtr<KNotifyApprover>(new KNotifyApprover());
+    d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->knotifyApprover), "kcall_approver_knotify");
 }
 
 KCallApplication::~KCallApplication()
@@ -64,6 +72,16 @@ int KCallApplication::newInstance()
 ContactsModel *KCallApplication::contactsModel() const
 {
     return d->contactsModel;
+}
+
+void KCallApplication::showHideMainWindow()
+{
+    if ( !d->mainWindow ) {
+        d->mainWindow = new MainWindow;
+        d->mainWindow->show();
+    } else {
+        d->mainWindow->setVisible( !d->mainWindow->isVisible() );
+    }
 }
 
 void KCallApplication::onAccountManagerReady(Tp::PendingOperation *op)

@@ -14,32 +14,24 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef KCALLAPPLICATION_H
-#define KCALLAPPLICATION_H
+#ifndef SYSTRAYICON_H
+#define SYSTRAYICON_H
 
-#include <KUniqueApplication>
-namespace Tp { class PendingOperation; }
-class ContactsModel;
+#include "abstractclientapprover.h"
 
-class KCallApplication : public KUniqueApplication
+class SystrayIcon : public AbstractClientApprover
 {
     Q_OBJECT
 public:
-    KCallApplication();
-    virtual ~KCallApplication();
+    SystrayIcon();
+    virtual ~SystrayIcon();
 
-    virtual int newInstance();
-    ContactsModel *contactsModel() const;
-
-    static inline KCallApplication *instance()
-    { return static_cast<KCallApplication*>(QCoreApplication::instance()); }
-
-public slots:
-    void showHideMainWindow();
+protected slots:
+    virtual void newRequest(ApproverRequest *request);
+    virtual void requestFinished(ApproverRequest *request);
 
 private slots:
-    void onAccountManagerReady(Tp::PendingOperation *op);
-    void onAccountCreated(const QString & path);
+    void onActivateRequested(bool active, const QPoint & pos);
 
 private:
     struct Private;

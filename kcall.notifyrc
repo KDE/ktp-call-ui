@@ -1,10 +1,15 @@
 [Global]
 IconName=internet-telephony
 Comment=KCall
+Comment[sv]=Kcall
 Name=KCall
+Name[sv]=Kcall
 
 [Event/newcall]
 Name=Incoming Call
+Name[km]=ការ​ហៅ​ចូល
+Name[sv]=Inkommande samtal
+Name[uk]=Вхідний дзвінок
 Sound=KDE-Im-Phone-Ring.ogg
 Action=Popup|Sound
 Flags=Persistent

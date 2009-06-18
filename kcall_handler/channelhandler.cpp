@@ -1,9 +1,9 @@
 /*
     Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
 
-    This library is free software; you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
@@ -11,73 +11,39 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License
+    You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "callwindowpart_p.h"
+#include "channelhandler.h"
 #include "abstractmediahandler.h"
 #include <KDebug>
 #include <KLocalizedString>
-#include <KAction>
-#include <KActionCollection>
 #include <TelepathyQt4/Connection>
 #include <TelepathyQt4/PendingReady>
 
-CallWindowPartPrivate::CallWindowPartPrivate(CallWindowPart *qq)
-    : QObject(qq), q_ptr(qq)
+ChannelHandler::ChannelHandler(QObject *parent)
+    : QObject(parent)
 {
     m_state = Disconnected;
 }
 
-void CallWindowPartPrivate::setupActions()
+void ChannelHandler::setState(State s)
 {
-    Q_Q(CallWindowPart);
-    m_hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
-    connect(m_hangupAction, SIGNAL(triggered()), SLOT(hangupCall()));
-    q->actionCollection()->addAction("hangup", m_hangupAction);
-}
-
-void CallWindowPartPrivate::setState(State s, const QString & extraMsg)
-{
-    Q_Q(CallWindowPart);
+    m_state = s;
+    emit stateChanged(s);
     switch (s) {
-    case Connecting:
-        setStatus(i18nc("@info:status", "Connecting..."), extraMsg);
-        m_hangupAction->setEnabled(false);
-        break;
-    case Ringing:
-        setStatus(i18nc("@info:status", "Ringing..."), extraMsg);
-        m_hangupAction->setEnabled(true);
-        break;
-    case InCall:
-        setStatus(i18nc("@info:status", "Talking..."), extraMsg);
-        m_hangupAction->setEnabled(true);
-        break;
-    case HangingUp:
-        setStatus(i18nc("@info:status", "Hanging up..."), extraMsg);
-        m_hangupAction->setEnabled(false);
-        break;
     case Disconnected:
-        setStatus(i18nc("@info:status", "Disconnected."), extraMsg);
-        m_hangupAction->setEnabled(false);
-        emit q->callEnded(false);
+        emit callEnded(false);
         break;
     case Error:
-        setStatus(i18nc("@info:status", "Disconnected with error."), extraMsg);
-        m_hangupAction->setEnabled(false);
-        emit q->callEnded(true);
+        emit callEnded(true);
+        break;
+    default:
         break;
     }
-    m_state = s;
 }
 
-void CallWindowPartPrivate::setStatus(const QString & msg, const QString & extraMsg)
-{
-    Q_Q(CallWindowPart);
-    emit q->setStatusBarText(QString("%1 %2").arg(msg).arg(extraMsg));
-}
-
-void CallWindowPartPrivate::handleChannel(Tp::StreamedMediaChannelPtr channel)
+void ChannelHandler::handleChannel(Tp::StreamedMediaChannelPtr channel)
 {
     m_channel = channel;
     Tp::PendingReady *pr = m_channel->becomeReady(QSet<Tp::Feature>()
@@ -91,12 +57,12 @@ void CallWindowPartPrivate::handleChannel(Tp::StreamedMediaChannelPtr channel)
             SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
 }
 
-void CallWindowPartPrivate::onChannelReady(Tp::PendingOperation *op)
+void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
 {
     if ( op->isError() ) {
         kError() << "StreamedMediaChannel failed to become ready:"
                  << op->errorName() << op->errorMessage();
-        setState(Error, op->errorMessage());
+        setState(Error);
         return;
     }
 
@@ -140,15 +106,15 @@ void CallWindowPartPrivate::onChannelReady(Tp::PendingOperation *op)
     }
 }
 
-void CallWindowPartPrivate::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
+void ChannelHandler::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
                                                  const QString &errorMessage)
 {
     Q_UNUSED(proxy);
     kDebug() << "channel became invalid:" << errorName << errorMessage;
-    setState(Error, errorMessage);
+    setState(Error);
 }
 
-void CallWindowPartPrivate::onStreamAdded(const Tp::MediaStreamPtr & stream)
+void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
 {
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream created";
     kDebug() << " direction:" << stream->direction();
@@ -156,12 +122,12 @@ void CallWindowPartPrivate::onStreamAdded(const Tp::MediaStreamPtr & stream)
     kDebug() << " pending send:" << stream->pendingSend();
 }
 
-void CallWindowPartPrivate::onStreamRemoved(const Tp::MediaStreamPtr & stream)
+void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
 {
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream removed";
 }
 
-void CallWindowPartPrivate::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
+void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
                                                      Tp::MediaStreamDirection direction,
                                                      Tp::MediaStreamPendingSend pendingSend)
 {
@@ -170,7 +136,7 @@ void CallWindowPartPrivate::onStreamDirectionChanged(const Tp::MediaStreamPtr & 
     kDebug() << "pending send:" << pendingSend;
 }
 
-void CallWindowPartPrivate::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
+void ChannelHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
                                                  Tp::MediaStreamState state)
 {
     kDebug() <<  (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
@@ -179,7 +145,7 @@ void CallWindowPartPrivate::onStreamStateChanged(const Tp::MediaStreamPtr & stre
 }
 
 
-void CallWindowPartPrivate::hangupCall()
+void ChannelHandler::hangupCall()
 {
     Q_ASSERT(!m_channel.isNull() && m_state != HangingUp && m_state != Disconnected && m_state != Error);
     setState(HangingUp);
@@ -188,7 +154,7 @@ void CallWindowPartPrivate::hangupCall()
             SLOT(onChannelClosed(Tp::PendingOperation*)));
 }
 
-void CallWindowPartPrivate::onChannelClosed(Tp::PendingOperation *op)
+void ChannelHandler::onChannelClosed(Tp::PendingOperation *op)
 {
     if (op->isError()) {
         kError() << "Failed to close channel:" << op->errorName() << op->errorMessage();
@@ -198,7 +164,7 @@ void CallWindowPartPrivate::onChannelClosed(Tp::PendingOperation *op)
     setState(Disconnected);
 }
 
-bool CallWindowPartPrivate::requestClose()
+bool ChannelHandler::requestClose()
 {
     switch(m_state) {
     case Ringing:
@@ -218,4 +184,4 @@ bool CallWindowPartPrivate::requestClose()
     return true; //warnings--
 }
 
-#include "callwindowpart_p.moc"
+#include "channelhandler.moc"

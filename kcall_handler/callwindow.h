@@ -17,10 +17,10 @@
 #ifndef CALLWINDOW_H
 #define CALLWINDOW_H
 
-#include <KParts/MainWindow>
-#include <TelepathyQt4/Contact>
+#include "channelhandler.h"
+#include <KXmlGuiWindow>
 
-class CallWindow : public KParts::MainWindow
+class CallWindow : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
@@ -28,9 +28,12 @@ public:
     virtual ~CallWindow();
 
 private:
-    void init();
+    void setupActions();
+    void setupUi();
 
 private slots:
+    void setState(ChannelHandler::State state);
+    void setStatus(const QString & msg);
     void onCallEnded(bool hasError);
 
 protected:

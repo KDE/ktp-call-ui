@@ -11,7 +11,6 @@ include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR}
 add_definitions(${KDE4_DEFINITIONS})
 
 add_subdirectory(kcall_handler)
-add_subdirectory(callwindowpart)
 
 set(kcall_SRCS
     main.cpp

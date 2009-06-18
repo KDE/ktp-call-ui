@@ -20,27 +20,30 @@
 #include <QtGui/QLabel>
 #include <KDebug>
 #include <KLocalizedString>
-#include <KPluginLoader>
-#include <KPluginFactory>
-#include <KParts/Part>
+#include <KAction>
+#include <KActionCollection>
+#include <KStatusBar>
+#include <TelepathyQt4/StreamedMediaChannel>
 
 struct CallWindow::Private
 {
-    KPluginLoader *loader;
-    KParts::Part *part;
+    QLabel *dummyLabel;
+    KAction *hangupAction;
+    ChannelHandler *channelHandler;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
  * the specified \a channel must be ready and the call must have been accepted.
  */
 CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
-    : KParts::MainWindow(), d(new Private)
+    : KXmlGuiWindow(), d(new Private)
 {
-    init();
-    if ( d->part ) {
-        QMetaObject::invokeMethod(d->part, "handleStreamedMediaChannel",
-                                  Q_ARG(Tp::StreamedMediaChannelPtr, channel));
-    }
+    d->channelHandler = new ChannelHandler(this);
+    d->channelHandler->handleChannel(channel);
+    connect(d->channelHandler, SIGNAL(stateChanged(ChannelHandler::State)),
+            SLOT(setState(ChannelHandler::State)));
+
+    setupUi();
 }
 
 CallWindow::~CallWindow()
@@ -49,39 +52,57 @@ CallWindow::~CallWindow()
     delete d;
 }
 
-void CallWindow::init()
+void CallWindow::setupActions()
 {
-    d->part = NULL;
-    d->loader = new KPluginLoader("kcall_callwindowpart", KGlobal::mainComponent(), this);
-    KPluginFactory *factory = d->loader->factory();
-    if ( factory ) {
-        d->part = factory->create<KParts::Part>(this, this);
-        //version check
-        int index = d->part->metaObject()->indexOfClassInfo("Interface version");
-        const char *version = d->part->metaObject()->classInfo(index).value();
-        if ( !version || version[0] != '0' ) {
-            kWarning() << "Incompatible plugin version loaded";
-            d->part->deleteLater();
-            d->part = NULL;
-        }
-    }
+    d->hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
+    connect(d->hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangupCall()));
+    actionCollection()->addAction("hangup", d->hangupAction);
+}
 
-    if ( d->part ) {
-        setCentralWidget(d->part->widget());
-    } else {
-        QLabel *label = new QLabel(i18nc("@info:status", "Could not load call window part. "
-                                                         "Please check your installation."), this);
-        label->setWordWrap(true);
-        setCentralWidget(label);
-    }
+void CallWindow::setupUi()
+{
+    d->dummyLabel = new QLabel("To be replaced by a real widget", this);
+    setCentralWidget(d->dummyLabel);
+
+    setupActions();
 
     setAutoSaveSettings(QLatin1String("CallWindow"));
-    setupGUI(QSize(320, 260), ToolBar | Keys | StatusBar | Save, QLatin1String("callwindowui.rc"));
-    if ( d->part ) {
-        createGUI(d->part);
-    } else {
-        KXmlGuiWindow::createGUI(QLatin1String("callwindowui.rc"));
+    setupGUI(QSize(320, 260), Default, QLatin1String("callwindowui.rc"));
+}
+
+void CallWindow::setState(ChannelHandler::State state)
+{
+    switch (state) {
+    case ChannelHandler::Connecting:
+        setStatus(i18nc("@info:status", "Connecting..."));
+        d->hangupAction->setEnabled(false);
+        break;
+    case ChannelHandler::Ringing:
+        setStatus(i18nc("@info:status", "Ringing..."));
+        d->hangupAction->setEnabled(true);
+        break;
+    case ChannelHandler::InCall:
+        setStatus(i18nc("@info:status", "Talking..."));
+        d->hangupAction->setEnabled(true);
+        break;
+    case ChannelHandler::HangingUp:
+        setStatus(i18nc("@info:status", "Hanging up..."));
+        d->hangupAction->setEnabled(false);
+        break;
+    case ChannelHandler::Disconnected:
+        setStatus(i18nc("@info:status", "Disconnected."));
+        d->hangupAction->setEnabled(false);
+        break;
+    case ChannelHandler::Error:
+        setStatus(i18nc("@info:status", "Disconnected with error."));
+        d->hangupAction->setEnabled(false);
+        break;
     }
+}
+
+void CallWindow::setStatus(const QString & msg)
+{
+    statusBar()->showMessage(msg);
 }
 
 void CallWindow::onCallEnded(bool hasError)
@@ -90,17 +111,12 @@ void CallWindow::onCallEnded(bool hasError)
 
 void CallWindow::closeEvent(QCloseEvent *event)
 {
-    if ( d->part ) {
-        bool canClose;
-        if ( QMetaObject::invokeMethod(d->part, "requestClose", Q_RETURN_ARG(bool, canClose)) ) {
-            if ( !canClose ) {
-                kDebug() << "Ignoring close event";
-                connect(d->part, SIGNAL(callEnded(bool)), SLOT(close()));
-                event->ignore();
-            }
-        }
+    if ( !d->channelHandler->requestClose() ) {
+        kDebug() << "Ignoring close event";
+        connect(d->channelHandler, SIGNAL(callEnded(bool)), SLOT(close()));
+        event->ignore();
     }
-    KParts::MainWindow::closeEvent(event);
+    KXmlGuiWindow::closeEvent(event);
 }
 
 #include "callwindow.moc"

@@ -16,7 +16,6 @@
 */
 #include "kcallapplication.h"
 #include "mainwindow.h"
-#include "callhandler.h"
 #include "systrayicon.h"
 #include "knotifyapprover.h"
 #include "models/contactsmodel.h"
@@ -31,7 +30,6 @@ struct KCallApplication::Private
     ContactsModel *contactsModel;
     Tp::AccountManagerPtr accountManager;
     Tp::ClientRegistrarPtr registrar;
-    Tp::SharedPtr<CallHandler> callHandler;
     Tp::SharedPtr<SystrayIcon> systrayIcon;
     Tp::SharedPtr<KNotifyApprover> knotifyApprover;
 };
@@ -47,8 +45,6 @@ KCallApplication::KCallApplication()
             SLOT(onAccountManagerReady(Tp::PendingOperation *)));
 
     d->registrar = Tp::ClientRegistrar::create();
-    d->callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
-    d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->callHandler), "kcall");
     d->systrayIcon = Tp::SharedPtr<SystrayIcon>(new SystrayIcon());
     d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->systrayIcon), "kcall_approver_systray");
     d->knotifyApprover = Tp::SharedPtr<KNotifyApprover>(new KNotifyApprover());

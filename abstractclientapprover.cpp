@@ -63,7 +63,7 @@ Tp::ChannelDispatchOperationPtr ApproverRequest::dispatchOperation() const
 
 void ApproverRequest::accept()
 {
-    d->dispatchOperation->handleWith("org.freedesktop.Telepathy.Client.kcall");
+    d->dispatchOperation->handleWith("org.freedesktop.Telepathy.Client.kcall_handler");
     emit finished(this);
 }
 

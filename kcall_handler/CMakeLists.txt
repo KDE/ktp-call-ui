@@ -69,7 +69,7 @@ if (BUILD_KCALL_HANDLER)
                                         ${TPFARSIGHT_LIBRARIES})
 
     install(TARGETS kcall_handler ${INSTALL_TARGETS_DEFAULT_ARGS})
-
+    install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall_handler)
 
     configure_file(org.freedesktop.Telepathy.Client.kcall_handler.service.in
                    org.freedesktop.Telepathy.Client.kcall_handler.service)

@@ -38,8 +38,7 @@ struct CallWindow::Private
 CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
     : KXmlGuiWindow(), d(new Private)
 {
-    d->channelHandler = new ChannelHandler(this);
-    d->channelHandler->handleChannel(channel);
+    d->channelHandler = new ChannelHandler(channel, this);
     connect(d->channelHandler, SIGNAL(stateChanged(ChannelHandler::State)),
             SLOT(setState(ChannelHandler::State)));
 
@@ -97,6 +96,8 @@ void CallWindow::setState(ChannelHandler::State state)
         setStatus(i18nc("@info:status", "Disconnected with error."));
         d->hangupAction->setEnabled(false);
         break;
+    default:
+        Q_ASSERT(false);
     }
 }
 

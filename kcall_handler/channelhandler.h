@@ -18,18 +18,16 @@
 #define CHANNELHANDLER_H
 
 #include <QtCore/QObject>
-#include <TelepathyQt4/Types>
-#include <TelepathyQt4/Constants>
-namespace Tp { class PendingOperation; class DBusProxy; }
+#include <TelepathyQt4/StreamedMediaChannel>
 
 class ChannelHandler : public QObject
 {
     Q_OBJECT
 public:
-    ChannelHandler(QObject *parent = 0);
+    explicit ChannelHandler(Tp::StreamedMediaChannelPtr channel, QObject *parent = 0);
+    virtual ~ChannelHandler();
 
-    enum State { Connecting, Ringing, InCall, HangingUp, Disconnected, Error };
-    void handleChannel(Tp::StreamedMediaChannelPtr channel);
+    enum State { NotReady, Connecting, Ringing, InCall, HangingUp, Disconnected, Error };
     bool requestClose();
 
 public slots:
@@ -52,11 +50,15 @@ private slots:
                                   Tp::MediaStreamDirection direction,
                                   Tp::MediaStreamPendingSend pendingSend);
     void onStreamStateChanged(const Tp::MediaStreamPtr & stream, Tp::MediaStreamState state);
-    void onChannelClosed(Tp::PendingOperation *op);
+    void onGroupMembersChanged(const Tp::Contacts & groupMembersAdded,
+                               const Tp::Contacts & groupLocalPendingMembersAdded,
+                               const Tp::Contacts & groupRemotePendingMembersAdded,
+                               const Tp::Contacts & groupMembersRemoved,
+                               const Tp::Channel::GroupMemberChangeDetails & details);
 
 private:
-    Tp::StreamedMediaChannelPtr m_channel;
-    State m_state;
+    struct Private;
+    Private *const d;
 };
 
 #endif

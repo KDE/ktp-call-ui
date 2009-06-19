@@ -21,15 +21,39 @@
 #include <TelepathyQt4/Connection>
 #include <TelepathyQt4/PendingReady>
 
-ChannelHandler::ChannelHandler(QObject *parent)
-    : QObject(parent)
+struct ChannelHandler::Private
 {
-    m_state = Disconnected;
+    Tp::StreamedMediaChannelPtr channel;
+    State state;
+    AbstractMediaHandler *mediaHandler;
+};
+
+ChannelHandler::ChannelHandler(Tp::StreamedMediaChannelPtr channel, QObject *parent)
+    : QObject(parent), d(new Private)
+{
+    d->state = NotReady;
+    d->channel = channel;
+    d->mediaHandler = NULL;
+
+    Tp::PendingReady *pr = d->channel->becomeReady(QSet<Tp::Feature>()
+                                                    << Tp::StreamedMediaChannel::FeatureCore
+                                                    << Tp::StreamedMediaChannel::FeatureStreams);
+
+    connect(pr, SIGNAL(finished(Tp::PendingOperation*)),
+            SLOT(onChannelReady(Tp::PendingOperation*)));
+    connect(d->channel.data(),
+            SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
+            SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
+}
+
+ChannelHandler::~ChannelHandler()
+{
+    delete d;
 }
 
 void ChannelHandler::setState(State s)
 {
-    m_state = s;
+    d->state = s;
     emit stateChanged(s);
     switch (s) {
     case Disconnected:
@@ -43,22 +67,10 @@ void ChannelHandler::setState(State s)
     }
 }
 
-void ChannelHandler::handleChannel(Tp::StreamedMediaChannelPtr channel)
-{
-    m_channel = channel;
-    Tp::PendingReady *pr = m_channel->becomeReady(QSet<Tp::Feature>()
-                                                    << Tp::StreamedMediaChannel::FeatureCore
-                                                    << Tp::StreamedMediaChannel::FeatureStreams);
-
-    connect(pr, SIGNAL(finished(Tp::PendingOperation*)),
-            SLOT(onChannelReady(Tp::PendingOperation*)));
-    connect(m_channel.data(),
-            SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
-            SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
-}
-
 void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
 {
+    Q_ASSERT(d->state == NotReady);
+
     if ( op->isError() ) {
         kError() << "StreamedMediaChannel failed to become ready:"
                  << op->errorName() << op->errorMessage();
@@ -66,27 +78,32 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
         return;
     }
 
-    if ( m_channel->handlerStreamingRequired() ) {
+    if ( d->channel->handlerStreamingRequired() ) {
         kDebug() << "Creating farsight channel";
-        AbstractMediaHandler::create(m_channel, this);
+        d->mediaHandler = AbstractMediaHandler::create(d->channel, this);
     }
 
-    connect(m_channel.data(),
+    connect(d->channel.data(),
             SIGNAL(streamAdded(Tp::MediaStreamPtr)),
             SLOT(onStreamAdded(Tp::MediaStreamPtr)));
-    connect(m_channel.data(),
+    connect(d->channel.data(),
             SIGNAL(streamRemoved(Tp::MediaStreamPtr)),
             SLOT(onStreamRemoved(Tp::MediaStreamPtr)));
-    connect(m_channel.data(),
+    connect(d->channel.data(),
             SIGNAL(streamDirectionChanged(Tp::MediaStreamPtr, Tp::MediaStreamDirection,
                                           Tp::MediaStreamPendingSend)),
             SLOT(onStreamDirectionChanged(Tp::MediaStreamPtr, Tp::MediaStreamDirection,
                                           Tp::MediaStreamPendingSend)));
-    connect(m_channel.data(),
+    connect(d->channel.data(),
             SIGNAL(streamStateChanged(Tp::MediaStreamPtr, Tp::MediaStreamState)),
             SLOT(onStreamStateChanged(Tp::MediaStreamPtr, Tp::MediaStreamState)));
+    connect(d->channel.data(),
+            SIGNAL(groupMembersChanged(Tp::Contacts, Tp::Contacts, Tp::Contacts,
+                                       Tp::Contacts, Tp::Channel::GroupMemberChangeDetails)),
+            SLOT(onGroupMembersChanged(Tp::Contacts, Tp::Contacts, Tp::Contacts,
+                                       Tp::Contacts, Tp::Channel::GroupMemberChangeDetails)));
 
-    Tp::MediaStreams streams = m_channel->streams();
+    Tp::MediaStreams streams = d->channel->streams();
     kDebug() << streams.size();
 
     foreach (const Tp::MediaStreamPtr &stream, streams) {
@@ -99,19 +116,26 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
        // onStreamStateChanged(stream, stream->state());
     }
 
-    if ( m_channel->awaitingRemoteAnswer() ) {
-        setState(Ringing);
-    } else {
-        setState(InCall);
+    //The user must have accepted the call already, using the approver.
+    //No need to ask the user again...
+    if ( d->channel->awaitingLocalAnswer() ) {
+        d->channel->acceptCall();
     }
+
+    setState(Connecting);
 }
 
 void ChannelHandler::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
-                                                 const QString &errorMessage)
+                                          const QString &errorMessage)
 {
     Q_UNUSED(proxy);
     kDebug() << "channel became invalid:" << errorName << errorMessage;
-    setState(Error);
+
+    if ( errorName == TELEPATHY_ERROR_CANCELLED ) {
+        setState(Disconnected);
+    } else {
+        setState(Error);
+    }
 }
 
 void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
@@ -128,8 +152,8 @@ void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
 }
 
 void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
-                                                     Tp::MediaStreamDirection direction,
-                                                     Tp::MediaStreamPendingSend pendingSend)
+                                              Tp::MediaStreamDirection direction,
+                                              Tp::MediaStreamPendingSend pendingSend)
 {
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
                 "stream direction changed to" << direction;
@@ -137,36 +161,49 @@ void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
 }
 
 void ChannelHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
-                                                 Tp::MediaStreamState state)
+                                          Tp::MediaStreamState state)
 {
     kDebug() <<  (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
                 "stream state changed to" << state;
     kDebug() << " pending send:" << stream->pendingSend();
+
+    if (d->state == Connecting && state == Tp::MediaStreamStateConnected) {
+        if ( d->channel->awaitingRemoteAnswer() ) {
+            setState(Ringing);
+        } else {
+            setState(InCall);
+        }
+    }
 }
 
+void ChannelHandler::onGroupMembersChanged(const Tp::Contacts & groupMembersAdded,
+                                           const Tp::Contacts & groupLocalPendingMembersAdded,
+                                           const Tp::Contacts & groupRemotePendingMembersAdded,
+                                           const Tp::Contacts & groupMembersRemoved,
+                                           const Tp::Channel::GroupMemberChangeDetails & details)
+{
+    Q_UNUSED(groupLocalPendingMembersAdded);
+    Q_UNUSED(groupRemotePendingMembersAdded);
+    Q_UNUSED(groupMembersRemoved);
+    Q_UNUSED(details);
+
+    if ( d->state == Ringing ) {
+        if ( groupMembersAdded.size() > 0 && !d->channel->awaitingRemoteAnswer() ) {
+            setState(InCall);
+        }
+    }
+}
 
 void ChannelHandler::hangupCall()
 {
-    Q_ASSERT(!m_channel.isNull() && m_state != HangingUp && m_state != Disconnected && m_state != Error);
+    Q_ASSERT(!d->channel.isNull() && d->state != HangingUp && d->state != Disconnected && d->state != Error);
     setState(HangingUp);
-    connect(m_channel->requestClose(),
-            SIGNAL(finished(Tp::PendingOperation*)),
-            SLOT(onChannelClosed(Tp::PendingOperation*)));
-}
-
-void ChannelHandler::onChannelClosed(Tp::PendingOperation *op)
-{
-    if (op->isError()) {
-        kError() << "Failed to close channel:" << op->errorName() << op->errorMessage();
-    } else {
-        kDebug() << "Channel closed";
-    }
-    setState(Disconnected);
+    d->channel->requestClose();
 }
 
 bool ChannelHandler::requestClose()
 {
-    switch(m_state) {
+    switch(d->state) {
     case Ringing:
     case InCall:
         kDebug() << "Hanging up call on close request";
@@ -177,6 +214,7 @@ bool ChannelHandler::requestClose()
     case Connecting: //FIXME is it ok to just close the window here?
     case Disconnected:
     case Error:
+    case NotReady:
         return true;
     default:
         Q_ASSERT(false);

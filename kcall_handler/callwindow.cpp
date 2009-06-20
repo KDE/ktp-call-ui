@@ -34,6 +34,8 @@ struct CallWindow::Private
     KAction *hangupAction;
     ChannelHandler *channelHandler;
     VolumeDock *volumeDock;
+    QTime callDuration;
+    QTimer callDurationTimer;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -49,6 +51,8 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
             SLOT(onMediaHandlerCreated(AbstractMediaHandler*)));
 
     setupUi();
+
+    connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 }
 
 CallWindow::~CallWindow()
@@ -70,6 +74,9 @@ void CallWindow::setupUi()
     setCentralWidget(d->dummyLabel);
     d->volumeDock = NULL;
 
+    d->callDuration.setHMS(0, 0, 0);
+    statusBar()->insertPermanentItem(d->callDuration.toString(), 1);
+
     setupActions();
 
     setAutoSaveSettings(QLatin1String("CallWindow"));
@@ -90,6 +97,7 @@ void CallWindow::setState(ChannelHandler::State state)
     case ChannelHandler::InCall:
         setStatus(i18nc("@info:status", "Talking..."));
         d->hangupAction->setEnabled(true);
+        d->callDurationTimer.start(1000);
         break;
     case ChannelHandler::HangingUp:
         setStatus(i18nc("@info:status", "Hanging up..."));
@@ -98,10 +106,12 @@ void CallWindow::setState(ChannelHandler::State state)
     case ChannelHandler::Disconnected:
         setStatus(i18nc("@info:status", "Disconnected."));
         d->hangupAction->setEnabled(false);
+        d->callDurationTimer.stop();
         break;
     case ChannelHandler::Error:
         setStatus(i18nc("@info:status", "Disconnected with error."));
         d->hangupAction->setEnabled(false);
+        d->callDurationTimer.stop();
         break;
     default:
         Q_ASSERT(false);
@@ -123,6 +133,12 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
     d->volumeDock->inputVolumeWidget()->setAudioDevice(handler->audioInputDevice());
     d->volumeDock->outputVolumeWidget()->setAudioDevice(handler->audioOutputDevice());
     addDockWidget(Qt::BottomDockWidgetArea, d->volumeDock);
+}
+
+void CallWindow::onCallDurationTimerTimeout()
+{
+    d->callDuration = d->callDuration.addSecs(1);
+    statusBar()->changeItem(d->callDuration.toString(), 1);
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

@@ -36,6 +36,7 @@ private slots:
     void setStatus(const QString & msg);
     void onCallEnded(bool hasError);
     void onMediaHandlerCreated(AbstractMediaHandler *handler);
+    void onCallDurationTimerTimeout();
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

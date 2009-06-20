@@ -23,12 +23,14 @@
 class AbstractAudioDevice : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ name)
     Q_PROPERTY(bool muted READ isMuted WRITE setMuted)
     Q_PROPERTY(qreal volume READ volume WRITE setVolume)
 
 public:
     virtual ~AbstractAudioDevice() {}
 
+    virtual QString name() const = 0;
     virtual bool isMuted() const = 0;
     virtual qreal volume() const = 0;
 

@@ -15,6 +15,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "callwindow.h"
+#include "volumedock.h"
+#include "volumewidget.h"
+#include "abstractmediahandler.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
@@ -30,6 +33,7 @@ struct CallWindow::Private
     QLabel *dummyLabel;
     KAction *hangupAction;
     ChannelHandler *channelHandler;
+    VolumeDock *volumeDock;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -41,6 +45,8 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
     d->channelHandler = new ChannelHandler(channel, this);
     connect(d->channelHandler, SIGNAL(stateChanged(ChannelHandler::State)),
             SLOT(setState(ChannelHandler::State)));
+    connect(d->channelHandler, SIGNAL(mediaHandlerCreated(AbstractMediaHandler*)),
+            SLOT(onMediaHandlerCreated(AbstractMediaHandler*)));
 
     setupUi();
 }
@@ -62,6 +68,7 @@ void CallWindow::setupUi()
 {
     d->dummyLabel = new QLabel("To be replaced by a real widget", this);
     setCentralWidget(d->dummyLabel);
+    d->volumeDock = NULL;
 
     setupActions();
 
@@ -108,6 +115,14 @@ void CallWindow::setStatus(const QString & msg)
 
 void CallWindow::onCallEnded(bool hasError)
 {
+}
+
+void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
+{
+    d->volumeDock = new VolumeDock(this);
+    d->volumeDock->inputVolumeWidget()->setAudioDevice(handler->audioInputDevice());
+    d->volumeDock->outputVolumeWidget()->setAudioDevice(handler->audioOutputDevice());
+    addDockWidget(Qt::BottomDockWidgetArea, d->volumeDock);
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

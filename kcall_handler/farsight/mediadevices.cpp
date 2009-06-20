@@ -20,13 +20,15 @@
 */
 #include "mediadevices.h"
 #include <KDebug>
+#include <KLocalizedString>
 
 namespace Farsight {
 
-AudioDevice::AudioDevice(QObject *parent)
+AudioDevice::AudioDevice(const QString & name, QObject *parent)
     : AbstractAudioDevice(parent),
       m_bin(NULL),
-      m_volumeElement(NULL)
+      m_volumeElement(NULL),
+      m_name(name)
 {
 }
 
@@ -42,6 +44,11 @@ AudioDevice::~AudioDevice()
 GstElement *AudioDevice::bin() const
 {
     return m_bin;
+}
+
+QString AudioDevice::name() const
+{
+    return m_name;
 }
 
 bool AudioDevice::isMuted() const
@@ -91,7 +98,7 @@ void AudioDevice::setVolume(qreal volume)
 
 AudioDevice *AudioDevice::createInputDevice(QObject *parent)
 {
-    AudioDevice *device = new AudioDevice(parent);
+    AudioDevice *device = new AudioDevice(i18n("Microphone"), parent);
     device->m_bin = gst_bin_new("audio-input-bin");
     GstElement *audioSrc = gst_element_factory_make("autoaudiosrc", NULL);
     //device->m_volumeElement = gst_element_factory_make("volume", "input_volume");
@@ -128,7 +135,7 @@ AudioDevice *AudioDevice::createInputDevice(QObject *parent)
 
 AudioDevice *AudioDevice::createOutputDevice(QObject *parent)
 {
-    AudioDevice *device = new AudioDevice(parent);
+    AudioDevice *device = new AudioDevice(i18n("Speakers"), parent);
     device->m_bin = gst_bin_new("audio-output-bin");
     GstElement *resample = gst_element_factory_make("audioresample", NULL);
     device->m_volumeElement = gst_element_factory_make("volume", "output_volume");

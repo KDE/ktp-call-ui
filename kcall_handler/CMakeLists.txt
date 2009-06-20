@@ -56,6 +56,8 @@ if (BUILD_KCALL_HANDLER)
         callhandler.cpp
         channelhandler.cpp
         abstractmediahandler.cpp
+        volumewidget.cpp
+        volumedock.cpp
         farsight/mediadevices.cpp
         farsight/mediahandler.cpp
     )

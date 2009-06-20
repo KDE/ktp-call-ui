@@ -14,31 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CALLWINDOW_H
-#define CALLWINDOW_H
+#ifndef VOLUMEDOCK_H
+#define VOLUMEDOCK_H
 
-#include "channelhandler.h"
-#include <KXmlGuiWindow>
+#include <QtGui/QDockWidget>
+class VolumeWidget;
 
-class CallWindow : public KXmlGuiWindow
+class VolumeDock : public QDockWidget
 {
     Q_OBJECT
 public:
-    CallWindow(Tp::StreamedMediaChannelPtr channel);
-    virtual ~CallWindow();
+    VolumeDock(QWidget *parent = 0);
+    virtual ~VolumeDock();
 
-private:
-    void setupActions();
-    void setupUi();
-
-private slots:
-    void setState(ChannelHandler::State state);
-    void setStatus(const QString & msg);
-    void onCallEnded(bool hasError);
-    void onMediaHandlerCreated(AbstractMediaHandler *handler);
-
-protected:
-    virtual void closeEvent(QCloseEvent *event);
+    VolumeWidget *inputVolumeWidget() const;
+    VolumeWidget *outputVolumeWidget() const;
 
 private:
     struct Private;

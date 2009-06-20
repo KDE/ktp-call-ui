@@ -19,6 +19,7 @@
 
 #include <QtCore/QObject>
 #include <TelepathyQt4/StreamedMediaChannel>
+class AbstractMediaHandler;
 
 class ChannelHandler : public QObject
 {
@@ -36,6 +37,7 @@ public slots:
 signals:
     void stateChanged(ChannelHandler::State newState);
     void callEnded(bool withError);
+    void mediaHandlerCreated(AbstractMediaHandler *handler);
 
 private:
     void setState(State s);

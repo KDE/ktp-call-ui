@@ -14,31 +14,23 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CALLWINDOW_H
-#define CALLWINDOW_H
+#ifndef VOLUMEWIDGET_H
+#define VOLUMEWIDGET_H
 
-#include "channelhandler.h"
-#include <KXmlGuiWindow>
+#include <QtGui/QWidget>
+class AbstractAudioDevice;
 
-class CallWindow : public KXmlGuiWindow
+class VolumeWidget : public QWidget
 {
     Q_OBJECT
 public:
-    CallWindow(Tp::StreamedMediaChannelPtr channel);
-    virtual ~CallWindow();
+    VolumeWidget(QWidget *parent = 0);
+    virtual ~VolumeWidget();
 
-private:
-    void setupActions();
-    void setupUi();
+    void setAudioDevice(AbstractAudioDevice *device);
 
 private slots:
-    void setState(ChannelHandler::State state);
-    void setStatus(const QString & msg);
-    void onCallEnded(bool hasError);
-    void onMediaHandlerCreated(AbstractMediaHandler *handler);
-
-protected:
-    virtual void closeEvent(QCloseEvent *event);
+    void onSliderValueChanged(int value);
 
 private:
     struct Private;

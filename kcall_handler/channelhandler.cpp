@@ -81,6 +81,7 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
     if ( d->channel->handlerStreamingRequired() ) {
         kDebug() << "Creating farsight channel";
         d->mediaHandler = AbstractMediaHandler::create(d->channel, this);
+        emit mediaHandlerCreated(d->mediaHandler);
     }
 
     connect(d->channel.data(),

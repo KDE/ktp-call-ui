@@ -32,6 +32,7 @@ public:
     virtual ~AudioDevice();
     GstElement *bin() const;
 
+    virtual QString name() const;
     virtual bool isMuted() const;
     virtual qreal volume() const;
 
@@ -40,10 +41,11 @@ public slots:
     virtual void setVolume(qreal volume);
 
 protected:
-    AudioDevice(QObject *parent = 0);
+    AudioDevice(const QString & name, QObject *parent = 0);
 
     GstElement *m_bin;
     GstElement *m_volumeElement;
+    QString m_name;
 };
 
 } //namespace Farsight

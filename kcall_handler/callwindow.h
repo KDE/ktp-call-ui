@@ -34,7 +34,6 @@ private:
 private slots:
     void setState(ChannelHandler::State state);
     void setStatus(const QString & msg);
-    void onCallEnded(bool hasError);
     void onMediaHandlerCreated(AbstractMediaHandler *handler);
     void onCallDurationTimerTimeout();
 

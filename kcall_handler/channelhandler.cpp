@@ -55,16 +55,6 @@ void ChannelHandler::setState(State s)
 {
     d->state = s;
     emit stateChanged(s);
-    switch (s) {
-    case Disconnected:
-        emit callEnded(false);
-        break;
-    case Error:
-        emit callEnded(true);
-        break;
-    default:
-        break;
-    }
 }
 
 void ChannelHandler::onChannelReady(Tp::PendingOperation *op)

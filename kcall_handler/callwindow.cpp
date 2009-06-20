@@ -107,6 +107,7 @@ void CallWindow::setState(ChannelHandler::State state)
         setStatus(i18nc("@info:status", "Disconnected."));
         d->hangupAction->setEnabled(false);
         d->callDurationTimer.stop();
+        QTimer::singleShot(1000, this, SLOT(close()));
         break;
     case ChannelHandler::Error:
         setStatus(i18nc("@info:status", "Disconnected with error."));
@@ -121,10 +122,6 @@ void CallWindow::setState(ChannelHandler::State state)
 void CallWindow::setStatus(const QString & msg)
 {
     statusBar()->showMessage(msg);
-}
-
-void CallWindow::onCallEnded(bool hasError)
-{
 }
 
 void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
@@ -145,7 +142,8 @@ void CallWindow::closeEvent(QCloseEvent *event)
 {
     if ( !d->channelHandler->requestClose() ) {
         kDebug() << "Ignoring close event";
-        connect(d->channelHandler, SIGNAL(callEnded(bool)), SLOT(close()));
+        disconnect(d->channelHandler, SIGNAL(stateChanged(ChannelHandler::State)), this, 0);
+        connect(d->channelHandler, SIGNAL(stateChanged(ChannelHandler::State)), SLOT(close()));
         event->ignore();
     }
     KXmlGuiWindow::closeEvent(event);

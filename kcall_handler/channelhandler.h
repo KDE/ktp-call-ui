@@ -36,7 +36,6 @@ public slots:
 
 signals:
     void stateChanged(ChannelHandler::State newState);
-    void callEnded(bool withError);
     void mediaHandlerCreated(AbstractMediaHandler *handler);
 
 private:

@@ -18,7 +18,7 @@
 #include "mainwindow.h"
 #include "systrayicon.h"
 #include "knotifyapprover.h"
-#include "models/contactsmodel.h"
+#include "libkcallprivate/contactsmodel.h"
 #include <KDebug>
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/PendingReady>

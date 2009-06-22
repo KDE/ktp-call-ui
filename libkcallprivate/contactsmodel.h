@@ -35,7 +35,7 @@ protected slots:
     inline void emitDataChange() { TreeModelItem::emitDataChange(); }
 };
 
-class ContactsModel : public TreeModel
+class KCALLPRIVATE_EXPORT ContactsModel : public TreeModel
 {
     Q_OBJECT
 public:

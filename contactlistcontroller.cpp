@@ -15,9 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "contactlistcontroller.h"
-#include "models/contactsmodel.h"
-#include "models/accountitem.h" //for Q_DECLARE_METATYPE
-#include "models/contactitem.h" //for Q_DECLARE_METATYPE
+#include "libkcallprivate/contactsmodel.h"
 #include <QtGui/QAbstractItemView>
 #include <KDebug>
 #include <KIcon>
@@ -25,6 +23,11 @@
 #include <KMenu>
 #include <KLocalizedString>
 #include <TelepathyQt4/ReferencedHandles>
+#include <TelepathyQt4/Account>
+#include <TelepathyQt4/Contact>
+
+Q_DECLARE_METATYPE(Tp::AccountPtr);
+Q_DECLARE_METATYPE(Tp::ContactPtr);
 
 struct ContactListController::Private
 {

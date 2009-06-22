@@ -18,7 +18,7 @@
 #include "ui_mainwindow.h"
 #include "kcallapplication.h"
 #include "contactlistcontroller.h"
-#include "models/contactsmodel.h"
+#include "libkcallprivate/contactsmodel.h"
 #include <KStatusBar>
 #include <KAction>
 #include <KActionCollection>

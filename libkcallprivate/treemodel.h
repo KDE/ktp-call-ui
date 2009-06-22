@@ -17,6 +17,7 @@
 #ifndef TREEMODEL_H
 #define TREEMODEL_H
 
+#include "kcallprivate_export.h"
 #include <QtCore/QAbstractItemModel>
 class TreeModel;
 
@@ -51,7 +52,7 @@ private:
     Private *const d;
 };
 
-class TreeModel : public QAbstractItemModel
+class KCALLPRIVATE_EXPORT TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:

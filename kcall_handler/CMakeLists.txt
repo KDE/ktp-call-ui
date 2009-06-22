@@ -58,6 +58,7 @@ if (BUILD_KCALL_HANDLER)
         abstractmediahandler.cpp
         volumewidget.cpp
         volumedock.cpp
+        participantsdock.cpp
         farsight/mediadevices.cpp
         farsight/mediahandler.cpp
     )
@@ -68,7 +69,8 @@ if (BUILD_KCALL_HANDLER)
                                         ${TELEPATHY_QT4_FARSIGHT_LIBRARIES}
                                         ${GSTREAMER_LIBRARIES}
                                         ${GOBJECT_LIBRARIES}
-                                        ${TPFARSIGHT_LIBRARIES})
+                                        ${TPFARSIGHT_LIBRARIES}
+                                        kcallprivate)
 
     install(TARGETS kcall_handler ${INSTALL_TARGETS_DEFAULT_ARGS})
     install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall_handler)

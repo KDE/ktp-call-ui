@@ -16,7 +16,7 @@
 */
 #include "contactitem.h"
 
-ContactItem::ContactItem(Tp::ContactPtr contact, TreeModelItem *parent, TreeModel *model)
+ContactItem::ContactItem(const Tp::ContactPtr & contact, TreeModelItem *parent, TreeModel *model)
     : ContactsModelItem(parent, model), m_contact(contact)
 {
     connect(m_contact.data(), SIGNAL(aliasChanged(QString)), SLOT(emitDataChange()));
@@ -31,9 +31,9 @@ QVariant ContactItem::data(int role) const
         return m_contact->alias();
     case Qt::DecorationRole:
         return iconForPresence((Tp::ConnectionPresenceType)m_contact->presenceType());
-    case ContactsModel::ItemTypeRole:
+    case KCall::ItemTypeRole:
         return QByteArray("contact");
-    case ContactsModel::ObjectPtrRole:
+    case KCall::ObjectPtrRole:
         return QVariant::fromValue(m_contact);
     default:
         return QVariant();

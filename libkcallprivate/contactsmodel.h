@@ -39,8 +39,6 @@ class KCALLPRIVATE_EXPORT ContactsModel : public TreeModel
 {
     Q_OBJECT
 public:
-    enum Role { ItemTypeRole = Qt::UserRole, ObjectPtrRole, };
-
     explicit ContactsModel(QObject *parent = 0);
 
 public slots:

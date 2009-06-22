@@ -80,7 +80,7 @@ void ContactListController::contextMenuRequested(const QPoint & pos)
         return;
     }
 
-    QByteArray type = index.data(ContactsModel::ItemTypeRole).toByteArray();
+    QByteArray type = index.data(KCall::ItemTypeRole).toByteArray();
     d->currentIndex = index;
     if ( type == "contact" ) {
         d->contactMenu->popup(d->view->mapToGlobal(pos));
@@ -92,11 +92,11 @@ void ContactListController::contextMenuRequested(const QPoint & pos)
 void ContactListController::callContact()
 {
     Q_ASSERT(d->currentIndex.isValid());
-    Tp::ContactPtr contact = d->currentIndex.data(ContactsModel::ObjectPtrRole).value<Tp::ContactPtr>();
+    Tp::ContactPtr contact = d->currentIndex.data(KCall::ObjectPtrRole).value<Tp::ContactPtr>();
     Q_ASSERT( !contact.isNull() );
 
     //TODO this should be removed when Tp::Contact has support for requesting channels directly
-    Tp::AccountPtr account = d->currentIndex.parent().data(ContactsModel::ObjectPtrRole).value<Tp::AccountPtr>();
+    Tp::AccountPtr account = d->currentIndex.parent().data(KCall::ObjectPtrRole).value<Tp::AccountPtr>();
     Q_ASSERT( !account.isNull() );
 
     QVariantMap request;
@@ -123,7 +123,7 @@ void ContactListController::setStatus(int statusIndex)
     presence.status = QLatin1String(statuses[statusIndex]);
 
     Q_ASSERT(d->currentIndex.isValid());
-    Tp::AccountPtr account = d->currentIndex.data(ContactsModel::ObjectPtrRole).value<Tp::AccountPtr>();
+    Tp::AccountPtr account = d->currentIndex.data(KCall::ObjectPtrRole).value<Tp::AccountPtr>();
     Q_ASSERT( !account.isNull() );
 
     account->setRequestedPresence(presence);

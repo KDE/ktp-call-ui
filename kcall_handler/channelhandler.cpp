@@ -16,6 +16,7 @@
 */
 #include "channelhandler.h"
 #include "abstractmediahandler.h"
+#include "../libkcallprivate/groupmembersmodel.h"
 #include <KDebug>
 #include <KLocalizedString>
 #include <TelepathyQt4/Connection>
@@ -73,6 +74,9 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
         d->mediaHandler = AbstractMediaHandler::create(d->channel, this);
         emit mediaHandlerCreated(d->mediaHandler);
     }
+
+    GroupMembersModel *model = new GroupMembersModel(Tp::ChannelPtr::staticCast(d->channel), this);
+    emit groupMembersModelCreated(model);
 
     connect(d->channel.data(),
             SIGNAL(streamAdded(Tp::MediaStreamPtr)),

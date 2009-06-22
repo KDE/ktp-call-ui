@@ -23,7 +23,7 @@
 class ContactItem : public ContactsModelItem
 {
 public:
-    ContactItem(Tp::ContactPtr contact, TreeModelItem *parent, TreeModel *model);
+    ContactItem(const Tp::ContactPtr & contact, TreeModelItem *parent, TreeModel *model);
 
     virtual QVariant data(int role) const;
 

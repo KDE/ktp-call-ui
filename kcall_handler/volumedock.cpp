@@ -17,6 +17,7 @@
 #include "volumedock.h"
 #include "volumewidget.h"
 #include <QtGui/QHBoxLayout>
+#include <KLocalizedString>
 
 struct VolumeDock::Private
 {
@@ -25,8 +26,9 @@ struct VolumeDock::Private
 };
 
 VolumeDock::VolumeDock(QWidget *parent)
-    : QDockWidget(parent), d(new Private)
+    : QDockWidget(i18n("Volume"), parent), d(new Private)
 {
+    setObjectName("VolumeDock");
     QWidget *mainWidget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(mainWidget);
     d->inputVolumeWidget = new VolumeWidget(mainWidget);

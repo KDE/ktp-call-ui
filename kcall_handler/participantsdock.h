@@ -14,36 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CALLWINDOW_H
-#define CALLWINDOW_H
+#ifndef PARTICIPANTSDOCK_H
+#define PARTICIPANTSDOCK_H
 
-#include "channelhandler.h"
-#include <KXmlGuiWindow>
+#include <QtGui/QDockWidget>
+class GroupMembersModel;
 
-class CallWindow : public KXmlGuiWindow
+class ParticipantsDock : public QDockWidget
 {
     Q_OBJECT
 public:
-    CallWindow(Tp::StreamedMediaChannelPtr channel);
-    virtual ~CallWindow();
-
-private:
-    void setupActions();
-    void setupUi();
-
-private slots:
-    void setState(ChannelHandler::State state);
-    void setStatus(const QString & msg);
-    void onMediaHandlerCreated(AbstractMediaHandler *handler);
-    void onGroupMembersModelCreated(GroupMembersModel *model);
-    void onCallDurationTimerTimeout();
-
-protected:
-    virtual void closeEvent(QCloseEvent *event);
-
-private:
-    struct Private;
-    Private *const d;
+    ParticipantsDock(GroupMembersModel *model, QWidget *parent = 0);
 };
 
 #endif

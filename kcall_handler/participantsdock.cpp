@@ -14,36 +14,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CALLWINDOW_H
-#define CALLWINDOW_H
+#include "participantsdock.h"
+#include "../libkcallprivate/groupmembersmodel.h"
+#include <QtGui/QListView>
+#include <QtGui/QVBoxLayout>
+#include <KLocalizedString>
 
-#include "channelhandler.h"
-#include <KXmlGuiWindow>
-
-class CallWindow : public KXmlGuiWindow
+ParticipantsDock::ParticipantsDock(GroupMembersModel *model, QWidget *parent)
+    : QDockWidget(i18n("Participants"), parent)
 {
-    Q_OBJECT
-public:
-    CallWindow(Tp::StreamedMediaChannelPtr channel);
-    virtual ~CallWindow();
+    setObjectName("ParticipantsDock");
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    QAbstractItemView *listView = new QListView(widget);
+    listView->setModel(model);
+    layout->addWidget(listView);
+    setWidget(widget);
+}
 
-private:
-    void setupActions();
-    void setupUi();
-
-private slots:
-    void setState(ChannelHandler::State state);
-    void setStatus(const QString & msg);
-    void onMediaHandlerCreated(AbstractMediaHandler *handler);
-    void onGroupMembersModelCreated(GroupMembersModel *model);
-    void onCallDurationTimerTimeout();
-
-protected:
-    virtual void closeEvent(QCloseEvent *event);
-
-private:
-    struct Private;
-    Private *const d;
-};
-
-#endif
+#include "participantsdock.moc"

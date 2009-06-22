@@ -75,4 +75,21 @@ private:
     TreeModelItem *m_root;
 };
 
+namespace KCall
+{
+    enum ExtraModelRoles {
+        ItemTypeRole = Qt::UserRole,
+        ObjectPtrRole,
+        GroupMembersListTypeRole
+    };
+
+    enum GroupMembersListType {
+        CurrentMembers,
+        LocalPendingMembers,
+        RemotePendingMembers
+    };
+}
+
+Q_DECLARE_METATYPE(KCall::GroupMembersListType)
+
 #endif

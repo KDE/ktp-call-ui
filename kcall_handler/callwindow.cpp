@@ -18,6 +18,7 @@
 #include "volumedock.h"
 #include "volumewidget.h"
 #include "abstractmediahandler.h"
+#include "participantsdock.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
@@ -49,6 +50,8 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
             SLOT(setState(ChannelHandler::State)));
     connect(d->channelHandler, SIGNAL(mediaHandlerCreated(AbstractMediaHandler*)),
             SLOT(onMediaHandlerCreated(AbstractMediaHandler*)));
+    connect(d->channelHandler, SIGNAL(groupMembersModelCreated(GroupMembersModel*)),
+            SLOT(onGroupMembersModelCreated(GroupMembersModel*)));
 
     setupUi();
 
@@ -130,6 +133,12 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
     d->volumeDock->inputVolumeWidget()->setAudioDevice(handler->audioInputDevice());
     d->volumeDock->outputVolumeWidget()->setAudioDevice(handler->audioOutputDevice());
     addDockWidget(Qt::BottomDockWidgetArea, d->volumeDock);
+}
+
+void CallWindow::onGroupMembersModelCreated(GroupMembersModel *model)
+{
+    ParticipantsDock *participantsDock = new ParticipantsDock(model, this);
+    addDockWidget(Qt::RightDockWidgetArea, participantsDock);
 }
 
 void CallWindow::onCallDurationTimerTimeout()

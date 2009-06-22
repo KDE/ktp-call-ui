@@ -7,6 +7,7 @@ set(libkcallprivate_SRCS
     pendingcontacts.cpp
     accountitem.cpp
     contactitem.cpp
+    groupmembersmodel.cpp
 )
 
 kde4_add_library(kcallprivate SHARED ${libkcallprivate_SRCS})

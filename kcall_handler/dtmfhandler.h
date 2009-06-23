@@ -14,33 +14,24 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CALLWINDOW_H
-#define CALLWINDOW_H
+#ifndef DTMFHANDLER_H
+#define DTMFHANDLER_H
 
-#include "channelhandler.h"
-#include <KXmlGuiWindow>
+#include <TelepathyQt4/StreamedMediaChannel>
+class DtmfWidget;
 
-class CallWindow : public KXmlGuiWindow
+class DtmfHandler : public QObject
 {
     Q_OBJECT
 public:
-    CallWindow(Tp::StreamedMediaChannelPtr channel);
-    virtual ~CallWindow();
+    explicit DtmfHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
+    virtual ~DtmfHandler();
 
-private:
-    void setupActions();
-    void setupUi();
+    void connectDtmfWidget(DtmfWidget *dtmfWidget);
 
 private slots:
-    void setState(ChannelHandler::State state);
-    void setStatus(const QString & msg);
-    void onMediaHandlerCreated(AbstractMediaHandler *handler);
-    void onGroupMembersModelCreated(GroupMembersModel *model);
-    void onDtmfHandlerCreated(DtmfHandler *handler);
-    void onCallDurationTimerTimeout();
-
-protected:
-    virtual void closeEvent(QCloseEvent *event);
+    void onStartSendDtmfEvent(Tp::DTMFEvent event);
+    void onStopSendDtmfEvent();
 
 private:
     struct Private;

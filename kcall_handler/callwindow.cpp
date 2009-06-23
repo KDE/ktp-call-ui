@@ -19,6 +19,8 @@
 #include "volumewidget.h"
 #include "abstractmediahandler.h"
 #include "participantsdock.h"
+#include "dtmfhandler.h"
+#include "../libkcallprivate/dtmfwidget.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
@@ -139,6 +141,15 @@ void CallWindow::onGroupMembersModelCreated(GroupMembersModel *model)
 {
     ParticipantsDock *participantsDock = new ParticipantsDock(model, this);
     addDockWidget(Qt::RightDockWidgetArea, participantsDock);
+}
+
+void CallWindow::onDtmfHandlerCreated(DtmfHandler *handler)
+{
+    QDockWidget *dock = new QDockWidget(i18n("Dialpad"), this);
+    DtmfWidget *dtmfWidget = new DtmfWidget(dock);
+    dock->setWidget(dtmfWidget);
+    handler->connectDtmfWidget(dtmfWidget);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
 }
 
 void CallWindow::onCallDurationTimerTimeout()

@@ -16,6 +16,7 @@
 */
 #include "channelhandler.h"
 #include "abstractmediahandler.h"
+#include "dtmfhandler.h"
 #include "../libkcallprivate/groupmembersmodel.h"
 #include <KDebug>
 #include <KLocalizedString>
@@ -73,6 +74,11 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
         kDebug() << "Creating farsight channel";
         d->mediaHandler = AbstractMediaHandler::create(d->channel, this);
         emit mediaHandlerCreated(d->mediaHandler);
+    }
+
+    if ( d->channel->interfaces().contains(TELEPATHY_INTERFACE_CHANNEL_INTERFACE_DTMF) ) {
+        kDebug() << "Creating DTMF handler";
+        emit dtmfHandlerCreated(new DtmfHandler(d->channel, this));
     }
 
     GroupMembersModel *model = new GroupMembersModel(Tp::ChannelPtr::staticCast(d->channel), this);

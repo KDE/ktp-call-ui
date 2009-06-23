@@ -56,6 +56,7 @@ if (BUILD_KCALL_HANDLER)
         callhandler.cpp
         channelhandler.cpp
         abstractmediahandler.cpp
+        dtmfhandler.cpp
         volumewidget.cpp
         volumedock.cpp
         participantsdock.cpp

@@ -21,6 +21,7 @@
 #include <TelepathyQt4/StreamedMediaChannel>
 class AbstractMediaHandler;
 class GroupMembersModel;
+class DtmfHandler;
 
 class ChannelHandler : public QObject
 {
@@ -39,6 +40,7 @@ signals:
     void stateChanged(ChannelHandler::State newState);
     void mediaHandlerCreated(AbstractMediaHandler *handler);
     void groupMembersModelCreated(GroupMembersModel *model);
+    void dtmfHandlerCreated(DtmfHandler *handler);
 
 private:
     void setState(State s);

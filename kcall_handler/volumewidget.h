@@ -31,6 +31,7 @@ public:
 
 private slots:
     void onSliderValueChanged(int value);
+    void onAudioDeviceDestroyed();
 
 private:
     struct Private;

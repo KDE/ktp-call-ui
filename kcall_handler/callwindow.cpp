@@ -33,10 +33,11 @@
 
 struct CallWindow::Private
 {
-    QLabel *dummyLabel;
     KAction *hangupAction;
     ChannelHandler *channelHandler;
     VolumeDock *volumeDock;
+    ParticipantsDock *participantsDock;
+    QDockWidget *dialpadDock;
     QTime callDuration;
     QTimer callDurationTimer;
 };
@@ -75,17 +76,39 @@ void CallWindow::setupActions()
 
 void CallWindow::setupUi()
 {
-    d->dummyLabel = new QLabel("To be replaced by a real widget", this);
-    setCentralWidget(d->dummyLabel);
+    QLabel *dummyLabel = new QLabel("To be replaced by a real widget", this);
+    setCentralWidget(dummyLabel);
+
     d->volumeDock = NULL;
+    d->dialpadDock = NULL;
+
+    //the corners should be occupied by the left and right dock widget areas
+    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
 
     d->callDuration.setHMS(0, 0, 0);
     statusBar()->insertPermanentItem(d->callDuration.toString(), 1);
 
     setupActions();
 
+    setupGUI(QSize(320, 260), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"));
-    setupGUI(QSize(320, 260), Default, QLatin1String("callwindowui.rc"));
+}
+
+void CallWindow::disableUi()
+{
+    d->participantsDock->setEnabled(false);
+    d->hangupAction->setEnabled(false);
+
+    if ( d->volumeDock ) {
+        d->volumeDock->setEnabled(false);
+    }
+
+    if ( d->dialpadDock ) {
+        d->dialpadDock->setEnabled(false);
+    }
 }
 
 void CallWindow::setState(ChannelHandler::State state)
@@ -110,13 +133,13 @@ void CallWindow::setState(ChannelHandler::State state)
         break;
     case ChannelHandler::Disconnected:
         setStatus(i18nc("@info:status", "Disconnected."));
-        d->hangupAction->setEnabled(false);
+        disableUi();
         d->callDurationTimer.stop();
         QTimer::singleShot(1000, this, SLOT(close()));
         break;
     case ChannelHandler::Error:
         setStatus(i18nc("@info:status", "Disconnected with error."));
-        d->hangupAction->setEnabled(false);
+        disableUi();
         d->callDurationTimer.stop();
         break;
     default:
@@ -135,21 +158,25 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
     d->volumeDock->inputVolumeWidget()->setAudioDevice(handler->audioInputDevice());
     d->volumeDock->outputVolumeWidget()->setAudioDevice(handler->audioOutputDevice());
     addDockWidget(Qt::BottomDockWidgetArea, d->volumeDock);
+    restoreDockWidget(d->volumeDock);
 }
 
 void CallWindow::onGroupMembersModelCreated(GroupMembersModel *model)
 {
-    ParticipantsDock *participantsDock = new ParticipantsDock(model, this);
-    addDockWidget(Qt::RightDockWidgetArea, participantsDock);
+    d->participantsDock = new ParticipantsDock(model, this);
+    addDockWidget(Qt::RightDockWidgetArea, d->participantsDock);
+    restoreDockWidget(d->participantsDock);
 }
 
 void CallWindow::onDtmfHandlerCreated(DtmfHandler *handler)
 {
-    QDockWidget *dock = new QDockWidget(i18n("Dialpad"), this);
-    DtmfWidget *dtmfWidget = new DtmfWidget(dock);
-    dock->setWidget(dtmfWidget);
+    d->dialpadDock = new QDockWidget(i18n("Dialpad"), this);
+    d->dialpadDock->setObjectName("DialpadDock");
+    DtmfWidget *dtmfWidget = new DtmfWidget(d->dialpadDock);
+    d->dialpadDock->setWidget(dtmfWidget);
     handler->connectDtmfWidget(dtmfWidget);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
+    addDockWidget(Qt::RightDockWidgetArea, d->dialpadDock);
+    restoreDockWidget(d->dialpadDock);
 }
 
 void CallWindow::onCallDurationTimerTimeout()
@@ -165,8 +192,9 @@ void CallWindow::closeEvent(QCloseEvent *event)
         disconnect(d->channelHandler, SIGNAL(stateChanged(ChannelHandler::State)), this, 0);
         connect(d->channelHandler, SIGNAL(stateChanged(ChannelHandler::State)), SLOT(close()));
         event->ignore();
+    } else {
+        KXmlGuiWindow::closeEvent(event);
     }
-    KXmlGuiWindow::closeEvent(event);
 }
 
 #include "callwindow.moc"

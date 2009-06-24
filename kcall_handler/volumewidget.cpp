@@ -58,6 +58,7 @@ void VolumeWidget::setAudioDevice(AbstractAudioDevice *device)
         d->label->setText(device->name());
         d->slider->setValue(static_cast<int>(d->device->volume()*10));
         setEnabled(true);
+        connect(d->device, SIGNAL(destroyed(QObject*)), SLOT(onAudioDeviceDestroyed()));
     } else {
         setEnabled(false);
     }
@@ -68,6 +69,12 @@ void VolumeWidget::onSliderValueChanged(int value)
     Q_ASSERT(d->device);
     d->device->setVolume(qreal(value)/qreal(10));
     d->slider->setValue(static_cast<int>(d->device->volume()*10));
+}
+
+void VolumeWidget::onAudioDeviceDestroyed()
+{
+    setEnabled(false);
+    d->device = NULL;
 }
 
 #include "volumewidget.moc"

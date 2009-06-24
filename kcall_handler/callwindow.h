@@ -30,6 +30,7 @@ public:
 private:
     void setupActions();
     void setupUi();
+    void disableUi();
 
 private slots:
     void setState(ChannelHandler::State state);

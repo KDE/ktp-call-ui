@@ -20,7 +20,9 @@
 #include "abstractmediahandler.h"
 #include "participantsdock.h"
 #include "dtmfhandler.h"
+#include "kcallhandlersettings.h"
 #include "../libkcallprivate/dtmfwidget.h"
+#include "../libkcallprivate/kcallhandlersettingsdialog.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
@@ -72,6 +74,8 @@ void CallWindow::setupActions()
     d->hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
     connect(d->hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangupCall()));
     actionCollection()->addAction("hangup", d->hangupAction);
+
+    KStandardAction::preferences(this, SLOT(showSettingsDialog()), actionCollection());
 }
 
 void CallWindow::setupUi()
@@ -135,7 +139,10 @@ void CallWindow::setState(ChannelHandler::State state)
         setStatus(i18nc("@info:status", "Disconnected."));
         disableUi();
         d->callDurationTimer.stop();
-        QTimer::singleShot(1000, this, SLOT(close()));
+        if ( KCallHandlerSettings::closeOnDisconnect() ) {
+            QTimer::singleShot(KCallHandlerSettings::closeOnDisconnectTimeout() * 1000,
+                               this, SLOT(close()));
+        }
         break;
     case ChannelHandler::Error:
         setStatus(i18nc("@info:status", "Disconnected with error."));
@@ -183,6 +190,13 @@ void CallWindow::onCallDurationTimerTimeout()
 {
     d->callDuration = d->callDuration.addSecs(1);
     statusBar()->changeItem(d->callDuration.toString(), 1);
+}
+
+void CallWindow::showSettingsDialog()
+{
+    if ( !KCallHandlerSettingsDialog::showDialog() ) {
+        new KCallHandlerSettingsDialog(this, KCallHandlerSettings::self());
+    }
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

@@ -23,6 +23,7 @@ set(kcall_SRCS
     knotifyapprover.cpp
 )
 
+kde4_add_kcfg_files(kcall_SRCS kcall_handler/kcallhandlersettings.kcfgc)
 kde4_add_ui_files(kcall_SRCS mainwindow.ui)
 kde4_add_executable(kcall ${kcall_SRCS})
 target_link_libraries(kcall ${KDE4_KDEUI_LIBS}

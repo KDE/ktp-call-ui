@@ -18,7 +18,9 @@
 #include "ui_mainwindow.h"
 #include "kcallapplication.h"
 #include "contactlistcontroller.h"
+#include "kcallhandlersettings.h"
 #include "libkcallprivate/contactsmodel.h"
+#include "libkcallprivate/kcallhandlersettingsdialog.h"
 #include <KStatusBar>
 #include <KAction>
 #include <KActionCollection>
@@ -48,6 +50,17 @@ MainWindow::~MainWindow()
 void MainWindow::setupActions()
 {
     KStandardAction::quit(KCallApplication::instance(), SLOT(quit()), actionCollection());
+    KStandardAction::preferences(this, SLOT(showSettingsDialog()), actionCollection());
+}
+
+void MainWindow::showSettingsDialog()
+{
+    if ( !KConfigDialog::showDialog("kcallsettings") ) {
+        //TODO use KCallSettings::self() when there is such a config class
+        KConfigDialog *dialog = new KConfigDialog(this, "kcallsettings", KCallHandlerSettings::self());
+        KCallHandlerSettingsDialog::addHandlerPagesToDialog(dialog, KCallHandlerSettings::self());
+        dialog->show();
+    }
 }
 
 #include "mainwindow.moc"

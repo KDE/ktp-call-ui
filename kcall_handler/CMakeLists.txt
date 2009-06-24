@@ -64,6 +64,7 @@ if (BUILD_KCALL_HANDLER)
         farsight/mediahandler.cpp
     )
 
+    kde4_add_kcfg_files(kcall_handler_SRCS kcallhandlersettings.kcfgc)
     kde4_add_executable(kcall_handler ${kcall_handler_SRCS})
     target_link_libraries(kcall_handler ${KDE4_KDEUI_LIBS}
                                         ${TELEPATHY_QT4_LIBRARIES}

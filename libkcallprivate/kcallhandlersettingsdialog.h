@@ -14,25 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef KCALLHANDLERSETTINGSDIALOG_H
+#define KCALLHANDLERSETTINGSDIALOG_H
 
-#include <KXmlGuiWindow>
-namespace Ui { class MainWindow; }
+#include "kcallprivate_export.h"
+#include <KConfigDialog>
 
-class MainWindow : public KXmlGuiWindow
+class KCALLPRIVATE_EXPORT KCallHandlerSettingsDialog : public KConfigDialog
 {
-    Q_OBJECT
 public:
-    MainWindow();
-    virtual ~MainWindow();
+    KCallHandlerSettingsDialog(QWidget *parent, KConfigSkeleton *config);
 
-private slots:
-    void showSettingsDialog();
-
-private:
-    void setupActions();
-    Ui::MainWindow *ui;
+    static bool showDialog();
+    static void addHandlerPagesToDialog(KConfigDialog *dialog, KConfigSkeleton *handlerConfig);
 };
 
 #endif

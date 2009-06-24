@@ -1,0 +1,4 @@
+File=kcallhandlersettings.kcfg
+ClassName=KCallHandlerSettings
+Singleton=true
+Mutators=true

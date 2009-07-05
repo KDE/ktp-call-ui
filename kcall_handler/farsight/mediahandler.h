@@ -25,12 +25,12 @@ class MediaHandler : public AbstractMediaHandler
 {
     Q_OBJECT
 public:
-    MediaHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
+    explicit MediaHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
     virtual ~MediaHandler();
 
     virtual Capabilities capabilities() const;
-    virtual AbstractAudioDevice *audioInputDevice() const;
-    virtual AbstractAudioDevice *audioOutputDevice() const;
+    virtual VolumeControlInterface *inputVolumeControl() const;
+    virtual VolumeControlInterface *outputVolumeControl() const;
 
 private:
     void initialize();

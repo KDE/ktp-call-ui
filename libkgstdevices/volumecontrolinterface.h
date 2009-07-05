@@ -14,40 +14,23 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _FARSIGHT_MEDIADEVICES_H
-#define _FARSIGHT_MEDIADEVICES_H
+#ifndef VOLUMECONTROLINTERFACE_H
+#define VOLUMECONTROLINTERFACE_H
 
-#include "../abstractmediahandler.h"
-#include <gst/gst.h>
-
-namespace Farsight {
-
-class AudioDevice : public AbstractAudioDevice
+class VolumeControlInterface
 {
-    Q_OBJECT
 public:
-    static AudioDevice *createInputDevice(QObject *parent = 0);
-    static AudioDevice *createOutputDevice(QObject *parent = 0);
+    virtual ~VolumeControlInterface() {}
 
-    virtual ~AudioDevice();
-    GstElement *bin() const;
+    virtual bool volumeControlIsAvailable() const = 0;
 
-    virtual QString name() const;
-    virtual bool isMuted() const;
-    virtual qreal volume() const;
+    virtual bool isMuted() const = 0;
+    virtual void setMuted(bool mute) = 0;
 
-public slots:
-    virtual void setMuted(bool mute);
-    virtual void setVolume(qreal volume);
-
-protected:
-    AudioDevice(const QString & name, QObject *parent = 0);
-
-    GstElement *m_bin;
-    GstElement *m_volumeElement;
-    QString m_name;
+    virtual int minVolume() const = 0;
+    virtual int maxVolume() const = 0;
+    virtual int volume() const = 0;
+    virtual void setVolume(int volume) = 0;
 };
-
-} //namespace Farsight
 
 #endif

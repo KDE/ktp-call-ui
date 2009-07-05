@@ -18,7 +18,7 @@
 #define VOLUMEWIDGET_H
 
 #include <QtGui/QWidget>
-class AbstractAudioDevice;
+class VolumeControlInterface;
 
 class VolumeWidget : public QWidget
 {
@@ -27,11 +27,10 @@ public:
     VolumeWidget(QWidget *parent = 0);
     virtual ~VolumeWidget();
 
-    void setAudioDevice(AbstractAudioDevice *device);
+    void setVolumeControl(VolumeControlInterface *control);
 
 private slots:
     void onSliderValueChanged(int value);
-    void onAudioDeviceDestroyed();
 
 private:
     struct Private;

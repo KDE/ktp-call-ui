@@ -15,33 +15,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "volumewidget.h"
-#include "abstractmediahandler.h"
-#include <QtGui/QLabel>
+#include "../libkgstdevices/volumecontrolinterface.h"
 #include <QtGui/QSlider>
 #include <QtGui/QVBoxLayout>
 
 struct VolumeWidget::Private
 {
-    QLabel *label;
     QSlider *slider;
-    AbstractAudioDevice *device;
+    VolumeControlInterface *control;
 };
 
 VolumeWidget::VolumeWidget(QWidget *parent)
     : QWidget(parent), d(new Private)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
-    d->label = new QLabel(this);
     d->slider = new QSlider(this);
-    layout->addWidget(d->label);
     layout->addWidget(d->slider);
 
-    d->slider->setMinimum(0);
-    d->slider->setMaximum(100);
     d->slider->setOrientation(Qt::Horizontal);
     connect(d->slider, SIGNAL(valueChanged(int)), SLOT(onSliderValueChanged(int)));
 
-    d->device = NULL;
+    d->control = NULL;
     setEnabled(false);
 }
 
@@ -50,15 +44,15 @@ VolumeWidget::~VolumeWidget()
     delete d;
 }
 
-void VolumeWidget::setAudioDevice(AbstractAudioDevice *device)
+void VolumeWidget::setVolumeControl(VolumeControlInterface *control)
 {
-    d->device = device;
+    d->control = control;
 
-    if ( d->device ) {
-        d->label->setText(device->name());
-        d->slider->setValue(static_cast<int>(d->device->volume()*10));
+    if ( d->control && d->control->volumeControlIsAvailable() ) {
+        d->slider->setMinimum(d->control->minVolume());
+        d->slider->setMaximum(d->control->maxVolume());
+        d->slider->setValue(d->control->volume());
         setEnabled(true);
-        connect(d->device, SIGNAL(destroyed(QObject*)), SLOT(onAudioDeviceDestroyed()));
     } else {
         setEnabled(false);
     }
@@ -66,15 +60,9 @@ void VolumeWidget::setAudioDevice(AbstractAudioDevice *device)
 
 void VolumeWidget::onSliderValueChanged(int value)
 {
-    Q_ASSERT(d->device);
-    d->device->setVolume(qreal(value)/qreal(10));
-    d->slider->setValue(static_cast<int>(d->device->volume()*10));
-}
-
-void VolumeWidget::onAudioDeviceDestroyed()
-{
-    setEnabled(false);
-    d->device = NULL;
+    Q_ASSERT(d->control);
+    d->control->setVolume(value);
+    d->slider->setValue(d->control->volume());
 }
 
 #include "volumewidget.moc"

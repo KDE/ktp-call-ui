@@ -17,14 +17,8 @@
 #include "abstractmediahandler.h"
 #include "farsight/mediahandler.h"
 
-
-AbstractAudioDevice::AbstractAudioDevice(QObject *parent)
-    : QObject(parent)
-{
-}
-
 AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
-    : QObject(parent)
+    : QObject(parent), m_status(Disconnected)
 {
 }
 

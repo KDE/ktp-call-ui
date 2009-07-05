@@ -19,28 +19,7 @@
 
 #include <QtCore/QObject>
 #include <TelepathyQt4/StreamedMediaChannel>
-
-class AbstractAudioDevice : public QObject
-{
-    Q_OBJECT
-    Q_PROPERTY(QString name READ name)
-    Q_PROPERTY(bool muted READ isMuted WRITE setMuted)
-    Q_PROPERTY(qreal volume READ volume WRITE setVolume)
-
-public:
-    virtual ~AbstractAudioDevice() {}
-
-    virtual QString name() const = 0;
-    virtual bool isMuted() const = 0;
-    virtual qreal volume() const = 0;
-
-public Q_SLOTS:
-    virtual void setMuted(bool mute) = 0;
-    virtual void setVolume(qreal volume) = 0;
-
-protected:
-    AbstractAudioDevice(QObject *parent = 0);
-};
+class VolumeControlInterface;
 
 class AbstractMediaHandler : public QObject
 {
@@ -68,8 +47,8 @@ public:
 
     Status status() const;
     virtual Capabilities capabilities() const = 0;
-    virtual AbstractAudioDevice *audioInputDevice() const = 0;
-    virtual AbstractAudioDevice *audioOutputDevice() const = 0;
+    virtual VolumeControlInterface *inputVolumeControl() const = 0;
+    virtual VolumeControlInterface *outputVolumeControl() const = 0;
 
 Q_SIGNALS:
     void statusChanged(AbstractMediaHandler::Status newStatus);

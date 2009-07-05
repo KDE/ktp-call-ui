@@ -23,6 +23,7 @@
 #include "kcallhandlersettings.h"
 #include "../libkcallprivate/dtmfwidget.h"
 #include "../libkcallprivate/kcallhandlersettingsdialog.h"
+#include "../libkgstdevices/volumecontrolinterface.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
@@ -162,8 +163,8 @@ void CallWindow::setStatus(const QString & msg)
 void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
 {
     d->volumeDock = new VolumeDock(this);
-    d->volumeDock->inputVolumeWidget()->setAudioDevice(handler->audioInputDevice());
-    d->volumeDock->outputVolumeWidget()->setAudioDevice(handler->audioOutputDevice());
+    d->volumeDock->inputVolumeWidget()->setVolumeControl(handler->inputVolumeControl());
+    d->volumeDock->outputVolumeWidget()->setVolumeControl(handler->outputVolumeControl());
     addDockWidget(Qt::BottomDockWidgetArea, d->volumeDock);
     restoreDockWidget(d->volumeDock);
 }

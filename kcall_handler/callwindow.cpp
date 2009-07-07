@@ -15,13 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "callwindow.h"
-#include "volumedock.h"
-#include "volumewidget.h"
+#include "ui_callwindow.h"
 #include "abstractmediahandler.h"
-#include "participantsdock.h"
 #include "dtmfhandler.h"
 #include "kcallhandlersettings.h"
-#include "../libkcallprivate/dtmfwidget.h"
+#include "../libkcallprivate/groupmembersmodel.h"
 #include "../libkcallprivate/kcallhandlersettingsdialog.h"
 #include "../libkgstdevices/volumecontrolinterface.h"
 #include <QtCore/QMetaObject>
@@ -29,20 +27,21 @@
 #include <QtGui/QLabel>
 #include <KDebug>
 #include <KLocalizedString>
-#include <KAction>
+#include <KToggleAction>
 #include <KActionCollection>
 #include <KStatusBar>
 #include <TelepathyQt4/StreamedMediaChannel>
+
+enum TabIndices { VolumeTabIndex, VideoControlsTabIndex, DialpadTabIndex };
 
 struct CallWindow::Private
 {
     KAction *hangupAction;
     ChannelHandler *channelHandler;
-    VolumeDock *volumeDock;
-    ParticipantsDock *participantsDock;
-    QDockWidget *dialpadDock;
     QTime callDuration;
     QTimer callDurationTimer;
+
+    Ui::CallWindow ui;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -76,27 +75,30 @@ void CallWindow::setupActions()
     connect(d->hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangupCall()));
     actionCollection()->addAction("hangup", d->hangupAction);
 
+    QAction *showParticipants = d->ui.participantsDock->toggleViewAction();
+    showParticipants->setText(i18nc("@action:inmenu", "Show participants"));
+    showParticipants->setIcon(KIcon("system-users"));
+    actionCollection()->addAction("showParticipants", showParticipants);
+
+    QAction *showLog = d->ui.logDock->toggleViewAction();
+    showLog->setText(i18nc("@action:inmenu", "Show log"));
+    actionCollection()->addAction("showLog", showLog);
+
     KStandardAction::preferences(this, SLOT(showSettingsDialog()), actionCollection());
 }
 
 void CallWindow::setupUi()
 {
-    QLabel *dummyLabel = new QLabel("To be replaced by a real widget", this);
-    setCentralWidget(dummyLabel);
+    d->ui.setupUi(this);
+    setupActions();
 
-    d->volumeDock = NULL;
-    d->dialpadDock = NULL;
-
-    //the corners should be occupied by the left and right dock widget areas
-    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
-    setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
-    setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
+    d->ui.videoInputWidget->hide();
+    d->ui.participantsDock->hide();
+    d->ui.logDock->hide();
+    disableUi();
 
     d->callDuration.setHMS(0, 0, 0);
     statusBar()->insertPermanentItem(d->callDuration.toString(), 1);
-
-    setupActions();
 
     setupGUI(QSize(320, 260), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"));
@@ -104,16 +106,14 @@ void CallWindow::setupUi()
 
 void CallWindow::disableUi()
 {
-    d->participantsDock->setEnabled(false);
     d->hangupAction->setEnabled(false);
-
-    if ( d->volumeDock ) {
-        d->volumeDock->setEnabled(false);
-    }
-
-    if ( d->dialpadDock ) {
-        d->dialpadDock->setEnabled(false);
-    }
+    d->ui.participantsDock->setEnabled(false);
+    d->ui.tabWidget->setTabEnabled(VolumeTabIndex, false);
+    d->ui.volumeTab->setEnabled(false);
+    d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
+    d->ui.videoControlsTab->setEnabled(false);
+    d->ui.tabWidget->setTabEnabled(DialpadTabIndex, false);
+    d->ui.dtmfWidget->setEnabled(false);
 }
 
 void CallWindow::setState(ChannelHandler::State state)
@@ -162,29 +162,24 @@ void CallWindow::setStatus(const QString & msg)
 
 void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
 {
-    d->volumeDock = new VolumeDock(this);
-    d->volumeDock->inputVolumeWidget()->setVolumeControl(handler->inputVolumeControl());
-    d->volumeDock->outputVolumeWidget()->setVolumeControl(handler->outputVolumeControl());
-    addDockWidget(Qt::BottomDockWidgetArea, d->volumeDock);
-    restoreDockWidget(d->volumeDock);
+    //FIXME this signal doesn't imply that we have an audio stream
+    d->ui.tabWidget->setTabEnabled(VolumeTabIndex, true);
+    d->ui.volumeTab->setEnabled(true);
+    d->ui.inputVolumeWidget->setVolumeControl(handler->inputVolumeControl());
+    d->ui.outputVolumeWidget->setVolumeControl(handler->outputVolumeControl());
 }
 
 void CallWindow::onGroupMembersModelCreated(GroupMembersModel *model)
 {
-    d->participantsDock = new ParticipantsDock(model, this);
-    addDockWidget(Qt::RightDockWidgetArea, d->participantsDock);
-    restoreDockWidget(d->participantsDock);
+    d->ui.participantsDock->setEnabled(true);
+    d->ui.participantsListView->setModel(model);
 }
 
 void CallWindow::onDtmfHandlerCreated(DtmfHandler *handler)
 {
-    d->dialpadDock = new QDockWidget(i18n("Dialpad"), this);
-    d->dialpadDock->setObjectName("DialpadDock");
-    DtmfWidget *dtmfWidget = new DtmfWidget(d->dialpadDock);
-    d->dialpadDock->setWidget(dtmfWidget);
-    handler->connectDtmfWidget(dtmfWidget);
-    addDockWidget(Qt::RightDockWidgetArea, d->dialpadDock);
-    restoreDockWidget(d->dialpadDock);
+    d->ui.tabWidget->setTabEnabled(DialpadTabIndex, true);
+    d->ui.dtmfWidget->setEnabled(true);
+    handler->connectDtmfWidget(d->ui.dtmfWidget);
 }
 
 void CallWindow::onCallDurationTimerTimeout()

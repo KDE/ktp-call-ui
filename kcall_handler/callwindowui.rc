@@ -10,6 +10,10 @@
     <Menu name="file" >
       <Action name="hangup" />
     </Menu>
+    <Menu name="view">
+      <Action name="showParticipants" />
+      <Action name="showLog" />
+    </Menu>
   </MenuBar>
 
   <ToolBar name="mainToolBar" >

@@ -1,6 +1,7 @@
 
 include_directories(${GSTREAMER_INCLUDE_DIR} ${GLIB2_INCLUDE_DIR} ${DBUSGLIB_INCLUDE_DIR}
-                    ${LIBXML2_INCLUDE_DIR} ${TPFARSIGHT_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+                    ${LIBXML2_INCLUDE_DIR} ${TPFARSIGHT_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+                    ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(kcall_handler_SRCS
     main.cpp
@@ -10,11 +11,10 @@ set(kcall_handler_SRCS
     abstractmediahandler.cpp
     dtmfhandler.cpp
     volumewidget.cpp
-    volumedock.cpp
-    participantsdock.cpp
     farsight/mediahandler.cpp
 )
 
+kde4_add_ui_files(kcall_handler_SRCS callwindow.ui)
 kde4_add_kcfg_files(kcall_handler_SRCS kcallhandlersettings.kcfgc)
 kde4_add_executable(kcall_handler ${kcall_handler_SRCS})
 target_link_libraries(kcall_handler ${KDE4_KDEUI_LIBS}

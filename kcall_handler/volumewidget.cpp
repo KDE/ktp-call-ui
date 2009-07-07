@@ -52,6 +52,8 @@ void VolumeWidget::setVolumeControl(VolumeControlInterface *control)
         d->slider->setMinimum(d->control->minVolume());
         d->slider->setMaximum(d->control->maxVolume());
         d->slider->setValue(d->control->volume());
+        d->slider->setTickPosition(QSlider::TicksAbove);
+        d->slider->setTickInterval((d->control->maxVolume() - d->control->minVolume())/10);
         setEnabled(true);
     } else {
         setEnabled(false);

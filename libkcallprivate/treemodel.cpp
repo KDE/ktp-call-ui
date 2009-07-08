@@ -118,7 +118,7 @@ void TreeModelItem::removeChild(int row)
 
 void TreeModelItem::removeChildren(int first, int last)
 {
-    Q_ASSERT(first >= 0 && last < d->children.size() && first < last);
+    Q_ASSERT(first >= 0 && last < d->children.size() && first <= last);
 
     d->model->beginRemoveRows(index(), first, last);
     for(int i=first; i<=last; i++) {

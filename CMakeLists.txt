@@ -65,6 +65,7 @@ if ( BUILD_KCALL_HANDLER )
     add_subdirectory(phonon)
     add_subdirectory(libkgstdevices)
     add_subdirectory(kcall_handler)
+    add_subdirectory(tests)
 endif ( BUILD_KCALL_HANDLER )
 
 set(kcall_SRCS

@@ -6,6 +6,7 @@ include_directories(${GSTREAMER_INCLUDE_DIR} ${GLIB2_INCLUDE_DIR} ${DBUSGLIB_INC
 set(kcall_handler_SRCS
     main.cpp
     callwindow.cpp
+    calllog.cpp
     callhandler.cpp
     channelhandler.cpp
     abstractmediahandler.cpp

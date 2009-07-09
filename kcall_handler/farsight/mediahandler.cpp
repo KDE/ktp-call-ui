@@ -146,7 +146,12 @@ void MediaHandler::onAudioSrcPadAdded(GstPad *srcPad)
 {
     if ( !d->deviceFactory->audioOutputDevice() ) {
         if ( !d->deviceFactory->createAudioOutputDevice() ) {
-            kError() << "Could not create audio output device"; //TODO use error log
+            foreach(const QString & error, d->deviceFactory->errorLog()) {
+                QMetaObject::invokeMethod(this, "logMessage", Qt::QueuedConnection,
+                                          Q_ARG(CallLog::LogType, CallLog::Error),
+                                          Q_ARG(QString, error));
+            }
+            d->deviceFactory->clearLog();
             return;
         }
         gst_bin_add(GST_BIN(d->pipeline), d->deviceFactory->audioOutputDevice()->bin());
@@ -165,7 +170,12 @@ void MediaHandler::onAudioSinkPadAdded(GstPad *sinkPad)
 {
     if ( !d->deviceFactory->audioInputDevice() ) {
         if ( !d->deviceFactory->createAudioInputDevice() ) {
-            kError() << "Could not create audio input device"; //TODO use error log
+            foreach(const QString & error, d->deviceFactory->errorLog()) {
+                QMetaObject::invokeMethod(this, "logMessage", Qt::QueuedConnection,
+                                          Q_ARG(CallLog::LogType, CallLog::Error),
+                                          Q_ARG(QString, error));
+            }
+            d->deviceFactory->clearLog();
             return;
         }
         gst_bin_add(GST_BIN(d->pipeline), d->deviceFactory->audioInputDevice()->bin());

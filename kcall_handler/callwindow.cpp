@@ -60,6 +60,11 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
 
     setupUi();
 
+    CallLog *callLog = new CallLog(d->ui.logView, this);
+    connect(d->channelHandler, SIGNAL(logMessage(CallLog::LogType, QString)),
+            callLog, SLOT(logMessage(CallLog::LogType, QString)));
+    connect(callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
+
     connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 }
 

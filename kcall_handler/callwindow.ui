@@ -15,10 +15,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QWidget" name="videoInputWidget" native="true">
-        <zorder>tabwidget</zorder>
-        <zorder>tabWidget</zorder>
-       </widget>
+       <widget class="QWidget" name="videoInputWidget" native="true"/>
       </item>
       <item>
        <widget class="KTabWidget" name="tabWidget">
@@ -88,7 +85,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="KTextEdit" name="logTextEdit">
+      <widget class="QPlainTextEdit" name="logView">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -119,11 +116,6 @@
    <extends>QTabWidget</extends>
    <header>ktabwidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>KTextEdit</class>
-   <extends>QTextEdit</extends>
-   <header>ktextedit.h</header>
   </customwidget>
   <customwidget>
    <class>DtmfWidget</class>

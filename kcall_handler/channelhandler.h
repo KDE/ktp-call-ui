@@ -17,7 +17,7 @@
 #ifndef CHANNELHANDLER_H
 #define CHANNELHANDLER_H
 
-#include <QtCore/QObject>
+#include "calllog.h"
 #include <TelepathyQt4/StreamedMediaChannel>
 class AbstractMediaHandler;
 class GroupMembersModel;
@@ -41,6 +41,7 @@ signals:
     void mediaHandlerCreated(AbstractMediaHandler *handler);
     void groupMembersModelCreated(GroupMembersModel *model);
     void dtmfHandlerCreated(DtmfHandler *handler);
+    void logMessage(CallLog::LogType logType, const QString & message);
 
 private:
     void setState(State s);

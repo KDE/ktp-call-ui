@@ -17,7 +17,7 @@
 #ifndef ABSTRACTMEDIAHANDLER_H
 #define ABSTRACTMEDIAHANDLER_H
 
-#include <QtCore/QObject>
+#include "calllog.h"
 #include <TelepathyQt4/StreamedMediaChannel>
 class VolumeControlInterface;
 
@@ -34,6 +34,8 @@ Q_SIGNALS:
 
     void audioOutputDeviceCreated(VolumeControlInterface *outputVolumeControl);
     void audioOutputDeviceDestroyed();
+
+    void logMessage(CallLog::LogType logType, const QString & message);
 
 protected:
     AbstractMediaHandler(QObject *parent = 0);

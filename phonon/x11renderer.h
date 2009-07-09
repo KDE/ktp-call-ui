@@ -15,26 +15,10 @@
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef Phonon_GSTREAMER_X11RENDERER_H
-#define Phonon_GSTREAMER_X11RENDERER_H
+#ifndef X11RENDERER_H
+#define X11RENDERER_H
 
-#include "videowidget.h"
-#include "common.h"
-
-#include <QtGui/QWidget>
-
-#include <gst/gst.h>
-
-QT_BEGIN_NAMESPACE
-
-#ifndef Q_WS_QWS
-
-class QString;
-
-namespace Phonon
-{
-namespace Gstreamer
-{
+#include "abstractrenderer.h"
 
 class OverlayWidget;
 class X11Renderer : public AbstractRenderer
@@ -43,10 +27,10 @@ public:
     X11Renderer(VideoWidget *videoWidget);
     ~X11Renderer();
     void handlePaint(QPaintEvent *event);
-    void aspectRatioChanged(Phonon::VideoWidget::AspectRatio aspectRatio);
-    void scaleModeChanged(Phonon::VideoWidget::ScaleMode scaleMode);
+    void aspectRatioChanged(VideoWidget::AspectRatio aspectRatio);
+    void scaleModeChanged(VideoWidget::ScaleMode scaleMode);
     void movieSizeChanged(const QSize &movieSize);
-    void handleMediaNodeEvent(const MediaNodeEvent *event);
+   // void handleMediaNodeEvent(const MediaNodeEvent *event);
     bool eventFilter(QEvent *);
     bool paintsOnWidget() { return false; }
     bool overlaySet() const { return m_overlaySet; }
@@ -58,11 +42,4 @@ private:
     bool m_overlaySet;
 };
 
-}
-} //namespace Phonon::Gstreamer
-
-#endif // Q_WS_QWS
-
-QT_END_NAMESPACE
-
-#endif // Phonon_GSTREAMER_X11RENDERER_H
+#endif // X11RENDERER_H

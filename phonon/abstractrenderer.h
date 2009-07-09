@@ -1,6 +1,6 @@
 /*  This file is part of the KDE project.
 
-    Copyright (C) 2    //Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).007 Nokia Corporation and/or its subsidiary(-ies).
+    Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
 
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -15,23 +15,10 @@
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef Phonon_GSTREAMER_ABSTRACTRENDERER_H
-#define Phonon_GSTREAMER_ABSTRACTRENDERER_H
+#ifndef ABSTRACTRENDERER_H
+#define ABSTRACTRENDERER_H
 
-#include "backend.h"
-#include "common.h"
-#include "medianode.h"
-#include <phonon/videowidget.h>
-
-QT_BEGIN_NAMESPACE
-
-class QString;
-namespace Phonon
-{
-namespace Gstreamer
-{
-
-class VideoWidget;
+#include "videowidget.h"
 
 class AbstractRenderer
 {
@@ -41,10 +28,10 @@ public:
         , m_videoSink(0) { }
     virtual ~AbstractRenderer();
     virtual GstElement *videoSink() {return m_videoSink;}
-    virtual void aspectRatioChanged(Phonon::VideoWidget::AspectRatio aspectRatio);
-    virtual void scaleModeChanged(Phonon::VideoWidget::ScaleMode scaleMode);
+    virtual void aspectRatioChanged(VideoWidget::AspectRatio aspectRatio);
+    virtual void scaleModeChanged(VideoWidget::ScaleMode scaleMode);
     virtual void movieSizeChanged(const QSize &movieSize);
-    virtual void handleMediaNodeEvent(const MediaNodeEvent *event) = 0;
+    //virtual void handleMediaNodeEvent(const MediaNodeEvent *event) = 0;
     virtual bool eventFilter(QEvent *) = 0;
     virtual void handlePaint(QPaintEvent *) {}
     virtual bool paintsOnWidget() { return true; } // Controls overlays
@@ -54,9 +41,4 @@ protected:
     GstElement *m_videoSink;
 };
 
-}
-} //namespace Phonon::Gstreamer
-
-QT_END_NAMESPACE
-
-#endif // Phonon_GSTREAMER_ABSTRACTRENDERER_H
+#endif // ABSTRACTRENDERER_H

@@ -14,29 +14,13 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include "videowidget.h"
 #include "x11renderer.h"
-
-#ifndef Q_WS_QWS
 
 #include <QtGui/QPalette>
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>
-#include <X11/Xlib.h>
-#include <gst/gst.h>
+#include <KDebug>
 #include <gst/interfaces/xoverlay.h>
-#include <gst/interfaces/propertyprobe.h>
-#include "common.h"
-#include "mediaobject.h"
-#include "message.h"
-
-QT_BEGIN_NAMESPACE
-
-namespace Phonon
-{
-namespace Gstreamer
-{
 
 class OverlayWidget : public QWidget
 {
@@ -46,8 +30,9 @@ public:
                   m_videoWidget(videoWidget), 
                   m_renderer(renderer) { }
     void paintEvent(QPaintEvent *) {
-        Phonon::State state = m_videoWidget->root() ? m_videoWidget->root()->state() : Phonon::LoadingState;
-        if (state == Phonon::PlayingState || state == Phonon::PausedState) {
+        GstState state;
+        gst_element_get_state(m_renderer->videoSink(), &state, NULL, 0);
+        if (state == GST_STATE_PLAYING || state == GST_STATE_PAUSED) {
             m_renderer->windowExposed();
         } else {
             QPainter painter(this);
@@ -63,7 +48,7 @@ X11Renderer::X11Renderer(VideoWidget *videoWidget)
         : AbstractRenderer(videoWidget)
 {
     m_renderWidget = new OverlayWidget(videoWidget, this);
-    videoWidget->backend()->logMessage("Creating X11 overlay renderer");
+    kDebug() << "Creating X11 overlay renderer";
     QPalette palette;
     palette.setColor(QPalette::Background, Qt::black);
     m_videoWidget->setPalette(palette);
@@ -108,7 +93,7 @@ GstElement* X11Renderer::createVideoSink()
 
     return videoSink;
 }
-
+#if 0
 void X11Renderer::handleMediaNodeEvent(const MediaNodeEvent *event)
 {
     switch (event->type()) {
@@ -119,16 +104,16 @@ void X11Renderer::handleMediaNodeEvent(const MediaNodeEvent *event)
         break;
     }
 }
+#endif
 
-
-void X11Renderer::aspectRatioChanged(Phonon::VideoWidget::AspectRatio)
+void X11Renderer::aspectRatioChanged(VideoWidget::AspectRatio)
 {
     if (m_renderWidget) {
         m_renderWidget->setGeometry(m_videoWidget->calculateDrawFrameRect());
     }
 }
 
-void X11Renderer::scaleModeChanged(Phonon::VideoWidget::ScaleMode)
+void X11Renderer::scaleModeChanged(VideoWidget::ScaleMode)
 {
     if (m_renderWidget) {
         m_renderWidget->setGeometry(m_videoWidget->calculateDrawFrameRect());
@@ -186,10 +171,3 @@ void X11Renderer::windowExposed()
     if (m_videoSink && GST_IS_X_OVERLAY(m_videoSink))
         gst_x_overlay_expose(GST_X_OVERLAY(m_videoSink));
 }
-
-}
-} //namespace Phonon::Gstreamer
-
-QT_END_NAMESPACE
-
-#endif // Q_WS_QWS

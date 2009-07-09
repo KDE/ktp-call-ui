@@ -62,6 +62,7 @@ add_definitions(${KDE4_DEFINITIONS})
 add_subdirectory(libkcallprivate)
 
 if ( BUILD_KCALL_HANDLER )
+    add_subdirectory(phonon)
     add_subdirectory(libkgstdevices)
     add_subdirectory(kcall_handler)
 endif ( BUILD_KCALL_HANDLER )

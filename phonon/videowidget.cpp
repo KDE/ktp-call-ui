@@ -17,40 +17,21 @@
 
 #include "videowidget.h"
 #include <QtCore/QEvent>
-#include <QtGui/QResizeEvent>
-#include <QtGui/QPalette>
-#include <QtGui/QImage>
-#include <QtGui/QPainter>
-#include <QtGui/QBoxLayout>
-#include <QApplication>
-#include <gst/gst.h>
-#include <gst/interfaces/propertyprobe.h>
-#include "mediaobject.h"
-#include "message.h"
-#include "common.h"
-
-#include "glrenderer.h"
-#include "widgetrenderer.h"
+#include <KDebug>
+//#include "glrenderer.h"
+//#include "widgetrenderer.h"
 #include "x11renderer.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace Phonon
-{
-namespace Gstreamer
-{
-
-VideoWidget::VideoWidget(Backend *backend, QWidget *parent) :
+VideoWidget::VideoWidget(QWidget *parent) :
     QWidget(parent),
-    MediaNode(backend, VideoSink),
     m_videoBin(0),
     m_renderer(0),
-    m_aspectRatio(Phonon::VideoWidget::AspectRatioAuto),
+    m_aspectRatio(AspectRatioAuto),
     m_brightness(0.0),
     m_hue(0.0),
     m_contrast(0.0),
     m_saturation(0.0),
-    m_scaleMode(Phonon::VideoWidget::FitInView),
+    m_scaleMode(FitInView),
     m_videoBalance(0),
     m_colorspace(0),
     m_videoplug(0)
@@ -73,7 +54,7 @@ VideoWidget::~VideoWidget()
 void VideoWidget::setupVideoBin()
 {
 
-    m_renderer = m_backend->deviceManager()->createVideoRenderer(this);
+    m_renderer = new X11Renderer(this);
     GstElement *videoSink = m_renderer->videoSink();
 
     m_videoBin = gst_bin_new (NULL);
@@ -119,7 +100,7 @@ void VideoWidget::setupVideoBin()
             if (parentWidget)
                 parentWidget->winId();  // Due to some existing issues with alien in 4.4,
                                         //  we must currently force the creation of a parent widget.
-            m_isValid = true; //initialization ok, accept input
+//FIXME            m_isValid = true; //initialization ok, accept input
         }
     }
 }
@@ -132,10 +113,10 @@ void VideoWidget::paintEvent(QPaintEvent *event)
 
 void VideoWidget::setVisible(bool val) {
     Q_ASSERT(m_renderer);
-
+#if 0
     // Disable overlays for graphics view
     if (root() && window() && window()->testAttribute(Qt::WA_DontShowOnScreen) && !m_renderer->paintsOnWidget()) {
-        m_backend->logMessage(QString("Widget rendering forced"), Backend::Info, this);
+        kDebug() << "Widget rendering forced";
         GstElement *videoSink = m_renderer->videoSink();
         Q_ASSERT(videoSink);
 
@@ -155,6 +136,7 @@ void VideoWidget::setVisible(bool val) {
         root()->invalidateGraph();
         root()->setState(root()->state());
     }
+#endif
     QWidget::setVisible(val);    
 }
 
@@ -165,7 +147,7 @@ bool VideoWidget::event(QEvent *event)
     return QWidget::event(event);
 }
 
-Phonon::VideoWidget::AspectRatio VideoWidget::aspectRatio() const
+VideoWidget::AspectRatio VideoWidget::aspectRatio() const
 {
     return m_aspectRatio;
 }
@@ -178,14 +160,14 @@ QSize VideoWidget::sizeHint() const
         return QSize(640, 480);
 }
 
-void VideoWidget::setAspectRatio(Phonon::VideoWidget::AspectRatio aspectRatio)
+void VideoWidget::setAspectRatio(AspectRatio aspectRatio)
 {
     m_aspectRatio = aspectRatio;
     if (m_renderer)
         m_renderer->aspectRatioChanged(aspectRatio);
 }
 
-Phonon::VideoWidget::ScaleMode VideoWidget::scaleMode() const
+VideoWidget::ScaleMode VideoWidget::scaleMode() const
 {
     return m_scaleMode;
 }
@@ -212,20 +194,20 @@ QRect VideoWidget::calculateDrawFrameRect() const
     // rect conforming to the aspect and containing the whole frame:
     switch (aspectRatio()) {
 
-    case Phonon::VideoWidget::AspectRatioWidget:
+    case AspectRatioWidget:
         drawFrameRect = widgetRect;
         // No more calculations needed.
         return drawFrameRect;
 
-    case Phonon::VideoWidget::AspectRatio4_3:
+    case AspectRatio4_3:
         drawFrameRect = scaleToAspect(widgetRect, 4, 3);
         break;
 
-    case Phonon::VideoWidget::AspectRatio16_9:
+    case AspectRatio16_9:
         drawFrameRect = scaleToAspect(widgetRect, 16, 9);
         break;
 
-    case Phonon::VideoWidget::AspectRatioAuto:
+    case AspectRatioAuto:
     default:
         drawFrameRect = QRect(0, 0, movieSize().width(), movieSize().height());
         break;
@@ -239,13 +221,13 @@ QRect VideoWidget::calculateDrawFrameRect() const
     float frameHeight = drawFrameRect.height() * float(widgetWidth) / float(drawFrameRect.width());
 
     switch (scaleMode()) {
-    case Phonon::VideoWidget::ScaleAndCrop:
+    case ScaleAndCrop:
         if (frameHeight < widgetHeight) {
             frameWidth *= float(widgetHeight) / float(frameHeight);
             frameHeight = widgetHeight;
         }
         break;
-    case Phonon::VideoWidget::FitInView:
+    case FitInView:
     default:
         if (frameHeight > widgetHeight) {
             frameWidth *= float(widgetHeight) / float(frameHeight);
@@ -259,7 +241,7 @@ QRect VideoWidget::calculateDrawFrameRect() const
     return drawFrameRect;
 }
 
-void VideoWidget::setScaleMode(Phonon::VideoWidget::ScaleMode scaleMode)
+void VideoWidget::setScaleMode(ScaleMode scaleMode)
 {
     m_scaleMode = scaleMode;
     if (m_renderer)
@@ -351,17 +333,18 @@ void VideoWidget::setSaturation(qreal newValue)
 
 void VideoWidget::setMovieSize(const QSize &size)
 {
-    m_backend->logMessage(QString("New video size %0 x %1").arg(size.width()).arg(size.height()), Backend::Info);
+    kDebug() << "New video size" << size;
     if (size == m_movieSize)
         return;
     m_movieSize = size;
-    widget()->updateGeometry();
-    widget()->update();
+    updateGeometry();
+    update();
 
     if (m_renderer)
         m_renderer->movieSizeChanged(m_movieSize);
 }
 
+#if 0
 void VideoWidget::mediaNodeEvent(const MediaNodeEvent *event)
 {
     switch (event->type()) {
@@ -378,10 +361,6 @@ void VideoWidget::mediaNodeEvent(const MediaNodeEvent *event)
     if (m_renderer)
         m_renderer->handleMediaNodeEvent(event);
 }
+#endif
 
-}
-} //namespace Phonon::Gstreamer
-
-QT_END_NAMESPACE
-
-#include "moc_videowidget.cpp"
+#include "videowidget.moc"

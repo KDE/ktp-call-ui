@@ -1,6 +1,6 @@
 /*  This file is part of the KDE project.
 
-    Copyright (C) 2    //Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).007 Nokia Corporation and/or its subsidiary(-ies).
+    Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
 
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -15,46 +15,58 @@
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef Phonon_GSTREAMER_VIDEOWIDGET_H
-#define Phonon_GSTREAMER_VIDEOWIDGET_H
+#ifndef VIDEOWIDGET_H
+#define VIDEOWIDGET_H
 
-#include <phonon/videowidget.h>
-#include <phonon/videowidgetinterface.h>
-
-#include "backend.h"
-#include "common.h"
-#include "medianode.h"
-#include "abstractrenderer.h"
-#include "videowidget.h"
-
+#include <QtGui/QWidget>
 #include <gst/gst.h>
+class AbstractRenderer;
 
-QT_BEGIN_NAMESPACE
-
-class QString;
-
-namespace Phonon
-{
-namespace Gstreamer
-{
-
-class VideoWidget : public QWidget, public Phonon::VideoWidgetInterface, public MediaNode
+class VideoWidget : public QWidget
 {
     Q_OBJECT
-    Q_INTERFACES(Phonon::VideoWidgetInterface Phonon::Gstreamer::MediaNode)
 public:
-    VideoWidget(Backend *backend, QWidget *parent = 0);
+
+    enum AspectRatio {
+        /**
+            * Let the decoder find the aspect ratio automatically from the
+            * media file (this is the default).
+            */
+        AspectRatioAuto = 0,
+        /**
+            * Fits the video into the widget making the aspect ratio depend
+            * solely on the size of the widget. This way the aspect ratio
+            * is freely resizeable by the user.
+            */
+        AspectRatioWidget = 1,
+        /**
+            * Make width/height == 4/3, which is the old TV size and
+            * monitor size (1024/768 == 4/3). (4:3)
+            */
+        AspectRatio4_3 = 2,
+        /**
+            * Make width/height == 16/9, which is the size of most current
+            * media. (16:9)
+            */
+        AspectRatio16_9 = 3
+    };
+
+    enum ScaleMode {
+        FitInView = 0,
+        ScaleAndCrop = 1
+    };
+
+    VideoWidget(QWidget *parent = 0);
     ~VideoWidget();
 
     void setupVideoBin();
     void paintEvent(QPaintEvent *event);
-    void mediaNodeEvent(const MediaNodeEvent *event);
     void setVisible(bool);
 
-    Phonon::VideoWidget::AspectRatio aspectRatio() const;
-    void setAspectRatio(Phonon::VideoWidget::AspectRatio aspectRatio);
-    Phonon::VideoWidget::ScaleMode scaleMode() const;
-    void setScaleMode(Phonon::VideoWidget::ScaleMode);
+    AspectRatio aspectRatio() const;
+    void setAspectRatio(AspectRatio aspectRatio);
+    ScaleMode scaleMode() const;
+    void setScaleMode(ScaleMode);
     qreal brightness() const;
     void setBrightness(qreal);
     qreal contrast() const;
@@ -80,9 +92,6 @@ public:
 
     bool event(QEvent *);
 
-    QWidget *widget() {
-        return this;
-    }
 
 protected:
     GstElement *m_videoBin;
@@ -90,18 +99,13 @@ protected:
     AbstractRenderer *m_renderer;
 
 private:
-    Phonon::VideoWidget::AspectRatio m_aspectRatio;
+    AspectRatio m_aspectRatio;
     qreal m_brightness, m_hue, m_contrast, m_saturation;
-    Phonon::VideoWidget::ScaleMode m_scaleMode;
+    ScaleMode m_scaleMode;
 
     GstElement *m_videoBalance;
     GstElement *m_colorspace;
     GstElement *m_videoplug;
 };
 
-}
-} //namespace Phonon::Gstreamer
-
-QT_END_NAMESPACE
-
-#endif // Phonon_GSTREAMER_VIDEOWIDGET_H
+#endif // VIDEOWIDGET_H

@@ -17,14 +17,6 @@
 
 #include "abstractrenderer.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace Phonon
-{
-namespace Gstreamer
-{
-
-
 AbstractRenderer::~AbstractRenderer()
 {
     if (m_videoSink) {
@@ -33,12 +25,12 @@ AbstractRenderer::~AbstractRenderer()
     }
 }
 
-void AbstractRenderer::aspectRatioChanged(Phonon::VideoWidget::AspectRatio aspectRatio)
+void AbstractRenderer::aspectRatioChanged(VideoWidget::AspectRatio aspectRatio)
 {
     Q_UNUSED(aspectRatio);
 }
 
-void AbstractRenderer::scaleModeChanged(Phonon::VideoWidget::ScaleMode scaleMode)
+void AbstractRenderer::scaleModeChanged(VideoWidget::ScaleMode scaleMode)
 {
     Q_UNUSED(scaleMode);
 }
@@ -47,10 +39,3 @@ void AbstractRenderer::movieSizeChanged(const QSize &size)
 {
     Q_UNUSED(size);
 }
-
-}
-} //namespace Phonon::Gstreamer
-
-QT_END_NAMESPACE
-
-

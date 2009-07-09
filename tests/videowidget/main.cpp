@@ -1,6 +1,6 @@
 #include <QtGui>
 #include <gst/gst.h>
-#include "../../phonon/videowidget.h"
+#include "../../libkgstvideowidget/videowidget.h"
 
 int main(int argc, char **argv)
 {

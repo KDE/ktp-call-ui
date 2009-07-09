@@ -295,11 +295,8 @@ GstPad *MediaHandler::Private::newAudioSinkPad()
         }
 
         gst_bin_add(GST_BIN(pipeline), liveadder);
-        gst_bin_add(GST_BIN(pipeline), deviceFactory->audioOutputDevice()->bin());
         gst_element_link(liveadder, deviceFactory->audioOutputDevice()->bin());
-
         gst_element_set_state(liveadder, GST_STATE_PLAYING);
-        gst_element_set_state(deviceFactory->audioOutputDevice()->bin(), GST_STATE_PLAYING);
     }
     return gst_element_get_request_pad(liveadder, "sink%d");
 }

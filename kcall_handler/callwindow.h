@@ -19,6 +19,7 @@
 
 #include "channelhandler.h"
 #include <KXmlGuiWindow>
+class VolumeControlInterface;
 
 class CallWindow : public KXmlGuiWindow
 {
@@ -36,6 +37,10 @@ private slots:
     void setState(ChannelHandler::State state);
     void setStatus(const QString & msg);
     void onMediaHandlerCreated(AbstractMediaHandler *handler);
+    void onAudioInputDeviceCreated(VolumeControlInterface *control);
+    void onAudioInputDeviceDestroyed();
+    void onAudioOutputDeviceCreated(VolumeControlInterface *control);
+    void onAudioOutputDeviceDestroyed();
     void onGroupMembersModelCreated(GroupMembersModel *model);
     void onDtmfHandlerCreated(DtmfHandler *handler);
     void onCallDurationTimerTimeout();

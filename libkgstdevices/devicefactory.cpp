@@ -39,6 +39,8 @@ DeviceFactory::DeviceFactory(const KConfigGroup & group)
     : d(new Private)
 {
     d->config = group;
+    d->audioInputDevice = NULL;
+    d->audioOutputDevice = NULL;
 }
 
 DeviceFactory::~DeviceFactory()

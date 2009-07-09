@@ -40,9 +40,8 @@ struct MediaHandler::Private
     static void onSrcPadAdded(TfStream *stream, GstPad *src, FsCodec *codec, MediaHandler *self);
     static gboolean onRequestResource(TfStream *stream, guint direction, MediaHandler *self);
 
-    GstPad *audioSinkPad();
+    GstPad *newAudioSinkPad();
 
-    AbstractMediaHandler::Capabilities caps;
     Tp::StreamedMediaChannelPtr channel;
     TfChannel *tfChannel;
     GstElement *pipeline;
@@ -52,31 +51,9 @@ struct MediaHandler::Private
     guint busWatchSrc;
 };
 
-GstPad *MediaHandler::Private::audioSinkPad()
-{
-    if ( !liveadder ) {
-        if ( !(liveadder = gst_element_factory_make("liveadder", NULL)) ) {
-            kDebug() << "liveadder not available. Attempting to use plain adder";
-            if ( !(liveadder = gst_element_factory_make("adder", NULL)) ) {
-                kFatal() << "Failed to create an adder gstreamer element. Please install "
-                            "either the \"adder\" or the \"liveadder\" gstreamer plugin.";
-            }
-        }
-
-        gst_bin_add(GST_BIN(pipeline), liveadder);
-        gst_bin_add(GST_BIN(pipeline), deviceFactory->audioOutputDevice()->bin());
-        gst_element_link(liveadder, deviceFactory->audioOutputDevice()->bin());
-
-        gst_element_set_state(liveadder, GST_STATE_PLAYING);
-        gst_element_set_state(deviceFactory->audioOutputDevice()->bin(), GST_STATE_PLAYING);
-    }
-    return gst_element_get_request_pad(liveadder, "sink%d");
-}
-
 MediaHandler::MediaHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent)
     : AbstractMediaHandler(parent), d(new Private)
 {
-    d->caps = None;
     d->channel = channel;
     d->tfChannel = NULL;
     d->pipeline = NULL;
@@ -85,6 +62,7 @@ MediaHandler::MediaHandler(const Tp::StreamedMediaChannelPtr & channel, QObject 
     d->bus = NULL;
     d->busWatchSrc = 0;
 
+    qRegisterMetaType<VolumeControlInterface*>("VolumeControlInterface*");
     initialize();
 }
 
@@ -111,21 +89,6 @@ MediaHandler::~MediaHandler()
     }
 
     delete d;
-}
-
-AbstractMediaHandler::Capabilities MediaHandler::capabilities() const
-{
-    return d->caps;
-}
-
-VolumeControlInterface *MediaHandler::inputVolumeControl() const
-{
-    return d->deviceFactory->audioInputDevice();
-}
-
-VolumeControlInterface *MediaHandler::outputVolumeControl() const
-{
-    return d->deviceFactory->audioOutputDevice();
 }
 
 void MediaHandler::initialize()
@@ -161,49 +124,61 @@ void MediaHandler::initialize()
 
     const KConfigGroup deviceSettings = KGlobal::config()->group("Gstreamer Devices");
     d->deviceFactory = new KGstDevices::DeviceFactory(deviceSettings);
-
-    if ( d->deviceFactory->createAudioInputDevice() ) {
-        d->caps |= SendAudio;
-    }
-
-    if ( d->deviceFactory->createAudioOutputDevice() ) {
-        gst_element_link(d->liveadder, d->deviceFactory->audioOutputDevice()->bin());
-        d->caps |= ReceiveAudio;
-    }
-
-    setStatus(Connecting);
 }
 
 void MediaHandler::stop()
 {
-    if (status() == Disconnected) {
-        return;
-    }
-
     if (d->bus) {
         if (d->busWatchSrc != 0) {
             g_source_remove(d->busWatchSrc);
         }
     }
 
-    if ( d->liveadder ) {
-        gst_element_set_state(d->liveadder, GST_STATE_NULL);
-    }
-
-    if ( d->deviceFactory->audioInputDevice() ) {
-        gst_element_set_state(d->deviceFactory->audioInputDevice()->bin(), GST_STATE_NULL);
-    }
-
-    if ( d->deviceFactory->audioOutputDevice() ) {
-        gst_element_set_state(d->deviceFactory->audioOutputDevice()->bin(), GST_STATE_NULL);
-    }
-
     if (d->pipeline) {
         gst_element_set_state(d->pipeline, GST_STATE_NULL);
     }
 
-    d->caps = None;
-    setStatus(Disconnected);
+    QMetaObject::invokeMethod(this, "audioInputDeviceDestroyed", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "audioOutputDeviceDestroyed", Qt::QueuedConnection);
+}
+
+void MediaHandler::onAudioSrcPadAdded(GstPad *srcPad)
+{
+    if ( !d->deviceFactory->audioOutputDevice() ) {
+        if ( !d->deviceFactory->createAudioOutputDevice() ) {
+            kError() << "Could not create audio output device"; //TODO use error log
+            return;
+        }
+        gst_bin_add(GST_BIN(d->pipeline), d->deviceFactory->audioOutputDevice()->bin());
+        gst_element_set_state(d->deviceFactory->audioOutputDevice()->bin(), GST_STATE_PLAYING);
+    }
+
+    GstPad *sinkPad = d->newAudioSinkPad();
+    Q_ASSERT(sinkPad);
+    gst_pad_link(srcPad, sinkPad);
+
+    QMetaObject::invokeMethod(this, "audioOutputDeviceCreated", Qt::QueuedConnection,
+                              Q_ARG(VolumeControlInterface*, d->deviceFactory->audioOutputDevice()));
+}
+
+void MediaHandler::onAudioSinkPadAdded(GstPad *sinkPad)
+{
+    if ( !d->deviceFactory->audioInputDevice() ) {
+        if ( !d->deviceFactory->createAudioInputDevice() ) {
+            kError() << "Could not create audio input device"; //TODO use error log
+            return;
+        }
+        gst_bin_add(GST_BIN(d->pipeline), d->deviceFactory->audioInputDevice()->bin());
+        gst_element_set_state(d->deviceFactory->audioInputDevice()->bin(), GST_STATE_PLAYING);
+    }
+
+    GstPad *srcPad = gst_element_get_static_pad(d->deviceFactory->audioInputDevice()->bin(), "src");
+    Q_ASSERT(srcPad);
+    gst_pad_link(srcPad, sinkPad);
+    gst_object_unref(srcPad);
+
+    QMetaObject::invokeMethod(this, "audioInputDeviceCreated", Qt::QueuedConnection,
+                              Q_ARG(VolumeControlInterface*, d->deviceFactory->audioInputDevice()));
 }
 
 gboolean MediaHandler::Private::busWatch(GstBus *bus, GstMessage *message, MediaHandler *self)
@@ -236,34 +211,10 @@ void MediaHandler::Private::onStreamCreated(TfChannel *tfChannel, TfStream *stre
                                             MediaHandler *self)
 {
     Q_UNUSED(tfChannel);
-    guint media_type;
-    GstPad *sink;
-    GstElement *element = NULL;
-
-    g_object_get(stream, "media-type", &media_type, "sink-pad", &sink, NULL);
-
-    switch (media_type) {
-    case Tp::MediaStreamTypeAudio:
-        element = self->d->deviceFactory->audioInputDevice()->bin();
-        break;
-    case Tp::MediaStreamTypeVideo:
-        kWarning() << "Handling video is not supported yet.";
-        return;
-    default:
-        Q_ASSERT(false);
-    }
-
     g_signal_connect(stream, "src-pad-added",
                      G_CALLBACK(&MediaHandler::Private::onSrcPadAdded), self);
     g_signal_connect(stream, "request-resource",
                      G_CALLBACK(&MediaHandler::Private::onRequestResource), self);
-
-    GstPad *pad = gst_element_get_static_pad(element, "src");
-    gst_bin_add(GST_BIN(self->d->pipeline), element);
-    gst_pad_link(pad, sink);
-    gst_object_unref(sink);
-    gst_object_unref(pad);
-    gst_element_set_state(element, GST_STATE_PLAYING);
 }
 
 void MediaHandler::Private::onSrcPadAdded(TfStream *stream, GstPad *src,
@@ -271,14 +222,11 @@ void MediaHandler::Private::onSrcPadAdded(TfStream *stream, GstPad *src,
 {
     Q_UNUSED(codec);
     guint media_type;
-    GstPad *pad = NULL;
-
     g_object_get(stream, "media-type", &media_type, NULL);
 
     switch (media_type) {
     case Tp::MediaStreamTypeAudio:
-        pad = self->d->audioSinkPad();
-        Q_ASSERT(pad);
+        self->onAudioSrcPadAdded(src);
         break;
     case Tp::MediaStreamTypeVideo:
         kWarning() << "Handling video is not supported yet.";
@@ -286,9 +234,6 @@ void MediaHandler::Private::onSrcPadAdded(TfStream *stream, GstPad *src,
     default:
         Q_ASSERT(false);
     }
-
-    gst_pad_link(src, pad);
-    self->setStatus(Connected);
 }
 
 gboolean MediaHandler::Private::onRequestResource(TfStream *stream, guint direction,
@@ -299,21 +244,54 @@ gboolean MediaHandler::Private::onRequestResource(TfStream *stream, guint direct
 
     switch (media_type) {
     case Tp::MediaStreamTypeAudio:
-        if ( (direction & Tp::MediaStreamDirectionSend)
-              && !(self->d->caps & SendAudio) ) {
-            return FALSE;
+
+        switch(direction) {
+        case Tp::MediaStreamDirectionSend:
+            GstPad *sink;
+            g_object_get(stream, "sink-pad", &sink, NULL);
+            self->onAudioSinkPadAdded(sink);
+            gst_object_unref(sink);
+            return (self->d->deviceFactory->audioInputDevice() != NULL);
+
+        case Tp::MediaStreamDirectionReceive:
+            /* The tp-farsight api is broken, so this signal will come after
+               the src-pad-added signal, which will allocate the resource instead.
+               Here we just return whether src-pad-added could allocate the device or not. */
+            return (self->d->deviceFactory->audioOutputDevice() != NULL);
+
+        default:
+            Q_ASSERT(false);
         }
-        if ( (direction & Tp::MediaStreamDirectionReceive)
-              && !(self->d->caps & ReceiveAudio) ) {
-            return FALSE;
-        }
-        return TRUE;
+        break;
+
     case Tp::MediaStreamTypeVideo:
         return FALSE;
+
     default:
         Q_ASSERT(false);
     }
     return FALSE; //warnings--
+}
+
+GstPad *MediaHandler::Private::newAudioSinkPad()
+{
+    if ( !liveadder ) {
+        if ( !(liveadder = gst_element_factory_make("liveadder", NULL)) ) {
+            kDebug() << "liveadder not available. Attempting to use plain adder";
+            if ( !(liveadder = gst_element_factory_make("adder", NULL)) ) {
+                kFatal() << "Failed to create an adder gstreamer element. Please install "
+                            "either the \"adder\" or the \"liveadder\" gstreamer plugin.";
+            }
+        }
+
+        gst_bin_add(GST_BIN(pipeline), liveadder);
+        gst_bin_add(GST_BIN(pipeline), deviceFactory->audioOutputDevice()->bin());
+        gst_element_link(liveadder, deviceFactory->audioOutputDevice()->bin());
+
+        gst_element_set_state(liveadder, GST_STATE_PLAYING);
+        gst_element_set_state(deviceFactory->audioOutputDevice()->bin(), GST_STATE_PLAYING);
+    }
+    return gst_element_get_request_pad(liveadder, "sink%d");
 }
 
 } //namespace Farsight

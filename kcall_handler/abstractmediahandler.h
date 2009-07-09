@@ -24,45 +24,19 @@ class VolumeControlInterface;
 class AbstractMediaHandler : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(Capability)
-    Q_FLAGS(Capabilities)
 public:
-    enum Capability {
-        None = 0x0,
-        SendAudio = 0x1,
-        ReceiveAudio = 0x2,
-        SendVideo = 0x4,
-        ReceiveVideo = 0x8
-    };
-    Q_DECLARE_FLAGS(Capabilities, Capability);
-
-    enum Status {
-        Disconnected,
-        Connecting,
-        Connected
-    };
-
     static AbstractMediaHandler *create(const Tp::StreamedMediaChannelPtr & channel,
                                         QObject *parent = 0);
 
-    Status status() const;
-    virtual Capabilities capabilities() const = 0;
-    virtual VolumeControlInterface *inputVolumeControl() const = 0;
-    virtual VolumeControlInterface *outputVolumeControl() const = 0;
-
 Q_SIGNALS:
-    void statusChanged(AbstractMediaHandler::Status newStatus);
+    void audioInputDeviceCreated(VolumeControlInterface *inputVolumeControl);
+    void audioInputDeviceDestroyed();
+
+    void audioOutputDeviceCreated(VolumeControlInterface *outputVolumeControl);
+    void audioOutputDeviceDestroyed();
 
 protected:
     AbstractMediaHandler(QObject *parent = 0);
-
-protected Q_SLOTS:
-    void setStatus(AbstractMediaHandler::Status s);
-
-private:
-    Status m_status;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractMediaHandler::Capabilities)
 
 #endif

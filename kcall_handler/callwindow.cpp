@@ -108,8 +108,9 @@ void CallWindow::disableUi()
 {
     d->hangupAction->setEnabled(false);
     d->ui.participantsDock->setEnabled(false);
-    d->ui.tabWidget->setTabEnabled(VolumeTabIndex, false);
-    d->ui.volumeTab->setEnabled(false);
+    //d->ui.tabWidget->setTabEnabled(VolumeTabIndex, false);
+    d->ui.microphoneGroupBox->setEnabled(false);
+    d->ui.speakersGroupBox->setEnabled(false);
     d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
     d->ui.videoControlsTab->setEnabled(false);
     d->ui.tabWidget->setTabEnabled(DialpadTabIndex, false);
@@ -162,11 +163,35 @@ void CallWindow::setStatus(const QString & msg)
 
 void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
 {
-    //FIXME this signal doesn't imply that we have an audio stream
-    d->ui.tabWidget->setTabEnabled(VolumeTabIndex, true);
-    d->ui.volumeTab->setEnabled(true);
-    d->ui.inputVolumeWidget->setVolumeControl(handler->inputVolumeControl());
-    d->ui.outputVolumeWidget->setVolumeControl(handler->outputVolumeControl());
+    connect(handler, SIGNAL(audioInputDeviceCreated(VolumeControlInterface*)),
+            SLOT(onAudioInputDeviceCreated(VolumeControlInterface*)));
+    connect(handler, SIGNAL(audioInputDeviceDestroyed()), SLOT(onAudioInputDeviceDestroyed()));
+
+    connect(handler, SIGNAL(audioOutputDeviceCreated(VolumeControlInterface*)),
+            SLOT(onAudioOutputDeviceCreated(VolumeControlInterface*)));
+    connect(handler, SIGNAL(audioOutputDeviceDestroyed()), SLOT(onAudioOutputDeviceDestroyed()));
+}
+
+void CallWindow::onAudioInputDeviceCreated(VolumeControlInterface *control)
+{
+    d->ui.microphoneGroupBox->setEnabled(true);
+    d->ui.inputVolumeWidget->setVolumeControl(control);
+}
+
+void CallWindow::onAudioInputDeviceDestroyed()
+{
+    d->ui.microphoneGroupBox->setEnabled(false);
+}
+
+void CallWindow::onAudioOutputDeviceCreated(VolumeControlInterface *control)
+{
+    d->ui.speakersGroupBox->setEnabled(true);
+    d->ui.outputVolumeWidget->setVolumeControl(control);
+}
+
+void CallWindow::onAudioOutputDeviceDestroyed()
+{
+    d->ui.speakersGroupBox->setEnabled(false);
 }
 
 void CallWindow::onGroupMembersModelCreated(GroupMembersModel *model)

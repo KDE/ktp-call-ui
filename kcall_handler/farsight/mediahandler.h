@@ -18,6 +18,7 @@
 #define _FARSIGHT_MEDIAHANDLER_H
 
 #include "../abstractmediahandler.h"
+typedef struct _GstPad GstPad;
 
 namespace Farsight {
 
@@ -28,13 +29,11 @@ public:
     explicit MediaHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
     virtual ~MediaHandler();
 
-    virtual Capabilities capabilities() const;
-    virtual VolumeControlInterface *inputVolumeControl() const;
-    virtual VolumeControlInterface *outputVolumeControl() const;
-
 private:
     void initialize();
     void stop();
+    void onAudioSrcPadAdded(GstPad *srcPad);
+    void onAudioSinkPadAdded(GstPad *sinkPad);
 
     struct Private;
     friend class Private;

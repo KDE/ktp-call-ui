@@ -18,7 +18,7 @@
 #include "farsight/mediahandler.h"
 
 AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
-    : QObject(parent), m_status(Disconnected)
+    : QObject(parent)
 {
 }
 
@@ -27,19 +27,6 @@ AbstractMediaHandler *AbstractMediaHandler::create(const Tp::StreamedMediaChanne
                                                    QObject *parent)
 {
     return new Farsight::MediaHandler(channel, parent);
-}
-
-AbstractMediaHandler::Status AbstractMediaHandler::status() const
-{
-    return m_status;
-}
-
-void AbstractMediaHandler::setStatus(AbstractMediaHandler::Status s)
-{
-    if ( s != m_status ) {
-        m_status = s;
-        emit statusChanged(s);
-    }
 }
 
 #include "abstractmediahandler.moc"

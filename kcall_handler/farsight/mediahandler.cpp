@@ -142,7 +142,7 @@ void MediaHandler::stop()
     QMetaObject::invokeMethod(this, "audioOutputDeviceDestroyed", Qt::QueuedConnection);
 }
 
-void MediaHandler::onAudioSrcPadAdded(GstPad *srcPad)
+bool MediaHandler::createAudioOutputDevice()
 {
     if ( !d->deviceFactory->audioOutputDevice() ) {
         if ( !d->deviceFactory->createAudioOutputDevice() ) {
@@ -152,10 +152,18 @@ void MediaHandler::onAudioSrcPadAdded(GstPad *srcPad)
                                           Q_ARG(QString, error));
             }
             d->deviceFactory->clearLog();
-            return;
+            return false;
         }
         gst_bin_add(GST_BIN(d->pipeline), d->deviceFactory->audioOutputDevice()->bin());
         gst_element_set_state(d->deviceFactory->audioOutputDevice()->bin(), GST_STATE_PLAYING);
+    }
+    return true;
+}
+
+void MediaHandler::onAudioSrcPadAdded(GstPad *srcPad)
+{
+    if ( !createAudioOutputDevice() ) {
+        return;
     }
 
     GstPad *sinkPad = d->newAudioSinkPad();
@@ -264,10 +272,11 @@ gboolean MediaHandler::Private::onRequestResource(TfStream *stream, guint direct
             return (self->d->deviceFactory->audioInputDevice() != NULL);
 
         case Tp::MediaStreamDirectionReceive:
-            /* The tp-farsight api is broken, so this signal will come after
-               the src-pad-added signal, which will allocate the resource instead.
-               Here we just return whether src-pad-added could allocate the device or not. */
-            return (self->d->deviceFactory->audioOutputDevice() != NULL);
+            /* The tp-farsight api is broken, so this signal may come either before or after
+               the src-pad-added signal, which may allocate the resource instead, so in that
+               case we just return whether the device exists or not. createAudioOutputDevice()
+               will just return true if the device is already open. */
+            return self->createAudioOutputDevice();
 
         default:
             Q_ASSERT(false);

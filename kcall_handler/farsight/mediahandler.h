@@ -32,6 +32,7 @@ public:
 private:
     void initialize();
     void stop();
+    bool createAudioOutputDevice();
     void onAudioSrcPadAdded(GstPad *srcPad);
     void onAudioSinkPadAdded(GstPad *sinkPad);
 

@@ -62,7 +62,7 @@ MediaHandler::MediaHandler(const Tp::StreamedMediaChannelPtr & channel, QObject 
     d->bus = NULL;
     d->busWatchSrc = 0;
 
-    qRegisterMetaType<VolumeControlInterface*>("VolumeControlInterface*");
+    qRegisterMetaType<GstPad*>("GstPad*");
     initialize();
 }
 
@@ -138,8 +138,8 @@ void MediaHandler::stop()
         gst_element_set_state(d->pipeline, GST_STATE_NULL);
     }
 
-    QMetaObject::invokeMethod(this, "audioInputDeviceDestroyed", Qt::QueuedConnection);
-    QMetaObject::invokeMethod(this, "audioOutputDeviceDestroyed", Qt::QueuedConnection);
+    emit audioInputDeviceDestroyed();
+    emit audioOutputDeviceDestroyed();
 }
 
 bool MediaHandler::createAudioOutputDevice()
@@ -170,8 +170,7 @@ void MediaHandler::onAudioSrcPadAdded(GstPad *srcPad)
     Q_ASSERT(sinkPad);
     gst_pad_link(srcPad, sinkPad);
 
-    QMetaObject::invokeMethod(this, "audioOutputDeviceCreated", Qt::QueuedConnection,
-                              Q_ARG(VolumeControlInterface*, d->deviceFactory->audioOutputDevice()));
+    emit audioOutputDeviceCreated(d->deviceFactory->audioOutputDevice());
 }
 
 void MediaHandler::onAudioSinkPadAdded(GstPad *sinkPad)
@@ -195,8 +194,7 @@ void MediaHandler::onAudioSinkPadAdded(GstPad *sinkPad)
     gst_pad_link(srcPad, sinkPad);
     gst_object_unref(srcPad);
 
-    QMetaObject::invokeMethod(this, "audioInputDeviceCreated", Qt::QueuedConnection,
-                              Q_ARG(VolumeControlInterface*, d->deviceFactory->audioInputDevice()));
+    emit audioInputDeviceCreated(d->deviceFactory->audioInputDevice());
 }
 
 gboolean MediaHandler::Private::busWatch(GstBus *bus, GstMessage *message, MediaHandler *self)
@@ -235,6 +233,7 @@ void MediaHandler::Private::onStreamCreated(TfChannel *tfChannel, TfStream *stre
                      G_CALLBACK(&MediaHandler::Private::onRequestResource), self);
 }
 
+/* WARNING this method is called in a different thread. God knows why... !@*#&^*&^ */
 void MediaHandler::Private::onSrcPadAdded(TfStream *stream, GstPad *src,
                                           FsCodec *codec, MediaHandler *self)
 {
@@ -244,7 +243,8 @@ void MediaHandler::Private::onSrcPadAdded(TfStream *stream, GstPad *src,
 
     switch (media_type) {
     case Tp::MediaStreamTypeAudio:
-        self->onAudioSrcPadAdded(src);
+        QMetaObject::invokeMethod(self, "onAudioSrcPadAdded", Qt::QueuedConnection,
+                                  Q_ARG(GstPad*, src));
         break;
     case Tp::MediaStreamTypeVideo:
         kWarning() << "Handling video is not supported yet.";

@@ -33,7 +33,7 @@ private:
     void initialize();
     void stop();
     bool createAudioOutputDevice();
-    void onAudioSrcPadAdded(GstPad *srcPad);
+    Q_INVOKABLE void onAudioSrcPadAdded(GstPad *srcPad);
     void onAudioSinkPadAdded(GstPad *sinkPad);
 
     struct Private;

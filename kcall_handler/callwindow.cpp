@@ -22,6 +22,7 @@
 #include "../libkcallprivate/groupmembersmodel.h"
 #include "../libkcallprivate/kcallhandlersettingsdialog.h"
 #include "../libkgstdevices/volumecontrolinterface.h"
+#include "../libkgstvideowidget/videowidget.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
@@ -40,7 +41,7 @@ struct CallWindow::Private
     ChannelHandler *channelHandler;
     QTime callDuration;
     QTimer callDurationTimer;
-
+    QHash<uint, QDockWidget*> videoOutputWidgets;
     Ui::CallWindow ui;
 };
 
@@ -175,6 +176,10 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
     connect(handler, SIGNAL(audioOutputDeviceCreated(VolumeControlInterface*)),
             SLOT(onAudioOutputDeviceCreated(VolumeControlInterface*)));
     connect(handler, SIGNAL(audioOutputDeviceDestroyed()), SLOT(onAudioOutputDeviceDestroyed()));
+
+    connect(handler, SIGNAL(videoOutputWidgetCreated(VideoWidget*, uint)),
+            SLOT(onVideoOutputWidgetCreated(VideoWidget*, uint)));
+    connect(handler, SIGNAL(closeVideoOutputWidget(uint)), SLOT(onCloseVideoOutputWidget(uint)));
 }
 
 void CallWindow::onAudioInputDeviceCreated(VolumeControlInterface *control)
@@ -197,6 +202,25 @@ void CallWindow::onAudioOutputDeviceCreated(VolumeControlInterface *control)
 void CallWindow::onAudioOutputDeviceDestroyed()
 {
     d->ui.speakersGroupBox->setEnabled(false);
+}
+
+void CallWindow::onVideoOutputWidgetCreated(VideoWidget *widget, uint id)
+{
+    QDockWidget *dock = new QDockWidget(this);
+    dock->setObjectName("video-output-" + QString::number(id));
+    dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+    dock->setWidget(widget);
+    addDockWidget(Qt::LeftDockWidgetArea, dock);
+    d->videoOutputWidgets[id] = dock;
+}
+
+void CallWindow::onCloseVideoOutputWidget(uint id)
+{
+    kDebug() << "bar";
+    QDockWidget *dock = d->videoOutputWidgets.take(id);
+    Q_ASSERT(dock);
+    removeDockWidget(dock);
+    dock->deleteLater();
 }
 
 void CallWindow::onGroupMembersModelCreated(GroupMembersModel *model)

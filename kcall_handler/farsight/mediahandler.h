@@ -35,6 +35,7 @@ private:
     bool createAudioOutputDevice();
     Q_INVOKABLE void onAudioSrcPadAdded(GstPad *srcPad);
     void onAudioSinkPadAdded(GstPad *sinkPad);
+    Q_INVOKABLE void onVideoSrcPadAdded(GstPad *srcPad, uint streamId);
 
     struct Private;
     friend class Private;

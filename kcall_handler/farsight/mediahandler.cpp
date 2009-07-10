@@ -21,6 +21,7 @@
 #include "mediahandler.h"
 #include "../../libkgstdevices/devicefactory.h"
 #include "../../libkgstdevices/mediadevices.h"
+#include "../../libkgstvideowidget/videowidget.h"
 #include <KDebug>
 #include <KGlobal>
 #include <KSharedConfig>
@@ -39,6 +40,7 @@ struct MediaHandler::Private
     static void onStreamCreated(TfChannel *tfChannel, TfStream *stream, MediaHandler *self);
     static void onSrcPadAdded(TfStream *stream, GstPad *src, FsCodec *codec, MediaHandler *self);
     static gboolean onRequestResource(TfStream *stream, guint direction, MediaHandler *self);
+    static void onFreeResource(TfStream *stream, guint direction, MediaHandler *self);
 
     GstPad *newAudioSinkPad();
 
@@ -197,6 +199,20 @@ void MediaHandler::onAudioSinkPadAdded(GstPad *sinkPad)
     emit audioInputDeviceCreated(d->deviceFactory->audioInputDevice());
 }
 
+void MediaHandler::onVideoSrcPadAdded(GstPad *srcPad, uint streamId)
+{
+    VideoWidget *vw = new VideoWidget;
+    gst_bin_add(GST_BIN(d->pipeline), vw->videoElement());
+
+    GstPad *sinkPad = gst_element_get_static_pad(vw->videoElement(), "sink");
+    Q_ASSERT(sinkPad);
+    gst_pad_link(srcPad, sinkPad);
+    gst_object_unref(sinkPad);
+
+    gst_element_set_state(vw->videoElement(), GST_STATE_PLAYING);
+    emit videoOutputWidgetCreated(vw, streamId);
+}
+
 gboolean MediaHandler::Private::busWatch(GstBus *bus, GstMessage *message, MediaHandler *self)
 {
     Q_UNUSED(bus);
@@ -231,6 +247,8 @@ void MediaHandler::Private::onStreamCreated(TfChannel *tfChannel, TfStream *stre
                      G_CALLBACK(&MediaHandler::Private::onSrcPadAdded), self);
     g_signal_connect(stream, "request-resource",
                      G_CALLBACK(&MediaHandler::Private::onRequestResource), self);
+    g_signal_connect(stream, "free-resource",
+                     G_CALLBACK(&MediaHandler::Private::onFreeResource), self);
 }
 
 /* WARNING this method is called in a different thread. God knows why... !@*#&^*&^ */
@@ -239,7 +257,8 @@ void MediaHandler::Private::onSrcPadAdded(TfStream *stream, GstPad *src,
 {
     Q_UNUSED(codec);
     guint media_type;
-    g_object_get(stream, "media-type", &media_type, NULL);
+    guint stream_id;
+    g_object_get(stream, "media-type", &media_type, "stream-id", &stream_id, NULL);
 
     switch (media_type) {
     case Tp::MediaStreamTypeAudio:
@@ -247,7 +266,8 @@ void MediaHandler::Private::onSrcPadAdded(TfStream *stream, GstPad *src,
                                   Q_ARG(GstPad*, src));
         break;
     case Tp::MediaStreamTypeVideo:
-        kWarning() << "Handling video is not supported yet.";
+        QMetaObject::invokeMethod(self, "onVideoSrcPadAdded", Qt::QueuedConnection,
+                                  Q_ARG(GstPad*, src), Q_ARG(uint, stream_id));
         return;
     default:
         Q_ASSERT(false);
@@ -281,15 +301,35 @@ gboolean MediaHandler::Private::onRequestResource(TfStream *stream, guint direct
         default:
             Q_ASSERT(false);
         }
-        break;
 
     case Tp::MediaStreamTypeVideo:
-        return FALSE;
+
+        switch(direction) {
+        case Tp::MediaStreamDirectionSend:
+            return FALSE; //TODO add support for that
+
+        case Tp::MediaStreamDirectionReceive:
+            return TRUE;
+
+        default:
+            Q_ASSERT(false);
+        }
 
     default:
         Q_ASSERT(false);
     }
     return FALSE; //warnings--
+}
+
+void MediaHandler::Private::onFreeResource(TfStream *stream, guint direction, MediaHandler *self)
+{
+    guint media_type;
+    guint stream_id;
+    g_object_get(stream, "media-type", &media_type, "stream-id", &stream_id, NULL);
+
+    if ( media_type == Tp::MediaStreamTypeVideo && direction == Tp::MediaStreamDirectionReceive ) {
+            emit self->closeVideoOutputWidget(stream_id);
+    }
 }
 
 GstPad *MediaHandler::Private::newAudioSinkPad()

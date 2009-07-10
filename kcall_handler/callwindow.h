@@ -20,6 +20,7 @@
 #include "channelhandler.h"
 #include <KXmlGuiWindow>
 class VolumeControlInterface;
+class VideoWidget;
 
 class CallWindow : public KXmlGuiWindow
 {
@@ -41,6 +42,8 @@ private slots:
     void onAudioInputDeviceDestroyed();
     void onAudioOutputDeviceCreated(VolumeControlInterface *control);
     void onAudioOutputDeviceDestroyed();
+    void onVideoOutputWidgetCreated(VideoWidget *widget, uint id);
+    void onCloseVideoOutputWidget(uint id);
     void onGroupMembersModelCreated(GroupMembersModel *model);
     void onDtmfHandlerCreated(DtmfHandler *handler);
     void onCallDurationTimerTimeout();

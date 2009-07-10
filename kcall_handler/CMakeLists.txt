@@ -25,7 +25,8 @@ target_link_libraries(kcall_handler ${KDE4_KDEUI_LIBS}
                                     ${GOBJECT_LIBRARIES}
                                     ${TPFARSIGHT_LIBRARIES}
                                     kcallprivate
-                                    kgstdevices)
+                                    kgstdevices
+                                    kgstvideowidget)
 
 install(TARGETS kcall_handler ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall_handler)

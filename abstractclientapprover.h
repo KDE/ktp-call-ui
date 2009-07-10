@@ -19,7 +19,7 @@
 
 #include <QtCore/QObject>
 #include <TelepathyQt4/AbstractClientApprover>
-namespace Tp { class PendingOperation; }
+namespace Tp { class PendingOperation; class DBusProxy; }
 
 class ApproverRequest : public QObject
 {
@@ -44,7 +44,9 @@ signals:
 
 private slots:
     void onDispatchOperationReady(Tp::PendingOperation *op);
-    void onDispatchOperationFinished();
+    void onDispatchOperationInvalidated(Tp::DBusProxy *proxy,
+                                        const QString & errorName,
+                                        const QString & errorMessage);
     void onClaimFinished(Tp::PendingOperation *op);
 
 private:

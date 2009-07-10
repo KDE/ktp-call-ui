@@ -83,13 +83,20 @@ void ApproverRequest::onDispatchOperationReady(Tp::PendingOperation *op)
         return;
     }
 
-    connect(d->dispatchOperation.data(), SIGNAL(finished()), SLOT(onDispatchOperationFinished()));
+    connect(d->dispatchOperation.data(), SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
+            SLOT(onDispatchOperationInvalidated(Tp::DBusProxy*, QString, QString)));
     emit ready(this);
     d->context->setFinished();
 }
 
-void ApproverRequest::onDispatchOperationFinished()
+void ApproverRequest::onDispatchOperationInvalidated(Tp::DBusProxy *proxy,
+                                                     const QString & errorName,
+                                                     const QString & errorMessage)
 {
+    Q_UNUSED(proxy);
+    if ( errorName != TELEPATHY_QT4_ERROR_OBJECT_REMOVED ) {
+        kError() << errorName << errorMessage;
+    }
     emit finished(this);
 }
 

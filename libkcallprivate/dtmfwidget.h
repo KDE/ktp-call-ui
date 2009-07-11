@@ -29,8 +29,8 @@ public:
     virtual ~DtmfWidget();
 
 Q_SIGNALS:
-    void startSendEvent(Tp::DTMFEvent event);
-    void stopSendEvent();
+    void startSendDtmfEvent(Tp::DTMFEvent event);
+    void stopSendDtmfEvent();
 
 private Q_SLOTS:
     void onButtonPressed(int code);

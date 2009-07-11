@@ -56,18 +56,18 @@ DtmfWidget::DtmfWidget(QWidget *parent)
     connect(d->ui.buttonAsterisk, SIGNAL(pressed()), &d->mapper, SLOT(map()));
     connect(d->ui.buttonHash, SIGNAL(pressed()), &d->mapper, SLOT(map()));
 
-    connect(d->ui.button0, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button1, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button2, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button3, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button4, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button5, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button6, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button7, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button8, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.button9, SIGNAL(released()),  SIGNAL(stopSendEvent()));
-    connect(d->ui.buttonAsterisk, SIGNAL(released()), SIGNAL(stopSendEvent()));
-    connect(d->ui.buttonHash, SIGNAL(released()), SIGNAL(stopSendEvent()));
+    connect(d->ui.button0, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button1, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button2, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button3, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button4, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button5, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button6, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button7, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button8, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.button9, SIGNAL(released()),  SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.buttonAsterisk, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
+    connect(d->ui.buttonHash, SIGNAL(released()), SIGNAL(stopSendDtmfEvent()));
 }
 
 DtmfWidget::~DtmfWidget()
@@ -77,7 +77,7 @@ DtmfWidget::~DtmfWidget()
 
 void DtmfWidget::onButtonPressed(int code)
 {
-    emit startSendEvent(static_cast<Tp::DTMFEvent>(code));
+    emit startSendDtmfEvent(static_cast<Tp::DTMFEvent>(code));
 }
 
 #include "dtmfwidget.moc"

@@ -96,7 +96,9 @@ void TreeModelItem::appendChild(TreeModelItem *child)
 
 void TreeModelItem::appendChildren(const QVector<TreeModelItem*> & children)
 {
-    Q_ASSERT(children.size() > 0);
+    if (children.size() == 0) {
+        return;
+    }
 
     d->model->beginInsertRows(index(), d->children.size(), d->children.size() + children.size() - 1);
     foreach(TreeModelItem *child, children) {

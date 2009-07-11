@@ -24,6 +24,9 @@
 #include <KStatusBar>
 #include <KAction>
 #include <KActionCollection>
+#include <TelepathyQt4/Account>
+
+Q_DECLARE_METATYPE(Tp::AccountPtr)
 
 MainWindow::MainWindow()
     : KXmlGuiWindow(),
@@ -37,6 +40,9 @@ MainWindow::MainWindow()
 
     ui->contactsTreeView->setModel(KCallApplication::instance()->contactsModel());
     new ContactListController(ui->contactsTreeView, KCallApplication::instance()->contactsModel());
+
+    ui->accountComboBox->setModel(KCallApplication::instance()->contactsModel());
+    connect(ui->dialButton, SIGNAL(clicked()), SLOT(onDialButtonClicked()));
 
     setupActions();
     setupGUI(QSize(340, 460));
@@ -61,6 +67,30 @@ void MainWindow::showSettingsDialog()
         KCallHandlerSettingsDialog::addHandlerPagesToDialog(dialog, KCallHandlerSettings::self());
         dialog->show();
     }
+}
+
+void MainWindow::onDialButtonClicked()
+{
+    int row = ui->accountComboBox->currentIndex();
+    QString id = ui->contactHandleLineEdit->text();
+    if ( row < 0  || id.isEmpty() ) {
+        return;
+    }
+
+    TreeModel *model = qobject_cast<TreeModel*>(ui->accountComboBox->model());
+    Q_ASSERT(model);
+
+    Tp::AccountPtr account = model->index(row, 0).data(KCall::ObjectPtrRole).value<Tp::AccountPtr>();
+    Q_ASSERT( !account.isNull() );
+
+    QVariantMap request;
+    request.insert(TELEPATHY_INTERFACE_CHANNEL ".ChannelType",
+                   TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
+    request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType", Tp::HandleTypeContact);
+    request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetID", id);
+   // request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialAudio", true);
+    account->ensureChannel(request, QDateTime::currentDateTime(),
+                           "org.freedesktop.Telepathy.Client.kcall_handler");
 }
 
 #include "mainwindow.moc"

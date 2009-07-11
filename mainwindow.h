@@ -29,6 +29,7 @@ public:
 
 private slots:
     void showSettingsDialog();
+    void onDialButtonClicked();
 
 private:
     void setupActions();

@@ -58,6 +58,8 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
             SLOT(onMediaHandlerCreated(AbstractMediaHandler*)));
     connect(d->channelHandler, SIGNAL(groupMembersModelCreated(GroupMembersModel*)),
             SLOT(onGroupMembersModelCreated(GroupMembersModel*)));
+    connect(d->channelHandler, SIGNAL(dtmfHandlerCreated(DtmfHandler*)),
+            SLOT(onDtmfHandlerCreated(DtmfHandler*)));
 
     setupUi();
 

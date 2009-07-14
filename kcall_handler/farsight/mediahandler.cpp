@@ -26,8 +26,10 @@
 #include <KGlobal>
 #include <KSharedConfig>
 #include <KConfigGroup>
+#include <KStandardDirs>
 #include <TelepathyQt4/Farsight/Channel>
 #include <telepathy-farsight/channel.h>
+#include <gst/farsight/fs-codec.h>
 
 namespace Farsight {
 
@@ -41,6 +43,8 @@ struct MediaHandler::Private
     static void onSrcPadAdded(TfStream *stream, GstPad *src, FsCodec *codec, MediaHandler *self);
     static gboolean onRequestResource(TfStream *stream, guint direction, MediaHandler *self);
     static void onFreeResource(TfStream *stream, guint direction, MediaHandler *self);
+    static GList *onStreamGetCodecConfig(TfChannel *channel, guint stream_id,
+                                         guint media_type, guint direction, MediaHandler *self);
 
     GstPad *newAudioSinkPad();
 
@@ -117,6 +121,8 @@ void MediaHandler::initialize()
                      G_CALLBACK(&MediaHandler::Private::onSessionCreated), this);
     g_signal_connect(d->tfChannel, "stream-created",
                      G_CALLBACK(&MediaHandler::Private::onStreamCreated), this);
+    g_signal_connect(d->tfChannel, "stream-get-codec-config",
+                     G_CALLBACK(&MediaHandler::Private::onStreamGetCodecConfig), this);
 
     d->pipeline = gst_pipeline_new(NULL);
     Q_ASSERT(d->pipeline);
@@ -329,6 +335,24 @@ void MediaHandler::Private::onFreeResource(TfStream *stream, guint direction, Me
 
     if ( media_type == Tp::MediaStreamTypeVideo && direction == Tp::MediaStreamDirectionReceive ) {
             emit self->closeVideoOutputWidget(stream_id);
+    }
+}
+
+GList *MediaHandler::Private::onStreamGetCodecConfig(TfChannel *channel, guint stream_id,
+                                              guint media_type, guint direction, MediaHandler *self)
+{
+    Q_UNUSED(channel);
+    Q_UNUSED(stream_id);
+    Q_UNUSED(media_type);
+    Q_UNUSED(direction);
+    Q_UNUSED(self);
+
+    QString codecsFile = KStandardDirs::locate("appdata", "codec-preferences.ini");
+    kDebug() << "Reading codec preferences from" << codecsFile;
+    if ( !codecsFile.isEmpty() ) {
+        return fs_codec_list_from_keyfile(QFile::encodeName(codecsFile), NULL);
+    } else {
+        return NULL;
     }
 }
 

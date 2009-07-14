@@ -218,9 +218,10 @@ void CallWindow::onVideoOutputWidgetCreated(VideoWidget *widget, uint id)
 
 void CallWindow::onCloseVideoOutputWidget(uint id)
 {
-    kDebug() << "bar";
     QDockWidget *dock = d->videoOutputWidgets.take(id);
-    Q_ASSERT(dock);
+    if ( !dock ) {
+        return;
+    }
     removeDockWidget(dock);
     dock->deleteLater();
 }

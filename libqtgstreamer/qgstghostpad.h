@@ -14,23 +14,30 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef VOLUMECONTROLINTERFACE_H
-#define VOLUMECONTROLINTERFACE_H
+#ifndef _QTGSTREAMER_QGSTGHOSTPAD_H
+#define _QTGSTREAMER_QGSTGHOSTPAD_H
 
-class VolumeControlInterface
+#include "qgstpad.h"
+
+namespace QtGstreamer {
+
+class QGstGhostPad;
+typedef QSharedPointer<QGstGhostPad> QGstGhostPadPtr;
+
+class QGstGhostPad : public QGstPad
 {
+    Q_OBJECT
+    Q_DISABLE_COPY(QGstGhostPad)
 public:
-    virtual ~VolumeControlInterface() {}
+    static QGstGhostPadPtr newGhostPad(const char *name, const QGstPadPtr & target);
+    virtual ~QGstGhostPad();
 
-    virtual bool volumeControlIsAvailable() const = 0;
-
-    virtual bool isMuted() const = 0;
-    virtual void setMuted(bool mute) = 0;
-
-    virtual int minVolume() const = 0;
-    virtual int maxVolume() const = 0;
-    virtual int volume() const = 0;
-    virtual void setVolume(int volume) = 0;
+protected:
+    QGstGhostPad(const char *name, const QGstPadPtr & target);
 };
+
+}
+
+Q_DECLARE_METATYPE(QtGstreamer::QGstGhostPadPtr)
 
 #endif

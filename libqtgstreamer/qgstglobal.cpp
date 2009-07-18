@@ -14,19 +14,19 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "abstractmediahandler.h"
-#include "farsight/farsightmediahandler.h"
+#include "qgstglobal.h"
+#include <gst/gst.h>
 
-AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
-    : QObject(parent)
+namespace QtGstreamer {
+
+void qGstInit()
 {
+    qGstInit(0, 0);
 }
 
-//static
-AbstractMediaHandler *AbstractMediaHandler::create(const Tp::StreamedMediaChannelPtr & channel,
-                                                   QObject *parent)
+void qGstInit(int *argc, char **argv[])
 {
-    return new FarsightMediaHandler(channel, parent);
+    gst_init(argc, argv);
 }
 
-#include "abstractmediahandler.moc"
+}

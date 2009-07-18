@@ -14,19 +14,37 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "abstractmediahandler.h"
-#include "farsight/farsightmediahandler.h"
+#include "qgstpipeline.h"
+#include <gst/gstpipeline.h>
 
-AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
-    : QObject(parent)
+namespace QtGstreamer {
+
+QGstPipeline::QGstPipeline(const char *name)
+    : QGstBin(GST_BIN(gst_pipeline_new(name)))
 {
 }
 
 //static
-AbstractMediaHandler *AbstractMediaHandler::create(const Tp::StreamedMediaChannelPtr & channel,
-                                                   QObject *parent)
+QGstPipelinePtr QGstPipeline::newPipeline(const char *name)
 {
-    return new FarsightMediaHandler(channel, parent);
+    return QGstPipelinePtr(new QGstPipeline(name));
 }
 
-#include "abstractmediahandler.moc"
+QGstPipeline::QGstPipeline(GstPipeline *gstPipeline)
+    : QGstBin(GST_BIN(gstPipeline))
+{
+}
+
+//static
+QGstPipelinePtr QGstPipeline::fromGstPipeline(GstPipeline *gstPipeline)
+{
+    return QGstPipelinePtr(new QGstPipeline(gstPipeline));
+}
+
+QGstPipeline::~QGstPipeline()
+{
+}
+
+}
+
+#include "qgstpipeline.moc"

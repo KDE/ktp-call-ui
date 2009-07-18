@@ -12,7 +12,8 @@ set(kcall_handler_SRCS
     abstractmediahandler.cpp
     dtmfhandler.cpp
     volumewidget.cpp
-    farsight/mediahandler.cpp
+    farsight/audiobin.cpp
+    farsight/farsightmediahandler.cpp
 )
 
 kde4_add_ui_files(kcall_handler_SRCS callwindow.ui)
@@ -20,13 +21,20 @@ kde4_add_kcfg_files(kcall_handler_SRCS kcallhandlersettings.kcfgc)
 kde4_add_executable(kcall_handler ${kcall_handler_SRCS})
 target_link_libraries(kcall_handler ${KDE4_KDEUI_LIBS}
                                     ${TELEPATHY_QT4_LIBRARIES}
-                                    ${TELEPATHY_QT4_FARSIGHT_LIBRARIES}
+                                    kcallprivate
+                                    qtpfarsight
+                                    kgstdevices
+                                    kgstvideowidget
+                                    QtGstreamer
+                                    #extra dependencies of libQtGstreamer
                                     ${GSTREAMER_LIBRARIES}
                                     ${GOBJECT_LIBRARIES}
+                                    #extra dependencies of libqtpfarsight
+                                    ${TELEPATHY_QT4_FARSIGHT_LIBRARIES}
                                     ${TPFARSIGHT_LIBRARIES}
-                                    kcallprivate
-                                    kgstdevices
-                                    kgstvideowidget)
+                                    #extra dependencies of libkgstdevices
+                                    ${KDE4_SOLID_LIBS}
+)
 
 install(TARGETS kcall_handler ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall_handler)

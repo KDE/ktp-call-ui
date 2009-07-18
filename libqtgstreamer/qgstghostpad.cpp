@@ -14,19 +14,26 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "abstractmediahandler.h"
-#include "farsight/farsightmediahandler.h"
+#include "qgstghostpad.h"
+#include <gst/gstghostpad.h>
 
-AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
-    : QObject(parent)
+namespace QtGstreamer {
+
+QGstGhostPad::QGstGhostPad(const char *name, const QGstPadPtr & target)
+    : QGstPad(gst_ghost_pad_new(name, GST_PAD(target->m_object)))
 {
 }
 
 //static
-AbstractMediaHandler *AbstractMediaHandler::create(const Tp::StreamedMediaChannelPtr & channel,
-                                                   QObject *parent)
+QGstGhostPadPtr QGstGhostPad::newGhostPad(const char *name, const QGstPadPtr & target)
 {
-    return new FarsightMediaHandler(channel, parent);
+    return QGstGhostPadPtr(new QGstGhostPad(name, target));
 }
 
-#include "abstractmediahandler.moc"
+QGstGhostPad::~QGstGhostPad()
+{
+}
+
+}
+
+#include "qgstghostpad.moc"

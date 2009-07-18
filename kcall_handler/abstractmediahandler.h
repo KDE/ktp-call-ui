@@ -19,7 +19,6 @@
 
 #include "calllog.h"
 #include <TelepathyQt4/StreamedMediaChannel>
-class VolumeControlInterface;
 class VideoWidget;
 
 class AbstractMediaHandler : public QObject
@@ -30,10 +29,10 @@ public:
                                         QObject *parent = 0);
 
 Q_SIGNALS:
-    void audioInputDeviceCreated(VolumeControlInterface *inputVolumeControl);
+    void audioInputDeviceCreated(QObject *inputVolumeControl);
     void audioInputDeviceDestroyed();
 
-    void audioOutputDeviceCreated(VolumeControlInterface *outputVolumeControl);
+    void audioOutputDeviceCreated(QObject *outputVolumeControl);
     void audioOutputDeviceDestroyed();
 
     void videoOutputWidgetCreated(VideoWidget *videoWidget, uint streamId);

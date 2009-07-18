@@ -1,16 +1,13 @@
-
-include_directories(${GSTREAMER_INCLUDE_DIR} ${GLIB2_INCLUDE_DIR}
-                    ${LIBXML2_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${KDE4_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
+add_definitions(${KDE4_DEFINITIONS})
 
 set(kgstdevices_SRCS
-    elementfactory_p.cpp
-    devicefactory.cpp
-    mediadevices.cpp
+    devicemanager.cpp
+    devicesmodel.cpp
+    devicechooser.cpp
 )
 
-kde4_add_library(kgstdevices ${kgstdevices_SRCS})
-target_link_libraries(kgstdevices ${KDE4_KDECORE_LIBS}
-                                    ${GSTREAMER_LIBRARIES}
-                                    ${GOBJECT_LIBRARIES})
-
-#install(TARGETS kgstdevices ${INSTALL_TARGETS_DEFAULT_ARGS})
+kde4_add_ui_files(kgstdevices_SRCS audiodevicechooser.ui)
+kde4_add_library(kgstdevices STATIC ${kgstdevices_SRCS})
+#set_target_properties(kgstdevices PROPERTIES SOVERSION 0 VERSION 0.0.1)
+#target_link_libraries(kgstdevices ${KDE4_KDEUI_LIBS} ${KDE4_SOLID_LIBS} -lQtGstreamer)

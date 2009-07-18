@@ -14,34 +14,41 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _FARSIGHT_MEDIAHANDLER_H
-#define _FARSIGHT_MEDIAHANDLER_H
+#ifndef _QTGSTREAMER_QGSTBUS_H
+#define _QTGSTREAMER_QGSTBUS_H
 
-#include "../abstractmediahandler.h"
-typedef struct _GstPad GstPad;
+#include "qgstobject.h"
+typedef struct _GstBus GstBus;
+typedef struct _GstMessage GstMessage;
 
-namespace Farsight {
+namespace QtGstreamer {
 
-class MediaHandler : public AbstractMediaHandler
+class QGstBus;
+typedef QSharedPointer<QGstBus> QGstBusPtr;
+class QGstBusPrivate;
+
+class QGstBus : public QGstObject
 {
     Q_OBJECT
+    Q_DISABLE_COPY(QGstBus)
+    friend class QGstBusPrivate;
 public:
-    explicit MediaHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
-    virtual ~MediaHandler();
+    static QGstBusPtr fromGstBus(GstBus *gstBus);
+    virtual ~QGstBus();
 
-private:
-    void initialize();
-    void stop();
-    bool createAudioOutputDevice();
-    Q_INVOKABLE void onAudioSrcPadAdded(GstPad *srcPad);
-    void onAudioSinkPadAdded(GstPad *sinkPad);
-    Q_INVOKABLE void onVideoSrcPadAdded(GstPad *srcPad, uint streamId);
+    void addSignalWatch();
+    void removeSignalWatch();
 
-    struct Private;
-    friend class Private;
-    Private *const d;
+Q_SIGNALS:
+    //FIXME this should emit a QGstMessagePtr
+    void message(GstMessage *message);
+
+protected:
+    QGstBus(GstBus *gstBus);
 };
 
-} //namespace Farsight
+}
+
+Q_DECLARE_METATYPE(QtGstreamer::QGstBusPtr)
 
 #endif

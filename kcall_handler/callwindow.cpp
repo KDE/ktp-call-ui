@@ -21,7 +21,6 @@
 #include "kcallhandlersettings.h"
 #include "../libkcallprivate/groupmembersmodel.h"
 #include "../libkcallprivate/kcallhandlersettingsdialog.h"
-#include "../libkgstdevices/volumecontrolinterface.h"
 #include "../libkgstvideowidget/videowidget.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
@@ -171,12 +170,12 @@ void CallWindow::setStatus(const QString & msg)
 
 void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
 {
-    connect(handler, SIGNAL(audioInputDeviceCreated(VolumeControlInterface*)),
-            SLOT(onAudioInputDeviceCreated(VolumeControlInterface*)));
+    connect(handler, SIGNAL(audioInputDeviceCreated(QObject*)),
+            SLOT(onAudioInputDeviceCreated(QObject*)));
     connect(handler, SIGNAL(audioInputDeviceDestroyed()), SLOT(onAudioInputDeviceDestroyed()));
 
-    connect(handler, SIGNAL(audioOutputDeviceCreated(VolumeControlInterface*)),
-            SLOT(onAudioOutputDeviceCreated(VolumeControlInterface*)));
+    connect(handler, SIGNAL(audioOutputDeviceCreated(QObject*)),
+            SLOT(onAudioOutputDeviceCreated(QObject*)));
     connect(handler, SIGNAL(audioOutputDeviceDestroyed()), SLOT(onAudioOutputDeviceDestroyed()));
 
     connect(handler, SIGNAL(videoOutputWidgetCreated(VideoWidget*, uint)),
@@ -184,7 +183,7 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
     connect(handler, SIGNAL(closeVideoOutputWidget(uint)), SLOT(onCloseVideoOutputWidget(uint)));
 }
 
-void CallWindow::onAudioInputDeviceCreated(VolumeControlInterface *control)
+void CallWindow::onAudioInputDeviceCreated(QObject *control)
 {
     d->ui.microphoneGroupBox->setEnabled(true);
     d->ui.inputVolumeWidget->setVolumeControl(control);
@@ -195,7 +194,7 @@ void CallWindow::onAudioInputDeviceDestroyed()
     d->ui.microphoneGroupBox->setEnabled(false);
 }
 
-void CallWindow::onAudioOutputDeviceCreated(VolumeControlInterface *control)
+void CallWindow::onAudioOutputDeviceCreated(QObject *control)
 {
     d->ui.speakersGroupBox->setEnabled(true);
     d->ui.outputVolumeWidget->setVolumeControl(control);

@@ -14,19 +14,38 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "abstractmediahandler.h"
-#include "farsight/farsightmediahandler.h"
+#ifndef _QTGSTREAMER_QGSTBIN_H
+#define _QTGSTREAMER_QGSTBIN_H
 
-AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
-    : QObject(parent)
+#include "qgstelement.h"
+typedef struct _GstBin GstBin;
+
+namespace QtGstreamer {
+
+class QGstBin;
+typedef QSharedPointer<QGstBin> QGstBinPtr;
+
+class QGstBin : public QGstElement
 {
+    Q_OBJECT
+    Q_DISABLE_COPY(QGstBin)
+public:
+    static QGstBinPtr newBin(const char *name = 0);
+    static QGstBinPtr fromGstBin(GstBin *gstBin);
+    virtual ~QGstBin();
+
+    bool add(const QGstElementPtr & element);
+    QGstBin & operator<<(const QGstElementPtr & element);
+
+    bool remove(const QGstElementPtr & element);
+
+protected:
+    QGstBin(const char *name = 0);
+    QGstBin(GstBin *gstBin);
+};
+
 }
 
-//static
-AbstractMediaHandler *AbstractMediaHandler::create(const Tp::StreamedMediaChannelPtr & channel,
-                                                   QObject *parent)
-{
-    return new FarsightMediaHandler(channel, parent);
-}
+Q_DECLARE_METATYPE(QtGstreamer::QGstBinPtr)
 
-#include "abstractmediahandler.moc"
+#endif

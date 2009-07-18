@@ -38,9 +38,9 @@ private slots:
     void setState(ChannelHandler::State state);
     void setStatus(const QString & msg);
     void onMediaHandlerCreated(AbstractMediaHandler *handler);
-    void onAudioInputDeviceCreated(VolumeControlInterface *control);
+    void onAudioInputDeviceCreated(QObject *control);
     void onAudioInputDeviceDestroyed();
-    void onAudioOutputDeviceCreated(VolumeControlInterface *control);
+    void onAudioOutputDeviceCreated(QObject *control);
     void onAudioOutputDeviceDestroyed();
     void onVideoOutputWidgetCreated(VideoWidget *widget, uint id);
     void onCloseVideoOutputWidget(uint id);

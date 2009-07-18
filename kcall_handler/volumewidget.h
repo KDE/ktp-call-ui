@@ -18,7 +18,6 @@
 #define VOLUMEWIDGET_H
 
 #include <QtGui/QWidget>
-class VolumeControlInterface;
 
 class VolumeWidget : public QWidget
 {
@@ -27,7 +26,7 @@ public:
     VolumeWidget(QWidget *parent = 0);
     virtual ~VolumeWidget();
 
-    void setVolumeControl(VolumeControlInterface *control);
+    void setVolumeControl(QObject *control);
 
 private slots:
     void onSliderValueChanged(int value);

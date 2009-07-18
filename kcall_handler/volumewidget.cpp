@@ -15,14 +15,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "volumewidget.h"
-#include "../libkgstdevices/volumecontrolinterface.h"
+#include <QtCore/QVariant>
 #include <QtGui/QSlider>
 #include <QtGui/QVBoxLayout>
 
 struct VolumeWidget::Private
 {
     QSlider *slider;
-    VolumeControlInterface *control;
+    QObject *control;
 };
 
 VolumeWidget::VolumeWidget(QWidget *parent)
@@ -44,16 +44,17 @@ VolumeWidget::~VolumeWidget()
     delete d;
 }
 
-void VolumeWidget::setVolumeControl(VolumeControlInterface *control)
+void VolumeWidget::setVolumeControl(QObject *control)
 {
     d->control = control;
 
-    if ( d->control && d->control->volumeControlIsAvailable() ) {
-        d->slider->setMinimum(d->control->minVolume());
-        d->slider->setMaximum(d->control->maxVolume());
-        d->slider->setValue(d->control->volume());
+    if ( d->control && d->control->property("volume").isValid() ) {
+        d->slider->setMinimum(d->control->property("minVolume").toInt());
+        d->slider->setMaximum(d->control->property("maxVolume").toInt());
+        d->slider->setValue(d->control->property("volume").toInt());
         d->slider->setTickPosition(QSlider::TicksAbove);
-        d->slider->setTickInterval((d->control->maxVolume() - d->control->minVolume())/10);
+        d->slider->setTickInterval((d->control->property("maxVolume").toInt() -
+                                    d->control->property("minVolume").toInt())/10);
         setEnabled(true);
     } else {
         setEnabled(false);
@@ -63,8 +64,8 @@ void VolumeWidget::setVolumeControl(VolumeControlInterface *control)
 void VolumeWidget::onSliderValueChanged(int value)
 {
     Q_ASSERT(d->control);
-    d->control->setVolume(value);
-    d->slider->setValue(d->control->volume());
+    d->control->setProperty("volume", QVariant(value));
+    d->slider->setValue(d->control->property("volume").toInt());
 }
 
 #include "volumewidget.moc"

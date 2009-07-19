@@ -30,7 +30,12 @@ public:
     ~Private();
 
     void init(Tp::StreamedMediaChannelPtr channel, QGstBusPtr bus);
+
+    //slots
     void onBusMessage(GstMessage *message);
+    void onAudioSrcPadAdded(QtGstreamer::QGstPadPtr pad);
+    void onVideoSrcPadAdded(QtGstreamer::QGstPadPtr pad);
+    void onConferencePadRemoved(QtGstreamer::QGstPadPtr pad);
 
     static gboolean busWatch(GstBus *bus, GstMessage *message, QTfChannel::Private *self);
     static void onTfChannelClosed(TfChannel *tfChannel, QTfChannel::Private *self);
@@ -49,6 +54,10 @@ private:
     TfChannel *m_tfChannel;
     QTfChannel *const q;
     QGstBusPtr m_bus;
+
+    QList<QByteArray> m_audioSrcPads;
+    QList<QByteArray> m_videoSrcPads;
+    QGstElementPtr m_conference;
 
     QMutex m_srcPadAddedMutex;
     bool m_audioOutputDeviceIsOpen;
@@ -83,12 +92,46 @@ void QTfChannel::Private::init(Tp::StreamedMediaChannelPtr channel, QGstBusPtr b
     m_bus = bus;
     connect(bus.data(), SIGNAL(message(GstMessage*)), q, SLOT(onBusMessage(GstMessage*)));
 
+    connect(q, SIGNAL(audioSrcPadAdded(QtGstreamer::QGstPadPtr)),
+            q, SLOT(onAudioSrcPadAdded(QtGstreamer::QGstPadPtr)));
+    connect(q, SIGNAL(videoSrcPadAdded(QtGstreamer::QGstPadPtr)),
+            q, SLOT(onVideoSrcPadAdded(QtGstreamer::QGstPadPtr)));
+
     qRegisterMetaType<QGstPadPtr>();
 }
 
 void QTfChannel::Private::onBusMessage(GstMessage *message)
 {
     tf_channel_bus_message(m_tfChannel, message);
+}
+
+void QTfChannel::Private::onAudioSrcPadAdded(QGstPadPtr pad)
+{
+    m_audioSrcPads.append(pad->property<QByteArray>("name"));
+}
+
+void QTfChannel::Private::onVideoSrcPadAdded(QGstPadPtr pad)
+{
+    m_videoSrcPads.append(pad->property<QByteArray>("name"));
+}
+
+void QTfChannel::Private::onConferencePadRemoved(QGstPadPtr pad)
+{
+    if ( pad->direction() != QGstPad::Src ) {
+        return;
+    }
+
+    QByteArray name = pad->property<QByteArray>("name");
+    int index = -1;
+    if ( (index = m_audioSrcPads.indexOf(name)) != -1 ) {
+        m_audioSrcPads.removeAt(index);
+        emit q->audioSrcPadRemoved(pad);
+    } else if ( (index = m_videoSrcPads.indexOf(name)) != -1 ) {
+        m_videoSrcPads.removeAt(index);
+        emit q->videoSrcPadRemoved(pad);
+    } else {
+        Q_ASSERT(false);
+    }
 }
 
 void QTfChannel::Private::onTfChannelClosed(TfChannel *tfChannel, QTfChannel::Private *self)
@@ -104,7 +147,10 @@ void QTfChannel::Private::onSessionCreated(TfChannel *tfChannel, FsConference *c
     Q_UNUSED(tfChannel);
     Q_UNUSED(participant);
     self->m_bus->addSignalWatch();
-    emit self->q->sessionCreated(QGstElement::fromGstElement(GST_ELEMENT(conference)));
+    self->m_conference = QGstElement::fromGstElement(GST_ELEMENT(conference));
+    connect(self->m_conference.data(), SIGNAL(padRemoved(QtGstreamer::QGstPadPtr)),
+            self->q, SLOT(onConferencePadRemoved(QtGstreamer::QGstPadPtr)));
+    emit self->q->sessionCreated(self->m_conference);
 }
 
 

@@ -24,9 +24,39 @@
 
 namespace QtGstreamer {
 
+class QGstElementPrivate
+{
+public:
+    static void no_more_pads(GstElement *element, QGstElement *self);
+    static void pad_added(GstElement *element, GstPad *pad, QGstElement *self);
+    static void pad_removed(GstElement *element, GstPad *pad, QGstElement *self);
+};
+
+//static
+void QGstElementPrivate::no_more_pads(GstElement *element, QGstElement *self)
+{
+    emit self->noMorePads();
+}
+
+//static
+void QGstElementPrivate::pad_added(GstElement *element, GstPad *pad, QGstElement *self)
+{
+    emit self->padAdded(QGstPad::fromGstPad(pad));
+}
+
+//static
+void QGstElementPrivate::pad_removed(GstElement *element, GstPad *pad, QGstElement *self)
+{
+    emit self->padRemoved(QGstPad::fromGstPad(pad));
+}
+
+
 QGstElement::QGstElement(GstElement *gstElement)
     : QGstObject(GST_OBJECT(gstElement))
 {
+    g_signal_connect(m_object, "no-more-pads", G_CALLBACK(&QGstElementPrivate::no_more_pads), this);
+    g_signal_connect(m_object, "pad-added", G_CALLBACK(&QGstElementPrivate::pad_added), this);
+    g_signal_connect(m_object, "pad-removed", G_CALLBACK(&QGstElementPrivate::pad_removed), this);
 }
 
 //static
@@ -37,6 +67,9 @@ QGstElementPtr QGstElement::fromGstElement(GstElement *gstElement)
 
 QGstElement::~QGstElement()
 {
+    g_signal_handlers_disconnect_by_func(m_object, (void*) &QGstElementPrivate::no_more_pads, this);
+    g_signal_handlers_disconnect_by_func(m_object, (void*) &QGstElementPrivate::pad_added, this);
+    g_signal_handlers_disconnect_by_func(m_object, (void*) &QGstElementPrivate::pad_removed, this);
 }
 
 QGstElement::State QGstElement::currentState() const
@@ -73,6 +106,11 @@ QGstPadPtr QGstElement::getRequestPad(const char *name)
         return QGstPadPtr();
     }
     return QGstPad::fromGstPad(pad);
+}
+
+void QGstElement::releaseRequestPad(const QGstPadPtr & pad)
+{
+    gst_element_release_request_pad(GST_ELEMENT(m_object), GST_PAD(pad->m_object));
 }
 
 QGstBusPtr QGstElement::getBus()

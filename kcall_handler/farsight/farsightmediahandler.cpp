@@ -41,6 +41,8 @@ struct FarsightMediaHandler::Private
     AudioBinPtr audioInputBin;
     AudioBinPtr audioOutputBin;
     QGstElementPtr audioAdder;
+
+    QHash<QByteArray, QGstPadPtr> audioAdderPadsMap;
 };
 
 FarsightMediaHandler::FarsightMediaHandler(const Tp::StreamedMediaChannelPtr & channel,
@@ -225,12 +227,14 @@ void FarsightMediaHandler::audioSrcPadAdded(QGstPadPtr srcPad)
     Q_ASSERT(!d->audioAdder.isNull() && !d->audioOutputBin.isNull());
     QGstPadPtr sinkPad = d->audioAdder->getRequestPad("sink%d");
     srcPad->link(sinkPad);
+    d->audioAdderPadsMap.insert(srcPad->property<QByteArray>("name"), sinkPad);
 }
 
 void FarsightMediaHandler::audioSrcPadRemoved(QGstPadPtr srcPad)
 {
-    //TODO implement me
-    Q_UNUSED(srcPad);
+    QGstPadPtr sinkPad = d->audioAdderPadsMap.take(srcPad->property<QByteArray>("name"));
+    srcPad->unlink(sinkPad);
+    d->audioAdder->releaseRequestPad(sinkPad);
 }
 
 void FarsightMediaHandler::openVideoOutputDevice(bool *success)

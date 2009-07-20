@@ -9,10 +9,9 @@ set(libkcallprivate_SRCS
     contactitem.cpp
     groupmembersmodel.cpp
     dtmfwidget.cpp
-    kcallhandlersettingsdialog.cpp
 )
 
-kde4_add_ui_files(libkcallprivate_SRCS dtmfwidget.ui callwindowsettingspage.ui)
+kde4_add_ui_files(libkcallprivate_SRCS dtmfwidget.ui)
 kde4_add_library(kcallprivate SHARED ${libkcallprivate_SRCS})
 target_link_libraries(kcallprivate ${KDE4_KDEUI_LIBS} ${TELEPATHY_QT4_LIBRARIES})
 install(TARGETS kcallprivate ${INSTALL_TARGETS_DEFAULT_ARGS})

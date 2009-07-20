@@ -18,12 +18,11 @@
 #include "ui_mainwindow.h"
 #include "kcallapplication.h"
 #include "contactlistcontroller.h"
-#include "kcallhandlersettings.h"
 #include "libkcallprivate/contactsmodel.h"
-#include "libkcallprivate/kcallhandlersettingsdialog.h"
 #include <KStatusBar>
 #include <KAction>
 #include <KActionCollection>
+#include <KSettings/Dialog>
 #include <TelepathyQt4/Account>
 
 Q_DECLARE_METATYPE(Tp::AccountPtr)
@@ -61,12 +60,9 @@ void MainWindow::setupActions()
 
 void MainWindow::showSettingsDialog()
 {
-    if ( !KConfigDialog::showDialog("kcallsettings") ) {
-        //TODO use KCallSettings::self() when there is such a config class
-        KConfigDialog *dialog = new KConfigDialog(this, "kcallsettings", KCallHandlerSettings::self());
-        KCallHandlerSettingsDialog::addHandlerPagesToDialog(dialog, KCallHandlerSettings::self());
-        dialog->show();
-    }
+    KSettings::Dialog *dialog = new KSettings::Dialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }
 
 void MainWindow::onDialButtonClicked()

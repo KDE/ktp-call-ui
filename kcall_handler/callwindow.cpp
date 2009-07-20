@@ -20,7 +20,6 @@
 #include "dtmfhandler.h"
 #include "kcallhandlersettings.h"
 #include "../libkcallprivate/groupmembersmodel.h"
-#include "../libkcallprivate/kcallhandlersettingsdialog.h"
 #include "../libkgstvideowidget/videowidget.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
@@ -90,8 +89,6 @@ void CallWindow::setupActions()
     QAction *showLog = d->ui.logDock->toggleViewAction();
     showLog->setText(i18nc("@action:inmenu", "Show log"));
     actionCollection()->addAction("showLog", showLog);
-
-    KStandardAction::preferences(this, SLOT(showSettingsDialog()), actionCollection());
 }
 
 void CallWindow::setupUi()
@@ -242,13 +239,6 @@ void CallWindow::onCallDurationTimerTimeout()
 {
     d->callDuration = d->callDuration.addSecs(1);
     statusBar()->changeItem(d->callDuration.toString(), 1);
-}
-
-void CallWindow::showSettingsDialog()
-{
-    if ( !KCallHandlerSettingsDialog::showDialog() ) {
-        new KCallHandlerSettingsDialog(this, KCallHandlerSettings::self());
-    }
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

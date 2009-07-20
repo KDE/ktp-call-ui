@@ -14,8 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "kcallhandlersettingsdialog.h"
 #include "ui_callwindowsettingspage.h"
+#include "kcallhandlersettings.h"
+#include <QtGui/QVBoxLayout>
+#include <KPluginFactory>
+#include <KCModule>
 
 class CallWindowSettingsPage : public QWidget, private Ui::CallWindowSettingsPage
 {
@@ -27,23 +30,22 @@ public:
     }
 };
 
-KCallHandlerSettingsDialog::KCallHandlerSettingsDialog(QWidget *parent, KConfigSkeleton *config)
-    : KConfigDialog(parent, "kcallhandlersettings", config)
+class KcmKCallSettings : public KCModule
 {
+public:
+    KcmKCallSettings(QWidget *parent, const QVariantList & args);
+};
+
+
+K_PLUGIN_FACTORY(KcmKCallSettingsFactory, registerPlugin<KcmKCallSettings>(); )
+K_EXPORT_PLUGIN(KcmKCallSettingsFactory("kcmkcallsettings", "kcall"))
+
+KcmKCallSettings::KcmKCallSettings(QWidget *parent, const QVariantList & args)
+    : KCModule(KcmKCallSettingsFactory::componentData(), parent, args)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
     CallWindowSettingsPage *cwsp = new CallWindowSettingsPage(this);
-    addPage(cwsp, i18n("Call Window"));
-}
+    layout->addWidget(cwsp);
 
-//static
-bool KCallHandlerSettingsDialog::showDialog()
-{
-    return KConfigDialog::showDialog("kcallhandlersettings");
-}
-
-//static
-void KCallHandlerSettingsDialog::addHandlerPagesToDialog(KConfigDialog *dialog,
-                                                         KConfigSkeleton *handlerConfig)
-{
-    CallWindowSettingsPage *cwsp = new CallWindowSettingsPage(dialog);
-    dialog->addPage(cwsp, handlerConfig, i18n("Call Window"));
+    addConfig(KCallHandlerSettings::self(), cwsp);
 }

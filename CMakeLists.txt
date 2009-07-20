@@ -67,6 +67,7 @@ if ( BUILD_KCALL_HANDLER )
     add_subdirectory(libkgstdevices)
     add_subdirectory(libqtpfarsight)
     add_subdirectory(kcall_handler)
+    add_subdirectory(kcm)
     add_subdirectory(tests)
 endif ( BUILD_KCALL_HANDLER )
 

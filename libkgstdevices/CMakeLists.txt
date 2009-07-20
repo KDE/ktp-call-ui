@@ -7,6 +7,7 @@ set(kgstdevices_SRCS
     tabledevicechooser.cpp
 )
 
+add_definitions(-fPIC)
 kde4_add_ui_files(kgstdevices_SRCS tabledevicechooser.ui)
 kde4_add_library(kgstdevices STATIC ${kgstdevices_SRCS})
 #set_target_properties(kgstdevices PROPERTIES SOVERSION 0 VERSION 0.0.1)

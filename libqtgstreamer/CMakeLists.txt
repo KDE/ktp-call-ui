@@ -25,6 +25,7 @@ set(QtGstreamer_HEADERS
     qgstbus.h
 ) 
 
+add_definitions(-fPIC)
 kde4_add_library(QtGstreamer STATIC ${QtGstreamer_SRCS})
 #set_target_properties(QtGstreamer PROPERTIES SOVERSION 0 VERSION 0.0.1)
 #target_link_libraries(QtGstreamer ${QT_QTCORE_LIBRARY} ${GSTREAMER_LIBRARIES} ${GOBJECT_LIBRARIES})

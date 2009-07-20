@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Devices
+Exec=kcmshell4 kcm_kcalldevices
+Type=Service
+X-KDE-ServiceTypes=KCModule
+X-KDE-Library=kcm_kcalldevices
+X-KDE-ParentApp=kcall_handler

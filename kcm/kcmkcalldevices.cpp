@@ -35,6 +35,7 @@ struct KcmKcallDevices::Private
     DeviceManager *manager;
     TableDeviceChooser *audioInputChooser;
     TableDeviceChooser *audioOutputChooser;
+    TableDeviceChooser *videoInputChooser;
 };
 
 KcmKcallDevices::KcmKcallDevices(QWidget *parent, const QVariantList & args)
@@ -51,8 +52,10 @@ KcmKcallDevices::KcmKcallDevices(QWidget *parent, const QVariantList & args)
 
     d->audioInputChooser = new TableDeviceChooser(d->manager, DeviceManager::AudioInput);
     d->audioOutputChooser = new TableDeviceChooser(d->manager, DeviceManager::AudioOutput);
+    d->videoInputChooser = new TableDeviceChooser(d->manager, DeviceManager::VideoInput);
     tabWidget->addTab(d->audioInputChooser, KIcon("audio-input-microphone"), i18n("Audio input device"));
     tabWidget->addTab(d->audioOutputChooser, KIcon("audio-card"), i18n("Audio output device"));
+    tabWidget->addTab(d->videoInputChooser, KIcon("camera-web"), i18n("Video input device"));
 }
 
 KcmKcallDevices::~KcmKcallDevices()

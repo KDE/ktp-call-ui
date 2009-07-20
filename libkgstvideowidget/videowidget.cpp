@@ -21,6 +21,7 @@
 //#include "glrenderer.h"
 //#include "widgetrenderer.h"
 #include "x11renderer.h"
+#include <gst/gst.h>
 
 VideoWidget::VideoWidget(QWidget *parent) :
     QWidget(parent),

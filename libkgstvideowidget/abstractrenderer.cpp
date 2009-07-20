@@ -16,6 +16,7 @@
 */
 
 #include "abstractrenderer.h"
+#include <gst/gstobject.h>
 
 AbstractRenderer::~AbstractRenderer()
 {

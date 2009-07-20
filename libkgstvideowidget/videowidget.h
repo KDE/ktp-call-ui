@@ -19,7 +19,7 @@
 #define VIDEOWIDGET_H
 
 #include <QtGui/QWidget>
-#include <gst/gst.h>
+typedef struct _GstElement GstElement;
 class AbstractRenderer;
 
 class VideoWidget : public QWidget

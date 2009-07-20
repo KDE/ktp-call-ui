@@ -1,7 +1,4 @@
-
-include_directories(${GSTREAMER_INCLUDE_DIR} ${GLIB2_INCLUDE_DIR} ${DBUSGLIB_INCLUDE_DIR}
-                    ${LIBXML2_INCLUDE_DIR} ${TPFARSIGHT_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-                    ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(kcall_handler_SRCS
     main.cpp

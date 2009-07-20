@@ -5,30 +5,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/mod
 find_package(KDE4 REQUIRED)
 find_package(TelepathyQt4 REQUIRED)
 find_package(LibKNotificationItem-1 REQUIRED)
-
-macro_optional_find_package(GStreamer)
-macro_log_feature(GSTREAMER_FOUND "GStreamer" "gstreamer 0.10 is required for kcall"
-                                    "http://gstreamer.freedesktop.org/modules/" FALSE "0.10")
-
-macro_optional_find_package(GObject)
-macro_optional_find_package(GLIB2)
-macro_log_feature(GOBJECT_FOUND "GObject" "GObject is required for kcall"
-                                "http://www.gtk.org/download/" FALSE)
-
-macro_optional_find_package(TpFarsight)
-macro_log_feature(TPFARSIGHT_FOUND "telepathy-farsight" "telepathy-farsight is required for kcall"
-                        "http://telepathy.freedesktop.org/releases/telepathy-farsight/" FALSE "0.0.4")
-
-
+find_package(GStreamer REQUIRED)
+find_package(GObject REQUIRED)
+find_package(GLIB2 REQUIRED)
+find_package(TpFarsight REQUIRED)
 # dbus-glib and libxml2 are not really used, but headers from other libs include stuff from those,
 # so we need their INCLUDE_DIR variable
-macro_optional_find_package(DbusGlib)
-macro_log_feature(DBUSGLIB_FOUND "dbus-glib" "dbus-glib is required for kcall"
-                                "http://dbus.freedesktop.org/releases/dbus-glib/" FALSE)
-
-macro_optional_find_package(LibXml2)
-macro_log_feature(LIBXML2_FOUND "LibXml2" "LibXml2 is required for kcall"
-                                    "http://xmlsoft.org/downloads.html" FALSE)
+find_package(DbusGlib REQUIRED)
+find_package(LibXml2 REQUIRED)
 
 include(CheckCXXSourceCompiles)
 set(CMAKE_REQUIRED_INCLUDES ${KDE4_INCLUDES})
@@ -47,29 +31,21 @@ if (NOT QT4_GLIB_SUPPORT)
     message(STATUS "WARNING: Qt4 is compiled without glib support. kcall will not work properly!")
 endif (NOT QT4_GLIB_SUPPORT)
 
-if (GSTREAMER_FOUND AND GOBJECT_FOUND AND TPFARSIGHT_FOUND AND DBUSGLIB_FOUND AND LIBXML2_FOUND)
-   set(BUILD_KCALL_HANDLER TRUE)
-else (GSTREAMER_FOUND AND GOBJECT_FOUND AND TPFARSIGHT_FOUND AND DBUSGLIB_FOUND AND LIBXML2_FOUND)
-   set(BUILD_KCALL_HANDLER FALSE)
-endif (GSTREAMER_FOUND AND GOBJECT_FOUND AND TPFARSIGHT_FOUND AND DBUSGLIB_FOUND AND LIBXML2_FOUND)
-
 
 include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR}
                     ${KNOTIFICATIONITEM_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 add_definitions(${KDE4_DEFINITIONS})
 
-
 add_subdirectory(libkcallprivate)
+add_subdirectory(libkgstvideowidget)
+add_subdirectory(libqtgstreamer)
+add_subdirectory(libkgstdevices)
+add_subdirectory(libqtpfarsight)
+add_subdirectory(kcall_handler)
+add_subdirectory(kcm)
+add_subdirectory(tests)
 
-if ( BUILD_KCALL_HANDLER )
-    add_subdirectory(libkgstvideowidget)
-    add_subdirectory(libqtgstreamer)
-    add_subdirectory(libkgstdevices)
-    add_subdirectory(libqtpfarsight)
-    add_subdirectory(kcall_handler)
-    add_subdirectory(kcm)
-    add_subdirectory(tests)
-endif ( BUILD_KCALL_HANDLER )
+##########
 
 set(kcall_SRCS
     main.cpp
@@ -89,5 +65,4 @@ target_link_libraries(kcall ${KDE4_KUTILS_LIBS}
                             kcallprivate)
 
 install(TARGETS kcall ${INSTALL_TARGETS_DEFAULT_ARGS})
-#install(FILES kcallui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall)
 install(FILES kcall.notifyrc DESTINATION ${DATA_INSTALL_DIR}/kcall)

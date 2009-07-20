@@ -1,5 +1,6 @@
 [Desktop Entry]
-Name=Settings
+Name=General
+Icon=internet-telephony
 Exec=kcmshell4 kcm_kcallsettings
 Type=Service
 X-KDE-ServiceTypes=KCModule

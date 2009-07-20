@@ -51,7 +51,7 @@ KcmKcallDevices::KcmKcallDevices(QWidget *parent, const QVariantList & args)
 
     d->audioInputChooser = new TableDeviceChooser(d->manager, DeviceManager::AudioInput);
     d->audioOutputChooser = new TableDeviceChooser(d->manager, DeviceManager::AudioOutput);
-    tabWidget->addTab(d->audioInputChooser, KIcon("audio-input-line"), i18n("Audio input device"));
+    tabWidget->addTab(d->audioInputChooser, KIcon("audio-input-microphone"), i18n("Audio input device"));
     tabWidget->addTab(d->audioOutputChooser, KIcon("audio-card"), i18n("Audio output device"));
 }
 

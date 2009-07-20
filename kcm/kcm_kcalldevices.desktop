@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Devices
+Icon=audio-card
 Exec=kcmshell4 kcm_kcalldevices
 Type=Service
 X-KDE-ServiceTypes=KCModule

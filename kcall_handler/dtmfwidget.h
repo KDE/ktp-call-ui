@@ -17,11 +17,10 @@
 #ifndef DTMFWIDGET_H
 #define DTMFWIDGET_H
 
-#include "kcallprivate_export.h"
 #include <QtGui/QWidget>
 #include <TelepathyQt4/Constants>
 
-class KCALLPRIVATE_EXPORT DtmfWidget : public QWidget
+class DtmfWidget : public QWidget
 {
     Q_OBJECT
 public:

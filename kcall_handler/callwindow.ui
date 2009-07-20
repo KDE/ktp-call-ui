@@ -120,7 +120,7 @@
   <customwidget>
    <class>DtmfWidget</class>
    <extends>QWidget</extends>
-   <header>../libkcallprivate/dtmfwidget.h</header>
+   <header>dtmfwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

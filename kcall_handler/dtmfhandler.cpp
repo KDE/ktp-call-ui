@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "dtmfhandler.h"
-#include "../libkcallprivate/dtmfwidget.h"
+#include "dtmfwidget.h"
 
 struct DtmfHandler::Private
 {

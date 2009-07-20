@@ -14,33 +14,29 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_DEVICECHOOSER_H
-#define _KGSTDEVICES_DEVICECHOOSER_H
+#ifndef _KGSTDEVICES_TABLEDEVICECHOOSER_H
+#define _KGSTDEVICES_TABLEDEVICECHOOSER_H
 
 #include "devicemanager.h"
 #include <QtGui/QWidget>
 
 namespace KGstDevices {
 
-struct DeviceChooserPrivate;
-
-class KGSTDEVICES_EXPORT DeviceChooser : public QWidget
+class KGSTDEVICES_EXPORT TableDeviceChooser : public QWidget
 {
     Q_OBJECT
-    Q_DISABLE_COPY(DeviceChooser)
-    Q_DECLARE_PRIVATE(DeviceChooser)
-    Q_PROPERTY(Device selectedDevice READ selectedDevice WRITE setSelectedDevice USER true)
 public:
-    static DeviceChooser *newDeviceChooser(DeviceManager *manager, DeviceManager::DeviceType type,
-                                           QWidget *parent = 0);
-    virtual ~DeviceChooser();
+    TableDeviceChooser(DeviceManager *manager, DeviceManager::DeviceType type, QWidget *parent = 0);
+    virtual ~TableDeviceChooser();
 
-    virtual Device selectedDevice() const;
-    virtual void setSelectedDevice(const Device & device);
-
-protected:
-    DeviceChooser(DeviceChooserPrivate *dd, QWidget *parent);
-    DeviceChooserPrivate *const d_ptr;
+private:
+    struct Private;
+    Private *const d;
+    Q_PRIVATE_SLOT(d, void onCurrentDeviceChanged(DeviceManager::DeviceType type));
+    Q_PRIVATE_SLOT(d, void onSelectionChanged(const QItemSelection & selected));
+    Q_PRIVATE_SLOT(d, void onModelReset());
+    Q_PRIVATE_SLOT(d, void testDevice());
+    Q_PRIVATE_SLOT(d, void toggleDetails());
 };
 
 }

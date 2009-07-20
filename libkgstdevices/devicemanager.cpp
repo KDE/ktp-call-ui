@@ -157,11 +157,7 @@ void DeviceManagerPrivate::detectDevices()
     }
 
     //set default devices
-    for (int i=0; i<4; i++) { //i here is DeviceManager::DeviceType.
-        if ( !m_currentDevices[i].isValid() && !m_availableDevices[i].isEmpty() ) {
-            m_currentDevices[i] = m_availableDevices[i][0];
-        }
-    }
+    q->loadDefaults();
 }
 
 static QByteArray formatAlsaDevice(const QByteArray & plugin, const QVariantList & list)
@@ -187,8 +183,12 @@ void DeviceManagerPrivate::addDevice(const Solid::Device & solidDevice)
 
         if ( solidAudioDevice->deviceType() & Solid::AudioInterface::AudioInput )
         {
+            Solid::Device vendorDevice = solidDevice;
+            while ( vendorDevice.isValid() && vendorDevice.vendor().isEmpty() ) {
+                vendorDevice = Solid::Device(vendorDevice.parentUdi());
+            }
             DevicePrivate device;
-            device.name = solidAudioDevice->name();
+            device.name = QString("%1 - %2").arg(vendorDevice.vendor(), solidDevice.product());
             device.udi = solidDevice.udi();
 
             switch ( solidAudioDevice->driver() ) {
@@ -213,8 +213,12 @@ void DeviceManagerPrivate::addDevice(const Solid::Device & solidDevice)
 
         if ( solidAudioDevice->deviceType() & Solid::AudioInterface::AudioOutput )
         {
+            Solid::Device vendorDevice = solidDevice;
+            while ( vendorDevice.isValid() && vendorDevice.vendor().isEmpty() ) {
+                vendorDevice = Solid::Device(vendorDevice.parentUdi());
+            }
             DevicePrivate device;
-            device.name = solidAudioDevice->name();
+            device.name = QString("%1 - %2").arg(vendorDevice.vendor(), solidDevice.product());
             device.udi = solidDevice.udi();
 
             switch ( solidAudioDevice->driver() ) {
@@ -241,11 +245,17 @@ void DeviceManagerPrivate::addDevice(const Solid::Device & solidDevice)
 
         if ( solidVideoDevice->supportedProtocols().contains("video4linux") ) {
             if ( solidVideoDevice->supportedDrivers("video4linux").contains("video4linux") ) {
+                Solid::Device vendorDevice = solidDevice;
+                while ( vendorDevice.isValid() && vendorDevice.vendor().isEmpty() ) {
+                    vendorDevice = Solid::Device(vendorDevice.parentUdi());
+                }
                 DevicePrivate device;
-                device.name = QString("%1 %2").arg(solidDevice.vendor(), solidDevice.product());
+                device.name = QString("%1 - %2").arg(vendorDevice.vendor(), solidDevice.product());
                 device.udi = solidDevice.udi();
                 device.driver = "v4l2src";
                 device.driverHandle = solidVideoDevice->driverHandle("video4linux");
+                m_availableDevices[DeviceManager::VideoInput].append(Device(device));
+                emit q->devicesChanged(DeviceManager::VideoInput);
             }
         }
     }
@@ -289,11 +299,12 @@ void DeviceManagerPrivate::addTestDevices()
 {
     DevicePrivate d;
     d.name = i18n("Test input device");
-    d.udi = QLatin1String("test");
 
+    d.udi = QLatin1String("test_audio");
     d.driver = "audiotestsrc";
     m_availableDevices[DeviceManager::AudioInput].append(Device(d));
 
+    d.udi = QLatin1String("test_video");
     d.driver = "videotestsrc";
     m_availableDevices[DeviceManager::VideoInput].append(Device(d));
 
@@ -304,19 +315,8 @@ void DeviceManagerPrivate::addTestDevices()
 
 void DeviceManagerPrivate::removeTestDevices()
 {
-    //i here is DeviceManager::DeviceType. Loop done for: AudioInput, VideoInput
-    for (uint i=0; i<3; i+=2) {
-        QList<Device>::iterator it = m_availableDevices[i].begin();
-        for(; it != m_availableDevices[i].end(); ++it) {
-            if ( (*it).udi() == QLatin1String("test") ) {
-                m_availableDevices[i].erase(it);
-            }
-        }
-    }
-
-    m_showTestDevices = false;
-    emit q->devicesChanged(DeviceManager::AudioInput);
-    emit q->devicesChanged(DeviceManager::VideoInput);
+    onDeviceRemoved(QLatin1String("test_audio"));
+    onDeviceRemoved(QLatin1String("test_video"));
 }
 
 DeviceManager::DeviceManager(QObject *parent)
@@ -358,9 +358,19 @@ Device DeviceManager::currentDeviceForType(DeviceType type) const
     return d->m_currentDevices[type];
 }
 
-void DeviceManager::setDeviceForType(DeviceType type, const Device & device)
+void DeviceManager::setCurrentDeviceForType(DeviceType type, const Device & device)
 {
     d->m_currentDevices[type] = device;
+    emit currentDeviceChanged(type);
+}
+
+void DeviceManager::loadDefaults()
+{
+    for(int i=0; i<4; i++) { //i here is DeviceManager::DeviceType.
+        if ( !d->m_availableDevices[i].isEmpty() ) {
+            setCurrentDeviceForType(static_cast<DeviceType>(i), d->m_availableDevices[i][0]);
+        }
+    }
 }
 
 void DeviceManager::loadConfig(const KConfigGroup & config)
@@ -378,7 +388,7 @@ void DeviceManager::loadConfig(const KConfigGroup & config)
         bool found = false;
         foreach(const Device & availableDevice, d->m_availableDevices[i]) {
             if ( d->m_currentDevices[i] == availableDevice ) {
-                d->m_currentDevices[i] = availableDevice; //get description/udi
+                setCurrentDeviceForType(static_cast<DeviceType>(i), availableDevice); //get description/udi
                 found = true;
             }
         }
@@ -386,7 +396,7 @@ void DeviceManager::loadConfig(const KConfigGroup & config)
         //if the device read from the config is not in the list of available devices,
         //do not use it and use the first available device instead
         if ( !found && d->m_availableDevices[i].size() > 0 ) {
-            d->m_currentDevices[i] = d->m_availableDevices[i][0];
+            setCurrentDeviceForType(static_cast<DeviceType>(i), d->m_availableDevices[i][0]);
         }
     }
 }

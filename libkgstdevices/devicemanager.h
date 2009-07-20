@@ -48,8 +48,9 @@ public:
     QList<Device> availableDevices(DeviceType type) const;
 
     Device currentDeviceForType(DeviceType type) const;
-    void setDeviceForType(DeviceType type, const Device & device);
+    void setCurrentDeviceForType(DeviceType type, const Device & device);
 
+    void loadDefaults();
     void loadConfig(const KConfigGroup & config);
     void saveConfig(KConfigGroup config) const;
 
@@ -60,6 +61,7 @@ public:
 
 Q_SIGNALS:
     void devicesChanged(DeviceManager::DeviceType type);
+    void currentDeviceChanged(DeviceManager::DeviceType type);
 
 private:
     friend struct DeviceManagerPrivate;

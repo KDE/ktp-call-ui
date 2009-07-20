@@ -4,6 +4,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/mod
 
 find_package(KDE4 REQUIRED)
 find_package(TelepathyQt4 REQUIRED)
+find_package(TelepathyQt4Farsight REQUIRED)
 find_package(LibKNotificationItem-1 REQUIRED)
 find_package(GStreamer REQUIRED)
 find_package(GObject REQUIRED)
@@ -32,7 +33,7 @@ if (NOT QT4_GLIB_SUPPORT)
 endif (NOT QT4_GLIB_SUPPORT)
 
 
-include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR}
+include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR} ${TELEPATHY_QT4_FARSIGHT_INCLUDE_DIR}
                     ${KNOTIFICATIONITEM_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 add_definitions(${KDE4_DEFINITIONS})
 
@@ -61,6 +62,7 @@ kde4_add_ui_files(kcall_SRCS mainwindow.ui)
 kde4_add_executable(kcall ${kcall_SRCS})
 target_link_libraries(kcall ${KDE4_KUTILS_LIBS}
                             ${TELEPATHY_QT4_LIBRARIES}
+                            ${TELEPATHY_QT4_FARSIGHT_LIBRARIES}
                             ${KNOTIFICATIONITEM_LIBRARIES}
                             kcallprivate)
 

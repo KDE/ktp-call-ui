@@ -76,6 +76,7 @@ void FarsightMediaHandler::init(const Tp::StreamedMediaChannelPtr & channel)
     }
 
     d->pipeline = QGstPipeline::newPipeline();
+    d->pipeline->setState(QGstElement::Playing);
 
     d->qtfchannel = new QTfChannel(channel, d->pipeline->getBus(), this);
     connect(d->qtfchannel, SIGNAL(sessionCreated(QtGstreamer::QGstElementPtr)),

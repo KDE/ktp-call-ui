@@ -128,6 +128,8 @@ void FarsightMediaHandler::onQTfChannelClosed()
 
 void FarsightMediaHandler::openAudioInputDevice(bool *success)
 {
+    kDebug() << "Opening audio input device";
+
     QGstElementPtr element = d->deviceManager->newAudioInputElement();
     if ( !element ) {
         emit logMessage(CallLog::Error, i18n("The gstreamer element for the audio input device "
@@ -160,6 +162,8 @@ void FarsightMediaHandler::openAudioInputDevice(bool *success)
 
 void FarsightMediaHandler::audioSinkPadAdded(QGstPadPtr sinkPad)
 {
+    kDebug() << "Audio sink pad added";
+
     Q_ASSERT(!d->audioInputBin.isNull());
     QGstPadPtr srcPad = d->audioInputBin->getStaticPad("src");
     srcPad->link(sinkPad);
@@ -167,6 +171,8 @@ void FarsightMediaHandler::audioSinkPadAdded(QGstPadPtr sinkPad)
 
 void FarsightMediaHandler::closeAudioInputDevice()
 {
+    kDebug() << "Closing audio input device";
+
     d->pipeline->remove(d->audioInputBin);
     d->audioInputBin->setState(QGstElement::Null);
     d->audioInputBin = AudioBinPtr();
@@ -175,6 +181,8 @@ void FarsightMediaHandler::closeAudioInputDevice()
 
 void FarsightMediaHandler::openVideoInputDevice(bool *success)
 {
+    kDebug() << "Opening video input device";
+
     QGstElementPtr element = d->deviceManager->newVideoInputElement();
     if ( !element ) {
         emit logMessage(CallLog::Error, i18n("The gstreamer element for the video input device "
@@ -221,6 +229,8 @@ void FarsightMediaHandler::openVideoInputDevice(bool *success)
 
 void FarsightMediaHandler::videoSinkPadAdded(QGstPadPtr sinkPad)
 {
+    kDebug() << "Video sink pad added";
+
     Q_ASSERT(!d->videoTee.isNull());
     QGstPadPtr srcPad = d->videoTee->getRequestPad("src%d");
     srcPad->link(sinkPad);
@@ -228,6 +238,8 @@ void FarsightMediaHandler::videoSinkPadAdded(QGstPadPtr sinkPad)
 
 void FarsightMediaHandler::closeVideoInputDevice()
 {
+    kDebug() << "Closing video input device";
+
     QGstElementPtr videoWidgetElement = QGstElement::fromGstElement(d->videoInputWidget->videoElement());
 
     d->videoInputBin->setState(QGstElement::Null);
@@ -248,6 +260,8 @@ void FarsightMediaHandler::closeVideoInputDevice()
 
 void FarsightMediaHandler::openAudioOutputDevice(bool *success)
 {
+    kDebug() << "Opening audio output device";
+
     QGstElementPtr element = d->deviceManager->newAudioOutputElement();
     if ( !element ) {
         emit logMessage(CallLog::Error, i18n("The gstreamer element for the audio output device "
@@ -289,6 +303,8 @@ void FarsightMediaHandler::openAudioOutputDevice(bool *success)
 
 void FarsightMediaHandler::audioSrcPadAdded(QGstPadPtr srcPad)
 {
+    kDebug() << "Audio src pad added";
+
     Q_ASSERT(!d->audioAdder.isNull() && !d->audioOutputBin.isNull());
     QGstPadPtr sinkPad = d->audioAdder->getRequestPad("sink%d");
     srcPad->link(sinkPad);
@@ -297,6 +313,8 @@ void FarsightMediaHandler::audioSrcPadAdded(QGstPadPtr srcPad)
 
 void FarsightMediaHandler::audioSrcPadRemoved(QGstPadPtr srcPad)
 {
+    kDebug() << "Audio src pad removed";
+
     QGstPadPtr sinkPad = d->audioAdderPadsMap.take(srcPad->property<QByteArray>("name"));
     srcPad->unlink(sinkPad);
     d->audioAdder->releaseRequestPad(sinkPad);
@@ -304,12 +322,16 @@ void FarsightMediaHandler::audioSrcPadRemoved(QGstPadPtr srcPad)
 
 void FarsightMediaHandler::openVideoOutputDevice(bool *success)
 {
+    kDebug() << "Opening video output device";
+
     //assume that we always have a video widget available.
     *success = true;
 }
 
 void FarsightMediaHandler::videoSrcPadAdded(QGstPadPtr srcPad)
 {
+    kDebug() << "Video src pad added";
+
     //TODO use the VideoWidget from DeviceManager
     ::VideoWidget *widget = new ::VideoWidget;
 
@@ -325,6 +347,8 @@ void FarsightMediaHandler::videoSrcPadAdded(QGstPadPtr srcPad)
 
 void FarsightMediaHandler::videoSrcPadRemoved(QGstPadPtr srcPad)
 {
+    kDebug() << "Video src pad removed";
+
     uint id = d->videoWidgetIdsMap.take(srcPad->property<QByteArray>("name"));
     emit closeVideoOutputWidget(id);
 }

@@ -14,37 +14,30 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _QTGSTREAMER_QGSTBUS_H
-#define _QTGSTREAMER_QGSTBUS_H
+#ifndef _QTGSTREAMER_QGSTSTRUCTURE_H
+#define _QTGSTREAMER_QGSTSTRUCTURE_H
 
-#include "qgstobject.h"
+#include "qgstdeclarations.h"
 
 namespace QtGstreamer {
 
-class QGstBusPrivate;
-
-class QGstBus : public QGstObject
+class QGstStructure
 {
-    Q_OBJECT
-    Q_DISABLE_COPY(QGstBus)
-    friend class QGstBusPrivate;
+    friend class QGstCaps;
 public:
-    static QGstBusPtr fromGstBus(GstBus *gstBus);
-    virtual ~QGstBus();
+    QGstStructure(const char *name);
+    QGstStructure(const QGstStructure & other);
+    virtual ~QGstStructure();
 
-    void addSignalWatch();
-    void removeSignalWatch();
+    QGstStructure & operator=(const QGstStructure & other);
 
-Q_SIGNALS:
-    //FIXME this should emit a QGstMessagePtr
-    void message(GstMessage *message);
+    QGValue getValue(const char *fieldName) const;
+    void setValue(const char *fieldName, const QGValue & value);
 
-protected:
-    QGstBus(GstBus *gstBus);
+private:
+    GstStructure *m_structure;
 };
 
 }
-
-Q_DECLARE_METATYPE(QtGstreamer::QGstBusPtr)
 
 #endif

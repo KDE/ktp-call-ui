@@ -11,6 +11,9 @@ set(QtGstreamer_SRCS
     qgstpad.cpp
     qgstghostpad.cpp
     qgstbus.cpp
+    qgvalue.cpp
+    qgstcaps.cpp
+    qgststructure.cpp
 )
 
 add_definitions(-fPIC)

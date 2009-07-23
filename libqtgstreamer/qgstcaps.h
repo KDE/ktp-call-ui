@@ -14,37 +14,39 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _QTGSTREAMER_QGSTBUS_H
-#define _QTGSTREAMER_QGSTBUS_H
+#ifndef _QTGSTREAMER_QGSTCAPS_H
+#define _QTGSTREAMER_QGSTCAPS_H
 
-#include "qgstobject.h"
+#include "qgstdeclarations.h"
+#include <QtCore/QMetaType>
 
 namespace QtGstreamer {
 
-class QGstBusPrivate;
-
-class QGstBus : public QGstObject
+class QGstCaps
 {
-    Q_OBJECT
-    Q_DISABLE_COPY(QGstBus)
-    friend class QGstBusPrivate;
+    Q_DISABLE_COPY(QGstCaps)
+    friend class QGValue;
 public:
-    static QGstBusPtr fromGstBus(GstBus *gstBus);
-    virtual ~QGstBus();
+    static QGstCapsPtr newEmpty();
+    static QGstCapsPtr newAny();
+    static QGstCapsPtr fromGstCaps(GstCaps *gstCaps);
+    virtual ~QGstCaps();
 
-    void addSignalWatch();
-    void removeSignalWatch();
+    void makeWritable();
+    void appendStructure(const QGstStructure & structure);
 
-Q_SIGNALS:
-    //FIXME this should emit a QGstMessagePtr
-    void message(GstMessage *message);
+    static QGstCapsPtr fromString(const char *string);
+    QByteArray toString() const;
 
 protected:
-    QGstBus(GstBus *gstBus);
+    QGstCaps(GstCaps *gstCaps);
+
+private:
+    GstCaps *m_caps;
 };
 
 }
 
-Q_DECLARE_METATYPE(QtGstreamer::QGstBusPtr)
+Q_DECLARE_METATYPE(QtGstreamer::QGstCapsPtr)
 
 #endif

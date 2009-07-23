@@ -141,7 +141,9 @@ void TableDeviceChooser::Private::testDevice()
     if ( !m_testing ) {
         m_testPipeline = QGstPipeline::newPipeline();
 
-        if ( m_type == DeviceManager::AudioOutput ) {
+        switch(m_type) {
+        case DeviceManager::AudioOutput:
+        {
             QGstElementPtr audioTestSrc = QGstElementFactory::make("audiotestsrc");
             QGstElementPtr audioConvert = QGstElementFactory::make("audioconvert");
             QGstElementPtr audioResample = QGstElementFactory::make("audioresample");
@@ -170,7 +172,10 @@ void TableDeviceChooser::Private::testDevice()
             m_testPipeline->add(audioResample);
             m_testPipeline->add(outputElement);
             QGstElement::link(audioTestSrc, audioConvert, audioResample, outputElement);
-        } else if ( m_type == DeviceManager::AudioInput ) {
+            break;
+        }
+        case DeviceManager::AudioInput:
+        {
             QGstElementPtr inputElement = m_manager->newAudioInputElement();
             if ( !inputElement ) {
                 KMessageBox::sorry(q, i18n("The gstreamer element for the selected device could "
@@ -211,10 +216,52 @@ void TableDeviceChooser::Private::testDevice()
             m_testPipeline->add(audioResample);
             m_testPipeline->add(outputElement);
             QGstElement::link(inputElement, audioConvert, audioResample, outputElement);
+            break;
+        }
+        case DeviceManager::VideoInput:
+        {
+            QGstElementPtr inputElement = m_manager->newVideoInputElement();
+            if ( !inputElement ) {
+                KMessageBox::sorry(q, i18n("The gstreamer element for the selected device could "
+                                        "not be created. Please check your gstreamer installation."));
+                m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
+                return;
+            } else if ( !inputElement->setState(QGstElement::Paused) ) {
+                KMessageBox::sorry(q, i18n("The selected device could not be initialized. "
+                                              "Please select another device."));
+                m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
+                return;
+            }
+
+            QGstElementPtr colorSpace = QGstElementFactory::make("ffmpegcolorspace");
+            QGstElementPtr videoScale = QGstElementFactory::make("videoscale");
+            QGstElementPtr videoRate = QGstElementFactory::make("videorate");
+            QGstElementPtr videoSink = QGstElementFactory::make("autovideosink");
+            if ( !colorSpace || !videoScale || !videoRate || !videoSink ) {
+                KMessageBox::sorry(q, i18n("Some gstreamer elements could not be created. "
+                                              "Please check your gstreamer installation."));
+                m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
+                return;
+            }
+
+            //TODO use the VideoWidget
+
+            m_testPipeline->add(inputElement);
+            m_testPipeline->add(colorSpace);
+            m_testPipeline->add(videoScale);
+            m_testPipeline->add(videoRate);
+            m_testPipeline->add(videoSink);
+            QGstElement::link(inputElement, colorSpace, videoScale, videoRate, videoSink);
+            break;
+        }
+        //TODO support DeviceManager::VideoOutput
+        default:
+            m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
+            return;
         }
         m_testPipeline->setState(QGstElement::Playing);
         m_testing = true;
-        m_ui.testButton->setText(i18nc("stop audio test", "Stop test"));
+        m_ui.testButton->setText(i18nc("stop audio/video test", "Stop test"));
         m_ui.testButton->setIcon(KIcon("media-playback-stop"));
     } else {
         m_testPipeline->setState(QGstElement::Null);

@@ -18,12 +18,8 @@
 #define _QTGSTREAMER_QGSTBIN_H
 
 #include "qgstelement.h"
-typedef struct _GstBin GstBin;
 
 namespace QtGstreamer {
-
-class QGstBin;
-typedef QSharedPointer<QGstBin> QGstBinPtr;
 
 class QGstBin : public QGstElement
 {
@@ -36,8 +32,9 @@ public:
 
     bool add(const QGstElementPtr & element);
     QGstBin & operator<<(const QGstElementPtr & element);
-
     bool remove(const QGstElementPtr & element);
+
+    QGstElementPtr getByName(const char *name);
 
 protected:
     QGstBin(const char *name = 0);

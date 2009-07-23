@@ -422,7 +422,7 @@ QtGstreamer::QGstElementPtr DeviceManager::newAudioInputElement()
     }
 
     if ( device.driver() == "alsasrc" || device.driver() == "osssrc" ) {
-        element->setProperty("device", device.driverHandle());
+        element->setProperty("device", device.driverHandle().toByteArray());
     }
 
     return element;
@@ -439,7 +439,7 @@ QtGstreamer::QGstElementPtr DeviceManager::newAudioOutputElement()
     }
 
     if ( device.driver() == "alsasink" || device.driver() == "osssink" ) {
-        element->setProperty("device", device.driverHandle());
+        element->setProperty("device", device.driverHandle().toByteArray());
     }
 
     return element;
@@ -456,11 +456,11 @@ QtGstreamer::QGstElementPtr DeviceManager::newVideoInputElement()
     }
 
     if ( device.driver() == "v4l2src" ) {
-        element->setProperty("device", device.driverHandle());
+        element->setProperty("device", device.driverHandle().toByteArray());
     }
 
     //HACK to detect if the device has a v4l1 or v4l2 driver
-    if ( device.driver() == "v4l2src" && !element->setState(QGstElement::Ready) ) {
+    if ( device.driver() == "v4l2src" && !element->setState(QGstElement::Paused) ) {
         QGstElementPtr element_v4l1 = QGstElementFactory::make("v4lsrc");
         if ( element_v4l1.isNull() ) {
             kWarning() << "Could not construct v4lsrc";
@@ -468,7 +468,7 @@ QtGstreamer::QGstElementPtr DeviceManager::newVideoInputElement()
             return element;
         }
 
-        element_v4l1->setProperty("device", device.driverHandle());
+        element_v4l1->setProperty("device", device.driverHandle().toByteArray());
         return element_v4l1;
     }
 

@@ -156,6 +156,11 @@ void DeviceManagerPrivate::detectDevices()
         m_availableDevices[DeviceManager::VideoInput].prepend(Device(d));
     }
 
+#ifdef USE_TEST_DEVICES
+    //and append the test devices, for testing purposes only
+    addTestDevices();
+#endif
+
     //set default devices
     q->loadDefaults();
 }

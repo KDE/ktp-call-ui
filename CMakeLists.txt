@@ -37,6 +37,10 @@ include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR}
                     ${KNOTIFICATIONITEM_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 add_definitions(${KDE4_DEFINITIONS})
 
+# This flag enables kcall to use audiotestsrc and videotestsrc as audio and video input devices respectively
+# This makes sense mostly for testing and is not meant to be there in releases.
+add_definitions(-DUSE_TEST_DEVICES)
+
 add_subdirectory(libkcallprivate)
 add_subdirectory(libkgstvideowidget)
 add_subdirectory(libqtgstreamer)

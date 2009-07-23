@@ -237,7 +237,7 @@ gboolean QTfChannel::Private::onRequestResource(TfStream *stream, guint directio
 
             QMutexLocker l(&self->m_srcPadAddedMutex);
             if ( !self->m_audioOutputDeviceIsOpen ) {
-                bool success;
+                bool success = false;
                 emit self->q->openAudioOutputDevice(&success);
                 self->m_audioOutputDeviceIsOpen = success;
 
@@ -281,7 +281,7 @@ gboolean QTfChannel::Private::onRequestResource(TfStream *stream, guint directio
 
             QMutexLocker l(&self->m_srcPadAddedMutex);
             if ( !self->m_videoOutputDeviceIsOpen ) {
-                bool success;
+                bool success = false;
                 emit self->q->openVideoOutputDevice(&success);
                 self->m_videoOutputDeviceIsOpen = success;
 

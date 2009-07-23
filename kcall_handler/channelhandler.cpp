@@ -147,6 +147,11 @@ void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
     kDebug() << " direction:" << stream->direction();
     kDebug() << " state:" << stream->state();
     kDebug() << " pending send:" << stream->pendingSend();
+
+    //clear pending send in new video streams.
+    if ( stream->type() == Tp::MediaStreamTypeVideo && stream->pendingSend() ) {
+        stream->requestDirection(Tp::MediaStreamDirectionReceive);
+    }
 }
 
 void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)

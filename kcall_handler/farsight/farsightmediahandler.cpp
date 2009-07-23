@@ -22,6 +22,7 @@
 #include "../../libqtgstreamer/qgstglobal.h"
 #include "../../libqtgstreamer/qgstbus.h"
 #include "../../libqtpfarsight/qtfchannel.h"
+#include "../../libkgstvideowidget/videowidget.h"
 #include <KDebug>
 #include <KGlobal>
 #include <KConfig>
@@ -34,6 +35,8 @@ using namespace KGstDevices;
 
 struct FarsightMediaHandler::Private
 {
+    Private() : videoWidgetIdsCounter(0) {}
+
     QTfChannel *qtfchannel;
     DeviceManager *deviceManager;
 
@@ -43,6 +46,8 @@ struct FarsightMediaHandler::Private
     QGstElementPtr audioAdder;
 
     QHash<QByteArray, QGstPadPtr> audioAdderPadsMap;
+    QHash<QByteArray, uint> videoWidgetIdsMap;
+    uint videoWidgetIdsCounter;
 };
 
 FarsightMediaHandler::FarsightMediaHandler(const Tp::StreamedMediaChannelPtr & channel,
@@ -239,22 +244,29 @@ void FarsightMediaHandler::audioSrcPadRemoved(QGstPadPtr srcPad)
 
 void FarsightMediaHandler::openVideoOutputDevice(bool *success)
 {
-    //TODO implement me
-    *success = false;
+    //assume that we always have a video widget available.
+    *success = true;
 }
 
 void FarsightMediaHandler::videoSrcPadAdded(QGstPadPtr srcPad)
 {
-    //TODO implement me
-    Q_UNUSED(srcPad);
-    Q_ASSERT(false);
+    //TODO use the VideoWidget from DeviceManager
+    ::VideoWidget *widget = new ::VideoWidget;
+
+    QGstElementPtr element = QGstElement::fromGstElement(widget->videoElement());
+    d->pipeline->add(element);
+    element->setState(QGstElement::Playing);
+    QGstPadPtr sinkPad = element->getStaticPad("sink");
+    srcPad->link(sinkPad);
+
+    d->videoWidgetIdsMap.insert(srcPad->property<QByteArray>("name"), d->videoWidgetIdsCounter);
+    emit videoOutputWidgetCreated(widget, d->videoWidgetIdsCounter++);
 }
 
 void FarsightMediaHandler::videoSrcPadRemoved(QGstPadPtr srcPad)
 {
-    //TODO implement me
-    Q_UNUSED(srcPad);
-    Q_ASSERT(false);
+    uint id = d->videoWidgetIdsMap.take(srcPad->property<QByteArray>("name"));
+    emit closeVideoOutputWidget(id);
 }
 
 #include "farsightmediahandler.moc"

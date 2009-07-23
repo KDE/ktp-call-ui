@@ -31,7 +31,9 @@ public:
 
 private slots:
     void contextMenuRequested(const QPoint & pos);
-    void callContact();
+    void callContactVoice();
+    void callContactVideo();
+    void callContact(bool useInitialVideo);
     void setStatus(int statusIndex);
 
 private:

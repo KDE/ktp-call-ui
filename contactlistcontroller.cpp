@@ -49,8 +49,11 @@ ContactListController::ContactListController(QAbstractItemView *view, QAbstractI
 
     // contact menu
     d->contactMenu = new KMenu(view);
-    KAction *callAction = new KAction(KIcon("voicecall"), i18nc("@action:inmenu", "Call"), d->contactMenu);
-    connect(callAction, SIGNAL(triggered()), SLOT(callContact()));
+    KAction *callAction = new KAction(KIcon("voicecall"), i18nc("@action:inmenu", "Voice call"), d->contactMenu);
+    connect(callAction, SIGNAL(triggered()), SLOT(callContactVoice()));
+    d->contactMenu->addAction(callAction);
+    callAction = new KAction(KIcon("camera-web"), i18nc("@action:inmenu", "Video call"), d->contactMenu);
+    connect(callAction, SIGNAL(triggered()), SLOT(callContactVideo()));
     d->contactMenu->addAction(callAction);
 
     // account menu
@@ -89,7 +92,17 @@ void ContactListController::contextMenuRequested(const QPoint & pos)
     }
 }
 
-void ContactListController::callContact()
+void ContactListController::callContactVoice()
+{
+    callContact(false);
+}
+
+void ContactListController::callContactVideo()
+{
+    callContact(true);
+}
+
+void ContactListController::callContact(bool useInitialVideo)
 {
     Q_ASSERT(d->currentIndex.isValid());
     Tp::ContactPtr contact = d->currentIndex.data(KCall::ObjectPtrRole).value<Tp::ContactPtr>();
@@ -105,6 +118,9 @@ void ContactListController::callContact()
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType", Tp::HandleTypeContact);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle", contact->handle()[0]);
     request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialAudio", true);
+    if ( useInitialVideo ) {
+        request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialVideo", true);
+    }
     account->ensureChannel(request, QDateTime::currentDateTime(), "org.freedesktop.Telepathy.Client.kcall_handler");
 }
 

@@ -175,6 +175,9 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
             SLOT(onAudioOutputDeviceCreated(QObject*)));
     connect(handler, SIGNAL(audioOutputDeviceDestroyed()), SLOT(onAudioOutputDeviceDestroyed()));
 
+    connect(handler, SIGNAL(videoInputDeviceCreated(QWidget*)),
+            SLOT(onVideoInputDeviceCreated(QWidget*)));
+
     connect(handler, SIGNAL(videoOutputWidgetCreated(VideoWidget*, uint)),
             SLOT(onVideoOutputWidgetCreated(VideoWidget*, uint)));
     connect(handler, SIGNAL(closeVideoOutputWidget(uint)), SLOT(onCloseVideoOutputWidget(uint)));
@@ -200,6 +203,11 @@ void CallWindow::onAudioOutputDeviceCreated(QObject *control)
 void CallWindow::onAudioOutputDeviceDestroyed()
 {
     d->ui.speakersGroupBox->setEnabled(false);
+}
+
+void CallWindow::onVideoInputDeviceCreated(QWidget *videoWidget)
+{
+    d->ui.verticalLayout->insertWidget(0, videoWidget);
 }
 
 void CallWindow::onVideoOutputWidgetCreated(VideoWidget *widget, uint id)

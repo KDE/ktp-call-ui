@@ -17,6 +17,7 @@
 #include "qtfchannel.h"
 #include "../libqtgstreamer/qgstbus.h"
 #include <QtCore/QMutex>
+#include <KDebug>
 #include <TelepathyQt4/Farsight/Channel>
 #include <telepathy-farsight/channel.h>
 #include <gst/farsight/fs-codec.h>
@@ -130,7 +131,7 @@ void QTfChannel::Private::onConferencePadRemoved(QGstPadPtr pad)
         m_videoSrcPads.removeAt(index);
         emit q->videoSrcPadRemoved(pad);
     } else {
-        Q_ASSERT(false);
+        kWarning() << "Unknown pad" << name << "was removed from FsConference";
     }
 }
 

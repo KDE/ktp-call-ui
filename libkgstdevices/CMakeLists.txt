@@ -4,6 +4,9 @@ set(kgstdevices_SRCS
     devicemanager.cpp
     devicesmodel.cpp
     tabledevicechooser.cpp
+    abstractrenderer.cpp
+    overlayrenderer.cpp
+    videowidget.cpp
 )
 
 add_definitions(-fPIC)

@@ -16,6 +16,7 @@
 */
 #include "tabledevicechooser.h"
 #include "devicesmodel.h"
+#include "videowidget.h"
 #include "ui_tabledevicechooser.h"
 #include "../libqtgstreamer/qgstpipeline.h"
 #include "../libqtgstreamer/qgstelementfactory.h"
@@ -35,6 +36,7 @@ struct TableDeviceChooser::Private
     void onSelectionChanged(const QItemSelection & selected);
     void onModelReset();
     void testDevice();
+    void onVideoWidgetDestroyed();
     void toggleDetails();
 
     QPointer<DeviceManager> m_manager;
@@ -233,28 +235,56 @@ void TableDeviceChooser::Private::testDevice()
                 return;
             }
 
-            QGstElementPtr colorSpace = QGstElementFactory::make("ffmpegcolorspace");
-            QGstElementPtr videoScale = QGstElementFactory::make("videoscale");
-            QGstElementPtr videoRate = QGstElementFactory::make("videorate");
-            QGstElementPtr videoSink = QGstElementFactory::make("autovideosink");
-            if ( !colorSpace || !videoScale || !videoRate || !videoSink ) {
+            VideoWidget *widget = m_manager->newVideoWidget();
+
+            if ( !widget ) {
                 KMessageBox::sorry(q, i18n("Some gstreamer elements could not be created. "
                                               "Please check your gstreamer installation."));
                 m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
                 return;
+            } else if ( !widget->videoBin()->setState(QGstElement::Ready) ) {
+                KMessageBox::sorry(q, i18n("The video output driver could not be initialized."));
+                m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
+                return;
             }
 
-            //TODO use the VideoWidget
+            widget->show();
+            widget->setAttribute(Qt::WA_DeleteOnClose);
+            connect(m_testPipeline.data(), SIGNAL(destroyed()), widget, SLOT(close()));
+            connect(widget, SIGNAL(destroyed()), q, SLOT(onVideoWidgetDestroyed()));
 
             m_testPipeline->add(inputElement);
-            m_testPipeline->add(colorSpace);
-            m_testPipeline->add(videoScale);
-            m_testPipeline->add(videoRate);
-            m_testPipeline->add(videoSink);
-            QGstElement::link(inputElement, colorSpace, videoScale, videoRate, videoSink);
+            m_testPipeline->add(widget->videoBin());
+            QGstElement::link(inputElement, widget->videoBin());
             break;
         }
-        //TODO support DeviceManager::VideoOutput
+        case DeviceManager::VideoOutput:
+        {
+            QGstElementPtr videoSrc = QGstElementFactory::make("videotestsrc");
+            VideoWidget *widget = m_manager->newVideoWidget();
+
+            if ( !videoSrc || !widget ) {
+                KMessageBox::sorry(q, i18n("Some gstreamer elements could not be created. "
+                                              "Please check your gstreamer installation."));
+                m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
+                return;
+            } else if ( !widget->videoBin()->setState(QGstElement::Ready) ) {
+                KMessageBox::sorry(q, i18n("The selected video output driver could not be "
+                                            "initialized. Please select another driver."));
+                m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
+                return;
+            }
+
+            widget->show();
+            widget->setAttribute(Qt::WA_DeleteOnClose);
+            connect(m_testPipeline.data(), SIGNAL(destroyed()), widget, SLOT(close()));
+            connect(widget, SIGNAL(destroyed()), q, SLOT(onVideoWidgetDestroyed()));
+
+            m_testPipeline->add(videoSrc);
+            m_testPipeline->add(widget->videoBin());
+            QGstElement::link(videoSrc, widget->videoBin());
+            break;
+        }
         default:
             m_testPipeline = QGstPipelinePtr(); //delete the pipeline, no reason to keep it.
             return;
@@ -264,11 +294,19 @@ void TableDeviceChooser::Private::testDevice()
         m_ui.testButton->setText(i18nc("stop audio/video test", "Stop test"));
         m_ui.testButton->setIcon(KIcon("media-playback-stop"));
     } else {
+        m_testing = false;
         m_testPipeline->setState(QGstElement::Null);
         m_testPipeline = QGstPipelinePtr(); //delete the pipeline
-        m_testing = false;
         m_ui.testButton->setText(i18nc("test the device", "Test"));
         m_ui.testButton->setIcon(KIcon("media-playback-start"));
+    }
+}
+
+void TableDeviceChooser::Private::onVideoWidgetDestroyed()
+{
+    //if we are still testing, stop testing.
+    if ( m_testing ) {
+        testDevice();
     }
 }
 

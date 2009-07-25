@@ -8,6 +8,7 @@ target_link_libraries(kcm_kcalldevices ${KDE4_KDEUI_LIBS}
                                     QtGstreamer
                                     #extra dependencies of libQtGstreamer
                                     ${GSTREAMER_LIBRARIES}
+                                    ${GSTREAMER_INTERFACE_LIBRARY}
                                     ${GOBJECT_LIBRARIES}
 )
 

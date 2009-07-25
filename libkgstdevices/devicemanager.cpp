@@ -15,6 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "devicemanager.h"
+#include "overlayrenderer.h"
+#include "videowidget.h"
 #include "../libqtgstreamer/qgstelementfactory.h"
 #include <QtCore/QPointer>
 #include <QtCore/QDataStream>
@@ -135,8 +137,12 @@ void DeviceManagerPrivate::detectDevices()
     {
         DevicePrivate d;
 #ifdef Q_WS_X11
-        d.name = i18n("X11 video renderer (Xv/X)");
+        d.name = i18n("Xv video renderer");
         d.driver = "xvimagesink";
+        m_availableDevices[DeviceManager::VideoOutput].append(Device(d));
+
+        d.name = i18n("X11 video renderer");
+        d.driver = "ximagesink";
         m_availableDevices[DeviceManager::VideoOutput].append(Device(d));
 #endif
     }
@@ -482,8 +488,21 @@ QtGstreamer::QGstElementPtr DeviceManager::newVideoInputElement()
 
 VideoWidget *DeviceManager::newVideoWidget(QWidget *parent)
 {
-    Q_UNUSED(parent);
-    return NULL;
+    using namespace QtGstreamer;
+    Device device = d->m_currentDevices[VideoOutput];
+    QGstElementPtr element = QGstElementFactory::make(device.driver());
+    if ( element.isNull() ) {
+        kWarning() << "Could not construct" << device.driver();
+        return NULL;
+    }
+
+    AbstractRenderer *renderer = new OverlayRenderer(element);
+    VideoWidget *widget = VideoWidget::newVideoWidget(renderer, parent);
+    if ( !widget ) {
+        delete renderer;
+    }
+
+    return widget;
 }
 
 

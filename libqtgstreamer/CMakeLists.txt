@@ -14,6 +14,7 @@ set(QtGstreamer_SRCS
     qgvalue.cpp
     qgstcaps.cpp
     qgststructure.cpp
+    interfaces/qgstxoverlay.cpp
 )
 
 add_definitions(-fPIC)

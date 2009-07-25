@@ -14,30 +14,27 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_TABLEDEVICECHOOSER_H
-#define _KGSTDEVICES_TABLEDEVICECHOOSER_H
+#ifndef _QTGSTREAMER_QGSTXOVERLAY_H
+#define _QTGSTREAMER_QGSTXOVERLAY_H
 
-#include "devicemanager.h"
-#include <QtGui/QWidget>
+#include "../qgstelement.h"
 
-namespace KGstDevices {
+namespace QtGstreamer {
 
-class KGSTDEVICES_EXPORT TableDeviceChooser : public QWidget
+class QGstXOverlay
 {
-    Q_OBJECT
 public:
-    TableDeviceChooser(DeviceManager *manager, DeviceManager::DeviceType type, QWidget *parent = 0);
-    virtual ~TableDeviceChooser();
+    QGstXOverlay(const QGstElementPtr & element);
+    ~QGstXOverlay();
+
+    static bool isXOverlay(const QGstElementPtr & element);
+
+    void setXWindowId(unsigned long id);
+    void expose();
+    void handleEvents(bool handle_events);
 
 private:
-    struct Private;
-    Private *const d;
-    Q_PRIVATE_SLOT(d, void onCurrentDeviceChanged(DeviceManager::DeviceType type));
-    Q_PRIVATE_SLOT(d, void onSelectionChanged(const QItemSelection & selected));
-    Q_PRIVATE_SLOT(d, void onModelReset());
-    Q_PRIVATE_SLOT(d, void testDevice());
-    Q_PRIVATE_SLOT(d, void onVideoWidgetDestroyed());
-    Q_PRIVATE_SLOT(d, void toggleDetails());
+    QGstElementPtr m_element;
 };
 
 }

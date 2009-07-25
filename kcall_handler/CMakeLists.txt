@@ -27,6 +27,7 @@ target_link_libraries(kcall_handler ${KDE4_KDEUI_LIBS}
                                     QtGstreamer
                                     #extra dependencies of libQtGstreamer
                                     ${GSTREAMER_LIBRARIES}
+                                    ${GSTREAMER_INTERFACE_LIBRARY}
                                     ${GOBJECT_LIBRARIES}
                                     #extra dependencies of libqtpfarsight
                                     ${TELEPATHY_QT4_FARSIGHT_LIBRARIES}

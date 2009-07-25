@@ -40,7 +40,8 @@ private slots:
     void onAudioInputDeviceDestroyed();
     void onAudioOutputDeviceCreated(QObject *control);
     void onAudioOutputDeviceDestroyed();
-    void onVideoInputDeviceCreated(QWidget *videoWidget);
+    void onVideoInputDeviceCreated(QObject *balanceControl, QWidget *videoWidget);
+    void onVideoInputDeviceDestroyed();
     void onVideoOutputWidgetCreated(QWidget *widget, uint id);
     void onCloseVideoOutputWidget(uint id);
     void onGroupMembersModelCreated(GroupMembersModel *model);

@@ -26,12 +26,32 @@ class VideoInputBin : public QtGstreamer::QGstBin
 {
     Q_OBJECT
     Q_DISABLE_COPY(VideoInputBin)
+    Q_PROPERTY(int brightness READ brightness WRITE setBrightness)
+    Q_PROPERTY(int contrast READ contrast WRITE setContrast)
+    Q_PROPERTY(int hue READ hue WRITE setHue)
+    Q_PROPERTY(int saturation READ saturation WRITE setSaturation)
 public:
     static VideoInputBinPtr createVideoInputBin(const QtGstreamer::QGstElementPtr & elemenet);
     virtual ~VideoInputBin();
 
+    int brightness() const;
+    void setBrightness(int brightness);
+
+    int contrast() const;
+    void setContrast(int contrast);
+
+    int hue() const;
+    void setHue(int hue);
+
+    int saturation() const;
+    void setSaturation(int saturation);
+
 protected:
     VideoInputBin();
+
+private:
+    struct Private;
+    Private *const d;
 };
 
 #endif

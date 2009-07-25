@@ -10,6 +10,7 @@ set(kcall_handler_SRCS
     dtmfhandler.cpp
     dtmfwidget.cpp
     volumewidget.cpp
+    videobalancewidget.cpp
     farsight/audiobin.cpp
     farsight/videoinputbin.cpp
     farsight/farsightmediahandler.cpp

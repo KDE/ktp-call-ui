@@ -174,8 +174,9 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
             SLOT(onAudioOutputDeviceCreated(QObject*)));
     connect(handler, SIGNAL(audioOutputDeviceDestroyed()), SLOT(onAudioOutputDeviceDestroyed()));
 
-    connect(handler, SIGNAL(videoInputDeviceCreated(QWidget*)),
-            SLOT(onVideoInputDeviceCreated(QWidget*)));
+    connect(handler, SIGNAL(videoInputDeviceCreated(QObject*, QWidget*)),
+            SLOT(onVideoInputDeviceCreated(QObject*, QWidget*)));
+    connect(handler, SIGNAL(videoInputDeviceDestroyed()), SLOT(onVideoInputDeviceDestroyed()));
 
     connect(handler, SIGNAL(videoOutputWidgetCreated(QWidget*, uint)),
             SLOT(onVideoOutputWidgetCreated(QWidget*, uint)));
@@ -204,9 +205,20 @@ void CallWindow::onAudioOutputDeviceDestroyed()
     d->ui.speakersGroupBox->setEnabled(false);
 }
 
-void CallWindow::onVideoInputDeviceCreated(QWidget *videoWidget)
+void CallWindow::onVideoInputDeviceCreated(QObject *balanceControl, QWidget *videoWidget)
 {
     d->ui.verticalLayout->insertWidget(0, videoWidget);
+
+    d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, true);
+    d->ui.videoControlsTab->setEnabled(true);
+    d->ui.videoInputBalanceWidget->setVideoBalanceControl(balanceControl);
+}
+
+void CallWindow::onVideoInputDeviceDestroyed()
+{
+    d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
+    d->ui.videoControlsTab->setEnabled(false);
+    d->ui.videoInputBalanceWidget->setVideoBalanceControl(NULL);
 }
 
 void CallWindow::onVideoOutputWidgetCreated(QWidget *widget, uint id)

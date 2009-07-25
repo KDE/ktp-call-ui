@@ -34,7 +34,7 @@ Q_SIGNALS:
     void audioOutputDeviceCreated(QObject *outputVolumeControl);
     void audioOutputDeviceDestroyed();
 
-    void videoInputDeviceCreated(QWidget *videoWidget);
+    void videoInputDeviceCreated(QObject *balanceControl, QWidget *videoWidget);
     void videoInputDeviceDestroyed();
 
     void videoOutputWidgetCreated(QWidget *videoWidget, uint streamId);

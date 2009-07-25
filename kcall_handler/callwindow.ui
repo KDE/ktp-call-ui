@@ -63,6 +63,23 @@
          <attribute name="title">
           <string>Video controls</string>
          </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Video input</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="VideoBalanceWidget" name="videoInputBalanceWidget" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </widget>
         <widget class="DtmfWidget" name="dtmfWidget">
          <attribute name="title">
@@ -127,6 +144,12 @@
    <class>VolumeWidget</class>
    <extends>QWidget</extends>
    <header>volumewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>VideoBalanceWidget</class>
+   <extends>QWidget</extends>
+   <header>videobalancewidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

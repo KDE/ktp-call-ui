@@ -226,7 +226,7 @@ void FarsightMediaHandler::openVideoInputDevice(bool *success)
     d->videoInputWidget->videoBin()->setState(QGstElement::Playing);
     *success = true;
 
-    emit videoInputDeviceCreated(d->videoInputWidget);
+    emit videoInputDeviceCreated(d->videoInputBin.data(), d->videoInputWidget);
 }
 
 void FarsightMediaHandler::videoSinkPadAdded(QGstPadPtr sinkPad)

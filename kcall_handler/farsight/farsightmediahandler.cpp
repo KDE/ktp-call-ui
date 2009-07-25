@@ -18,12 +18,12 @@
 #include "audiobin.h"
 #include "videoinputbin.h"
 #include "../../libkgstdevices/devicemanager.h"
+#include "../../libkgstdevices/videowidget.h"
 #include "../../libqtgstreamer/qgstpipeline.h"
 #include "../../libqtgstreamer/qgstelementfactory.h"
 #include "../../libqtgstreamer/qgstglobal.h"
 #include "../../libqtgstreamer/qgstbus.h"
 #include "../../libqtpfarsight/qtfchannel.h"
-#include "../../libkgstvideowidget/videowidget.h"
 #include <KDebug>
 #include <KGlobal>
 #include <KConfig>
@@ -47,7 +47,7 @@ struct FarsightMediaHandler::Private
     QGstElementPtr audioAdder;
     VideoInputBinPtr videoInputBin;
     QGstElementPtr videoTee;
-    QPointer< ::VideoWidget > videoInputWidget;
+    QPointer<VideoWidget> videoInputWidget;
 
     QHash<QByteArray, QGstPadPtr> audioAdderPadsMap;
     QHash<QByteArray, uint> videoWidgetIdsMap;
@@ -187,41 +187,43 @@ void FarsightMediaHandler::openVideoInputDevice(bool *success)
     if ( !element ) {
         emit logMessage(CallLog::Error, i18n("The gstreamer element for the video input device "
                                              "could not be created. Please check your gstreamer "
-                                             "installation"));
+                                             "installation."));
+        *success = false;
+        return;
+    } else if ( !element->setState(QGstElement::Paused) ) {
+        emit logMessage(CallLog::Error, i18n("The video input device could not be initialized."));
         *success = false;
         return;
     }
 
-    if ( !element->setState(QGstElement::Paused) ) {
-        emit logMessage(CallLog::Error, i18n("The video input device could not be initialized"));
-        *success = false;
-        return;
-    }
-
-    d->videoTee = QGstElementFactory::make("tee");
     d->videoInputBin = VideoInputBin::createVideoInputBin(element);
-    if ( !d->videoTee || !d->videoInputBin ) {
+    d->videoTee = QGstElementFactory::make("tee");
+    d->videoInputWidget = d->deviceManager->newVideoWidget();
+
+    if ( !d->videoInputBin || !d->videoTee || !d->videoInputWidget ) {
         emit logMessage(CallLog::Error, i18n("Some gstreamer elements could not be created. "
                                               "Please check your gstreamer installation."));
         *success = false;
         return;
+    } else if ( !d->videoInputWidget->videoBin()->setState(QGstElement::Ready) ) {
+        emit logMessage(CallLog::Error, i18n("The video output driver could not be initialized."));
+        *success = false;
+        delete d->videoInputWidget;
+        return;
     }
-
-    d->videoInputWidget = new ::VideoWidget;
-    QGstElementPtr videoWidgetElement = QGstElement::fromGstElement(d->videoInputWidget->videoElement());
 
     d->pipeline->add(d->videoInputBin);
     d->pipeline->add(d->videoTee);
-    d->pipeline->add(videoWidgetElement);
+    d->pipeline->add(d->videoInputWidget->videoBin());
 
     QGstElement::link(d->videoInputBin, d->videoTee);
     QGstPadPtr srcPad = d->videoTee->getRequestPad("src%d");
-    QGstPadPtr sinkPad = videoWidgetElement->getStaticPad("sink");
+    QGstPadPtr sinkPad = d->videoInputWidget->videoBin()->getStaticPad("sink");
     srcPad->link(sinkPad);
 
     d->videoInputBin->setState(QGstElement::Playing);
     d->videoTee->setState(QGstElement::Playing);
-    videoWidgetElement->setState(QGstElement::Playing);
+    d->videoInputWidget->videoBin()->setState(QGstElement::Playing);
     *success = true;
 
     emit videoInputDeviceCreated(d->videoInputWidget);
@@ -240,15 +242,13 @@ void FarsightMediaHandler::closeVideoInputDevice()
 {
     kDebug() << "Closing video input device";
 
-    QGstElementPtr videoWidgetElement = QGstElement::fromGstElement(d->videoInputWidget->videoElement());
-
     d->videoInputBin->setState(QGstElement::Null);
     d->videoTee->setState(QGstElement::Null);
-    videoWidgetElement->setState(QGstElement::Null);
+    d->videoInputWidget->videoBin()->setState(QGstElement::Null);
 
     d->pipeline->remove(d->videoInputBin);
     d->pipeline->remove(d->videoTee);
-    d->pipeline->remove(videoWidgetElement);
+    d->pipeline->remove(d->videoInputWidget->videoBin());
 
     d->videoInputBin = VideoInputBinPtr();
     d->videoTee = QGstElementPtr();
@@ -324,7 +324,22 @@ void FarsightMediaHandler::openVideoOutputDevice(bool *success)
 {
     kDebug() << "Opening video output device";
 
-    //assume that we always have a video widget available.
+    //here we construct a widget just to see if we can, and then destroy it...
+    VideoWidget *widget =  d->deviceManager->newVideoWidget();
+
+    if ( !widget ) {
+        emit logMessage(CallLog::Error, i18n("Some gstreamer elements could not be created. "
+                                              "Please check your gstreamer installation."));
+        *success = false;
+        return;
+    } else if ( !widget->videoBin()->setState(QGstElement::Ready) ) {
+        emit logMessage(CallLog::Error, i18n("The video output driver could not be initialized."));
+        *success = false;
+        delete widget;
+        return;
+    }
+
+    delete widget;
     *success = true;
 }
 
@@ -332,13 +347,12 @@ void FarsightMediaHandler::videoSrcPadAdded(QGstPadPtr srcPad)
 {
     kDebug() << "Video src pad added";
 
-    //TODO use the VideoWidget from DeviceManager
-    ::VideoWidget *widget = new ::VideoWidget;
+    VideoWidget *widget =  d->deviceManager->newVideoWidget();
+    Q_ASSERT(widget);
 
-    QGstElementPtr element = QGstElement::fromGstElement(widget->videoElement());
-    d->pipeline->add(element);
-    element->setState(QGstElement::Playing);
-    QGstPadPtr sinkPad = element->getStaticPad("sink");
+    d->pipeline->add(widget->videoBin());
+    widget->videoBin()->setState(QGstElement::Playing);
+    QGstPadPtr sinkPad = widget->videoBin()->getStaticPad("sink");
     srcPad->link(sinkPad);
 
     d->videoWidgetIdsMap.insert(srcPad->property<QByteArray>("name"), d->videoWidgetIdsCounter);

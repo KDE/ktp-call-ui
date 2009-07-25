@@ -20,7 +20,6 @@
 #include "dtmfhandler.h"
 #include "kcallhandlersettings.h"
 #include "../libkcallprivate/groupmembersmodel.h"
-#include "../libkgstvideowidget/videowidget.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QLabel>
@@ -178,8 +177,8 @@ void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)
     connect(handler, SIGNAL(videoInputDeviceCreated(QWidget*)),
             SLOT(onVideoInputDeviceCreated(QWidget*)));
 
-    connect(handler, SIGNAL(videoOutputWidgetCreated(VideoWidget*, uint)),
-            SLOT(onVideoOutputWidgetCreated(VideoWidget*, uint)));
+    connect(handler, SIGNAL(videoOutputWidgetCreated(QWidget*, uint)),
+            SLOT(onVideoOutputWidgetCreated(QWidget*, uint)));
     connect(handler, SIGNAL(closeVideoOutputWidget(uint)), SLOT(onCloseVideoOutputWidget(uint)));
 }
 
@@ -210,7 +209,7 @@ void CallWindow::onVideoInputDeviceCreated(QWidget *videoWidget)
     d->ui.verticalLayout->insertWidget(0, videoWidget);
 }
 
-void CallWindow::onVideoOutputWidgetCreated(VideoWidget *widget, uint id)
+void CallWindow::onVideoOutputWidgetCreated(QWidget *widget, uint id)
 {
     QDockWidget *dock = new QDockWidget(this);
     dock->setObjectName("video-output-" + QString::number(id));

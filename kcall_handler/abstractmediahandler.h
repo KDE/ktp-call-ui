@@ -19,7 +19,6 @@
 
 #include "calllog.h"
 #include <TelepathyQt4/StreamedMediaChannel>
-class VideoWidget;
 
 class AbstractMediaHandler : public QObject
 {
@@ -38,7 +37,7 @@ Q_SIGNALS:
     void videoInputDeviceCreated(QWidget *videoWidget);
     void videoInputDeviceDestroyed();
 
-    void videoOutputWidgetCreated(VideoWidget *videoWidget, uint streamId);
+    void videoOutputWidgetCreated(QWidget *videoWidget, uint streamId);
     void closeVideoOutputWidget(uint streamId);
 
     void logMessage(CallLog::LogType logType, const QString & message);

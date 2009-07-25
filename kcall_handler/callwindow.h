@@ -19,8 +19,6 @@
 
 #include "channelhandler.h"
 #include <KXmlGuiWindow>
-class VolumeControlInterface;
-class VideoWidget;
 
 class CallWindow : public KXmlGuiWindow
 {
@@ -43,7 +41,7 @@ private slots:
     void onAudioOutputDeviceCreated(QObject *control);
     void onAudioOutputDeviceDestroyed();
     void onVideoInputDeviceCreated(QWidget *videoWidget);
-    void onVideoOutputWidgetCreated(VideoWidget *widget, uint id);
+    void onVideoOutputWidgetCreated(QWidget *widget, uint id);
     void onCloseVideoOutputWidget(uint id);
     void onGroupMembersModelCreated(GroupMembersModel *model);
     void onDtmfHandlerCreated(DtmfHandler *handler);

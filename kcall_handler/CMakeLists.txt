@@ -23,7 +23,6 @@ target_link_libraries(kcall_handler ${KDE4_KDEUI_LIBS}
                                     kcallprivate
                                     qtpfarsight
                                     kgstdevices
-                                    kgstvideowidget
                                     QtGstreamer
                                     #extra dependencies of libQtGstreamer
                                     ${GSTREAMER_LIBRARIES}

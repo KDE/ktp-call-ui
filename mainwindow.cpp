@@ -61,6 +61,7 @@ void MainWindow::setupActions()
 void MainWindow::showSettingsDialog()
 {
     KSettings::Dialog *dialog = new KSettings::Dialog(this);
+    dialog->addModule("kcm_telepathy_accounts");
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

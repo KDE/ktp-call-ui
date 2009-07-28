@@ -39,6 +39,7 @@ struct CallWindow::Private
     QTime callDuration;
     QTimer callDurationTimer;
     QHash<uint, QDockWidget*> videoOutputWidgets;
+    QLabel *statusLabel;
     Ui::CallWindow ui;
 };
 
@@ -103,6 +104,9 @@ void CallWindow::setupUi()
     d->callDuration.setHMS(0, 0, 0);
     statusBar()->insertPermanentItem(d->callDuration.toString(), 1);
 
+    d->statusLabel = new QLabel;
+    statusBar()->addWidget(d->statusLabel);
+
     setupGUI(QSize(320, 260), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"));
 }
@@ -161,7 +165,7 @@ void CallWindow::setState(ChannelHandler::State state)
 
 void CallWindow::setStatus(const QString & msg)
 {
-    statusBar()->showMessage(msg);
+    d->statusLabel->setText(msg);
 }
 
 void CallWindow::onMediaHandlerCreated(AbstractMediaHandler *handler)

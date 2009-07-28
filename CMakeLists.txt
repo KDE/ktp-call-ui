@@ -68,4 +68,5 @@ target_link_libraries(kcall ${KDE4_KUTILS_LIBS}
                             kcallprivate)
 
 install(TARGETS kcall ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES kcallui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall)
 install(FILES kcall.notifyrc DESTINATION ${DATA_INSTALL_DIR}/kcall)

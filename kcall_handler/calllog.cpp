@@ -20,7 +20,7 @@
 #include <KDebug>
 
 CallLog::CallLog(QPlainTextEdit *logView, QObject *parent)
-    : QObject(parent), m_logView(logView)
+    : QObject(parent), m_logView(logView), m_errorLogged(false)
 {
     qRegisterMetaType<CallLog::LogType>();
 }
@@ -37,6 +37,7 @@ void CallLog::logMessage(CallLog::LogType type, const QString & message)
         break;
     case Error:
         modifiedMessage = i18n("Error: %1", message);
+        m_errorLogged = true;
         break;
     default:
         Q_ASSERT(false);

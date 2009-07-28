@@ -34,6 +34,7 @@ public:
     };
 
     CallLog(QPlainTextEdit *logView, QObject *parent = 0);
+    bool errorHasBeenLogged() const { return m_errorLogged; }
 
 public slots:
     void logMessage(CallLog::LogType type, const QString & message);
@@ -43,6 +44,7 @@ signals:
 
 private:
     QPointer<QPlainTextEdit> m_logView;
+    bool m_errorLogged;
 };
 
 Q_DECLARE_METATYPE(CallLog::LogType);

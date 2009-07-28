@@ -41,6 +41,7 @@ struct CallWindow::Private
     QHash<uint, QDockWidget*> videoOutputWidgets;
     QLabel *statusLabel;
     Ui::CallWindow ui;
+    CallLog *callLog;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -61,10 +62,10 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
 
     setupUi();
 
-    CallLog *callLog = new CallLog(d->ui.logView, this);
+    d->callLog = new CallLog(d->ui.logView, this);
     connect(d->channelHandler, SIGNAL(logMessage(CallLog::LogType, QString)),
-            callLog, SLOT(logMessage(CallLog::LogType, QString)));
-    connect(callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
+            d->callLog, SLOT(logMessage(CallLog::LogType, QString)));
+    connect(d->callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
 
     connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 }
@@ -148,7 +149,7 @@ void CallWindow::setState(ChannelHandler::State state)
         setStatus(i18nc("@info:status", "Disconnected."));
         disableUi();
         d->callDurationTimer.stop();
-        if ( KCallHandlerSettings::closeOnDisconnect() ) {
+        if ( KCallHandlerSettings::closeOnDisconnect() && !d->callLog->errorHasBeenLogged() ) {
             QTimer::singleShot(KCallHandlerSettings::closeOnDisconnectTimeout() * 1000,
                                this, SLOT(close()));
         }

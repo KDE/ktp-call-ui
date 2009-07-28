@@ -16,6 +16,7 @@
 */
 #include "abstractmediahandler.h"
 #include "farsight/farsightmediahandler.h"
+#include <KDebug>
 
 AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
     : QObject(parent)
@@ -26,6 +27,7 @@ AbstractMediaHandler::AbstractMediaHandler(QObject *parent)
 AbstractMediaHandler *AbstractMediaHandler::create(const Tp::StreamedMediaChannelPtr & channel,
                                                    QObject *parent)
 {
+    kDebug() << "Creating farsight channel";
     return new FarsightMediaHandler(channel, parent);
 }
 

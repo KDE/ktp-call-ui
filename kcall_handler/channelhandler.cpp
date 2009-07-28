@@ -66,12 +66,12 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
     if ( op->isError() ) {
         kError() << "StreamedMediaChannel failed to become ready:"
                  << op->errorName() << op->errorMessage();
+        emit logMessage(CallLog::Error, i18n("Could not initialize the channel"));
         setState(Error);
         return;
     }
 
     if ( d->channel->handlerStreamingRequired() ) {
-        kDebug() << "Creating farsight channel";
         d->mediaHandler = AbstractMediaHandler::create(d->channel, this);
         connect(d->mediaHandler, SIGNAL(logMessage(CallLog::LogType, QString)),
                 this, SIGNAL(logMessage(CallLog::LogType, QString)));
@@ -115,8 +115,16 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
         kDebug() << "  direction:" << stream->direction();
         kDebug() << "  state:" << stream->state();
 
-       // onStreamDirectionChanged(stream, stream->direction(), stream->pendingSend());
-       // onStreamStateChanged(stream, stream->state());
+        if ( stream->type() == Tp::MediaStreamTypeAudio ) {
+            emit logMessage(CallLog::Information, i18n("Audio stream created. Stream id: %1.",
+                                                       stream->id()));
+        } else {
+            emit logMessage(CallLog::Information, i18n("Video stream created. Stream id: %1.",
+                                                       stream->id()));
+        }
+
+        emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
+                        "Stream %1 direction is: %2.", stream->id(), stream->direction()));
     }
 
     //The user must have accepted the call already, using the approver.
@@ -135,8 +143,10 @@ void ChannelHandler::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &e
     kDebug() << "channel became invalid:" << errorName << errorMessage;
 
     if ( errorName == TELEPATHY_ERROR_CANCELLED ) {
+        emit logMessage(CallLog::Information, i18n("Channel closed"));
         setState(Disconnected);
     } else {
+        emit logMessage(CallLog::Error, i18n("Channel closed with error: %1", errorMessage));
         setState(Error);
     }
 }
@@ -148,6 +158,17 @@ void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
     kDebug() << " state:" << stream->state();
     kDebug() << " pending send:" << stream->pendingSend();
 
+    if ( stream->type() == Tp::MediaStreamTypeAudio ) {
+        emit logMessage(CallLog::Information, i18n("Audio stream created. Stream id: %1.",
+                                                    stream->id()));
+    } else {
+        emit logMessage(CallLog::Information, i18n("Video stream created. Stream id: %1.",
+                                                    stream->id()));
+    }
+
+    emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
+                    "Stream %1 direction is: %2.", stream->id(), stream->direction()));
+
     //clear pending send in new video streams.
     if ( stream->type() == Tp::MediaStreamTypeVideo && stream->pendingSend() ) {
         stream->requestDirection(Tp::MediaStreamDirectionReceive);
@@ -157,6 +178,8 @@ void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
 void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
 {
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream removed";
+    emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
+                    "Stream %1 removed.", stream->id()));
 }
 
 void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
@@ -166,6 +189,9 @@ void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
                 "stream direction changed to" << direction;
     kDebug() << "pending send:" << pendingSend;
+
+    emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
+                    "Stream %1 direction changed to: %2.", stream->id(), stream->direction()));
 }
 
 void ChannelHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
@@ -174,6 +200,9 @@ void ChannelHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
     kDebug() <<  (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
                 "stream state changed to" << state;
     kDebug() << " pending send:" << stream->pendingSend();
+
+    emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
+                    "Stream %1 state changed to: %2.", stream->id(), state));
 
     if (d->state == Connecting && state == Tp::MediaStreamStateConnected) {
         if ( d->channel->awaitingRemoteAnswer() ) {
@@ -191,9 +220,17 @@ void ChannelHandler::onGroupMembersChanged(const Tp::Contacts & groupMembersAdde
                                            const Tp::Channel::GroupMemberChangeDetails & details)
 {
     Q_UNUSED(groupLocalPendingMembersAdded);
-    Q_UNUSED(groupRemotePendingMembersAdded);
-    Q_UNUSED(groupMembersRemoved);
     Q_UNUSED(details);
+
+    foreach(const Tp::ContactPtr & contact, groupMembersAdded) {
+        emit logMessage(CallLog::Information, i18n("User %1 joined the conference.", contact->alias()));
+    }
+    foreach(const Tp::ContactPtr & contact, groupRemotePendingMembersAdded) {
+        emit logMessage(CallLog::Information, i18n("Awaiting answer from user %1.", contact->alias()));
+    }
+    foreach(const Tp::ContactPtr & contact, groupMembersRemoved) {
+        emit logMessage(CallLog::Information, i18n("User %1 left the conference.", contact->alias()));
+    }
 
     if ( d->state == Ringing ) {
         if ( groupMembersAdded.size() > 0 && !d->channel->awaitingRemoteAnswer() ) {

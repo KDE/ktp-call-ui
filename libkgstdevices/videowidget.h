@@ -37,6 +37,7 @@ public:
     virtual ~VideoWidget();
 
     QtGstreamer::QGstElementPtr videoBin() const;
+    AbstractRenderer *renderer() const;
 
     qreal brightness() const;
     void setBrightness(qreal brightness);

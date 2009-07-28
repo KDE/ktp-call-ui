@@ -19,6 +19,7 @@
 #include "videoinputbin.h"
 #include "../../libkgstdevices/devicemanager.h"
 #include "../../libkgstdevices/videowidget.h"
+#include "../../libkgstdevices/abstractrenderer.h"
 #include "../../libqtgstreamer/qgstpipeline.h"
 #include "../../libqtgstreamer/qgstelementfactory.h"
 #include "../../libqtgstreamer/qgstglobal.h"
@@ -212,6 +213,8 @@ void FarsightMediaHandler::openVideoInputDevice(bool *success)
         return;
     }
 
+    d->videoInputWidget->renderer()->setAspectRatio(AbstractRenderer::AspectRatio4_3);
+
     d->pipeline->add(d->videoInputBin);
     d->pipeline->add(d->videoTee);
     d->pipeline->add(d->videoInputWidget->videoBin());
@@ -349,6 +352,7 @@ void FarsightMediaHandler::videoSrcPadAdded(QGstPadPtr srcPad)
 
     VideoWidget *widget =  d->deviceManager->newVideoWidget();
     Q_ASSERT(widget);
+    widget->renderer()->setAspectRatio(AbstractRenderer::AspectRatio4_3);
 
     d->pipeline->add(widget->videoBin());
     widget->videoBin()->setState(QGstElement::Playing);

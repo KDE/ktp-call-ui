@@ -99,6 +99,11 @@ QGstElementPtr VideoWidget::videoBin() const
     return d->videoBin;
 }
 
+AbstractRenderer *VideoWidget::renderer() const
+{
+    return d->renderer;
+}
+
 qreal VideoWidget::brightness() const
 {
     return d->videoBalance->property<qreal>("brightness");

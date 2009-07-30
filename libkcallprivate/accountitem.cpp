@@ -43,18 +43,23 @@ QVariant AccountItem::data(int role) const
         case Qt::DisplayRole:
             return m_account->displayName();
         case Qt::DecorationRole:
+            return iconForPresence((Tp::ConnectionPresenceType)data(KCall::PresenceRole).value<Tp::SimplePresence>().type);
+        case KCall::PresenceRole:
         {
-            uint presenceType = m_account->currentPresence().type;
-            if ( presenceType == Tp::ConnectionPresenceTypeUnset ) {
+            Tp::SimplePresence presence = m_account->currentPresence();
+            if ( presence.type == Tp::ConnectionPresenceTypeUnset ) {
                 switch(m_account->connectionStatus()) {
                     case Tp::ConnectionStatusConnected:
-                        return iconForPresence(Tp::ConnectionPresenceTypeAvailable);
+                        presence.type = Tp::ConnectionPresenceTypeAvailable;
+                        presence.status = "available";
+                        break;
                     default:
-                        return iconForPresence(Tp::ConnectionPresenceTypeOffline);
+                        presence.type = Tp::ConnectionPresenceTypeOffline;
+                        presence.status = "offline";
+                        break;
                 }
-            } else {
-                return iconForPresence(static_cast<Tp::ConnectionPresenceType>(presenceType));
             }
+            return QVariant::fromValue(presence);
         }
         case KCall::ItemTypeRole:
             return QByteArray("account");

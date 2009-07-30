@@ -26,8 +26,17 @@
 #include <TelepathyQt4/Account>
 #include <TelepathyQt4/Contact>
 
-Q_DECLARE_METATYPE(Tp::AccountPtr);
-Q_DECLARE_METATYPE(Tp::ContactPtr);
+Q_DECLARE_METATYPE(Tp::AccountPtr)
+Q_DECLARE_METATYPE(Tp::ContactPtr)
+
+static Tp::ConnectionPresenceType accountPresenceTypes[] =
+                        { Tp::ConnectionPresenceTypeAvailable, Tp::ConnectionPresenceTypeAway,
+                          Tp::ConnectionPresenceTypeAway, Tp::ConnectionPresenceTypeBusy,
+                          Tp::ConnectionPresenceTypeBusy, Tp::ConnectionPresenceTypeExtendedAway,
+                          Tp::ConnectionPresenceTypeHidden, Tp::ConnectionPresenceTypeOffline };
+
+static const char *accountPresenceStatuses[] = { "available", "away", "brb", "busy",
+                                                 "dnd", "xa", "hidden", "offline" };
 
 struct ContactListController::Private
 {
@@ -35,6 +44,7 @@ struct ContactListController::Private
     QAbstractItemModel *model;
     KMenu *contactMenu;
     KMenu *accountMenu;
+    KSelectAction *setStatusAction;
     QModelIndex currentIndex;
 };
 
@@ -58,17 +68,17 @@ ContactListController::ContactListController(QAbstractItemView *view, QAbstractI
 
     // account menu
     d->accountMenu = new KMenu(view);
-    KSelectAction *setStatusAction = new KSelectAction(i18nc("@action:inmenu", "Status"), d->accountMenu);
-    setStatusAction->addAction(KIcon("user-online"), i18nc("@action:inmenu", "Available"));
-    setStatusAction->addAction(KIcon("user-away"), i18nc("@action:inmenu", "Away"));
-    setStatusAction->addAction(KIcon("user-away"), i18nc("@action:inmenu", "Be right back"));
-    setStatusAction->addAction(KIcon("user-busy"), i18nc("@action:inmenu", "Busy"));
-    setStatusAction->addAction(KIcon("user-busy"), i18nc("@action:inmenu", "Do not distrurb"));
-    setStatusAction->addAction(KIcon("user-away-extended"), i18nc("@action:inmenu", "Extended Away"));
-    setStatusAction->addAction(KIcon("user-invisible"), i18nc("@action:inmenu", "Invisible"));
-    setStatusAction->addAction(KIcon("user-offline"), i18nc("@action:inmenu", "Offline"));
-    connect(setStatusAction, SIGNAL(triggered(int)), SLOT(setStatus(int)));
-    d->accountMenu->addAction(setStatusAction);
+    d->setStatusAction = new KSelectAction(i18nc("@action:inmenu", "Status"), d->accountMenu);
+    d->setStatusAction->addAction(KIcon("user-online"), i18nc("@action:inmenu", "Available"));
+    d->setStatusAction->addAction(KIcon("user-away"), i18nc("@action:inmenu", "Away"));
+    d->setStatusAction->addAction(KIcon("user-away"), i18nc("@action:inmenu", "Be right back"));
+    d->setStatusAction->addAction(KIcon("user-busy"), i18nc("@action:inmenu", "Busy"));
+    d->setStatusAction->addAction(KIcon("user-busy"), i18nc("@action:inmenu", "Do not distrurb"));
+    d->setStatusAction->addAction(KIcon("user-away-extended"), i18nc("@action:inmenu", "Extended Away"));
+    d->setStatusAction->addAction(KIcon("user-invisible"), i18nc("@action:inmenu", "Invisible"));
+    d->setStatusAction->addAction(KIcon("user-offline"), i18nc("@action:inmenu", "Offline"));
+    connect(d->setStatusAction, SIGNAL(triggered(int)), SLOT(setStatus(int)));
+    d->accountMenu->addAction(d->setStatusAction);
 }
 
 ContactListController::~ContactListController()
@@ -88,6 +98,16 @@ void ContactListController::contextMenuRequested(const QPoint & pos)
     if ( type == "contact" ) {
         d->contactMenu->popup(d->view->mapToGlobal(pos));
     } else if ( type == "account" ) {
+        //get the current presence type of the account
+        Tp::SimplePresence presence = index.data(KCall::PresenceRole).value<Tp::SimplePresence>();
+        //set default presence to offline, in case we get any strange value from PresenceRole
+        d->setStatusAction->setCurrentItem(7);
+        //select the action from the "setStatusAction" that corresponds to the current presence
+        for(uint i=0; i<sizeof(accountPresenceStatuses)/sizeof(char*); i++) {
+            if ( accountPresenceStatuses[i] == presence.status ) {
+                d->setStatusAction->setCurrentItem(i);
+            }
+        }
         d->accountMenu->popup(d->view->mapToGlobal(pos));
     }
 }
@@ -126,17 +146,10 @@ void ContactListController::callContact(bool useInitialVideo)
 
 void ContactListController::setStatus(int statusIndex)
 {
-    static const char *statuses[] = { "available", "away", "brb", "busy", "dnd", "xa", "hidden", "offline" };
-    static Tp::ConnectionPresenceType types[] =
-                        { Tp::ConnectionPresenceTypeAvailable, Tp::ConnectionPresenceTypeAway,
-                          Tp::ConnectionPresenceTypeAway, Tp::ConnectionPresenceTypeBusy,
-                          Tp::ConnectionPresenceTypeBusy, Tp::ConnectionPresenceTypeExtendedAway,
-                          Tp::ConnectionPresenceTypeHidden, Tp::ConnectionPresenceTypeOffline };
-
     Q_ASSERT(statusIndex >= 0 && statusIndex <= 7);
     Tp::SimplePresence presence;
-    presence.type = types[statusIndex];
-    presence.status = QLatin1String(statuses[statusIndex]);
+    presence.type = accountPresenceTypes[statusIndex];
+    presence.status = QLatin1String(accountPresenceStatuses[statusIndex]);
 
     Q_ASSERT(d->currentIndex.isValid());
     Tp::AccountPtr account = d->currentIndex.data(KCall::ObjectPtrRole).value<Tp::AccountPtr>();

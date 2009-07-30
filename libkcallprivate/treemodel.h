@@ -80,7 +80,8 @@ namespace KCall
     enum ExtraModelRoles {
         ItemTypeRole = Qt::UserRole,
         ObjectPtrRole,
-        GroupMembersListTypeRole
+        GroupMembersListTypeRole,
+        PresenceRole
     };
 
     enum GroupMembersListType {

@@ -41,7 +41,8 @@ MainWindow::MainWindow()
     new ContactListController(ui->contactsTreeView, KCallApplication::instance()->contactsModel());
 
     ui->accountComboBox->setModel(KCallApplication::instance()->contactsModel());
-    connect(ui->dialButton, SIGNAL(clicked()), SLOT(onDialButtonClicked()));
+    connect(ui->dialAudioButton, SIGNAL(clicked()), SLOT(onDialAudioButtonClicked()));
+    connect(ui->dialVideoButton, SIGNAL(clicked()), SLOT(onDialVideoButtonClicked()));
 
     setupActions();
     setupGUI(QSize(340, 460));
@@ -66,7 +67,17 @@ void MainWindow::showSettingsDialog()
     dialog->show();
 }
 
-void MainWindow::onDialButtonClicked()
+void MainWindow::onDialAudioButtonClicked()
+{
+    makeDirectCall(false);
+}
+
+void MainWindow::onDialVideoButtonClicked()
+{
+    makeDirectCall(true);
+}
+
+void MainWindow::makeDirectCall(bool useVideo)
 {
     int row = ui->accountComboBox->currentIndex();
     QString id = ui->contactHandleLineEdit->text();
@@ -85,7 +96,10 @@ void MainWindow::onDialButtonClicked()
                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType", Tp::HandleTypeContact);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetID", id);
-   // request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialAudio", true);
+    request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialAudio", true);
+    if ( useVideo ) {
+        request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialVideo", true);
+    }
     account->ensureChannel(request, QDateTime::currentDateTime(),
                            "org.freedesktop.Telepathy.Client.kcall_handler");
 }

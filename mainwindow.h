@@ -29,7 +29,9 @@ public:
 
 private slots:
     void showSettingsDialog();
-    void onDialButtonClicked();
+    void onDialAudioButtonClicked();
+    void onDialVideoButtonClicked();
+    void makeDirectCall(bool useVideo);
 
 private:
     void setupActions();

@@ -34,7 +34,8 @@ public:
     virtual void paintEvent(QPaintEvent *event)
     {
         Q_UNUSED(event);
-        QGstElement::State state = m_renderer->videoSink()->currentState();
+        QGstElement::State state;
+        m_renderer->videoSink()->getState(&state, NULL, 0);
         if (state == QGstElement::Playing || state == QGstElement::Paused) {
             m_renderer->windowExposed();
         } else {

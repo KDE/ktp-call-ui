@@ -41,7 +41,13 @@ QVariant AccountItem::data(int role) const
     } else {
         switch(role) {
         case Qt::DisplayRole:
-            return m_account->displayName();
+            if ( m_account->connectionStatus() == Tp::ConnectionStatusConnecting ) {
+                return i18nc("protocol - display name (Connecting)", "%1 - %2 (Connecting)",
+                             m_account->protocol(), m_account->displayName());
+            } else {
+                return i18nc("protocol - display name", "%1 - %2",
+                             m_account->protocol(), m_account->displayName());
+            }
         case Qt::DecorationRole:
             return iconForPresence((Tp::ConnectionPresenceType)data(KCall::PresenceRole).value<Tp::SimplePresence>().type);
         case KCall::PresenceRole:

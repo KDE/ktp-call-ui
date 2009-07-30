@@ -43,7 +43,19 @@ QVariant AccountItem::data(int role) const
         case Qt::DisplayRole:
             return m_account->displayName();
         case Qt::DecorationRole:
-            return iconForPresence((Tp::ConnectionPresenceType)m_account->currentPresence().type);
+        {
+            uint presenceType = m_account->currentPresence().type;
+            if ( presenceType == Tp::ConnectionPresenceTypeUnset ) {
+                switch(m_account->connectionStatus()) {
+                    case Tp::ConnectionStatusConnected:
+                        return iconForPresence(Tp::ConnectionPresenceTypeAvailable);
+                    default:
+                        return iconForPresence(Tp::ConnectionPresenceTypeOffline);
+                }
+            } else {
+                return iconForPresence(static_cast<Tp::ConnectionPresenceType>(presenceType));
+            }
+        }
         case KCall::ItemTypeRole:
             return QByteArray("account");
         case KCall::ObjectPtrRole:
@@ -72,11 +84,9 @@ void AccountItem::onAccountReady(Tp::PendingOperation *op)
     connect(m_account.data(), SIGNAL(currentPresenceChanged(const Tp::SimplePresence &)),
             SLOT(emitDataChange()));
     connect(m_account.data(), SIGNAL(haveConnectionChanged(bool)), SLOT(emitDataChange()));
-/*
     connect(m_account.data(),
             SIGNAL(connectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)),
-            SLOT(onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)));
-*/
+            SLOT(emitDataChange()));
 
     if ( m_account->haveConnection() ) {
         connect(new PendingContacts(m_account, this),

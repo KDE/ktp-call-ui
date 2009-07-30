@@ -11,7 +11,7 @@ set(QtGstreamer_SRCS
     qgstpad.cpp
     qgstghostpad.cpp
     qgstbus.cpp
-    qgvalue.cpp
+    qgstvalue.cpp
     qgstcaps.cpp
     qgststructure.cpp
     interfaces/qgstxoverlay.cpp

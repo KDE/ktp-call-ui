@@ -31,8 +31,12 @@ public:
 
     QGstStructure & operator=(const QGstStructure & other);
 
-    QGValue getValue(const char *fieldName) const;
-    void setValue(const char *fieldName, const QGValue & value);
+    QGstValue getValue(const char *fieldName) const;
+    void setValue(const char *fieldName, const QGstValue & value);
+
+    QByteArray getName() const;
+    bool hasName(const char *name) const;
+    void setName(const char *name);
 
 private:
     GstStructure *m_structure;

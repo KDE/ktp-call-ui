@@ -25,7 +25,7 @@ namespace QtGstreamer {
 class QGstCaps
 {
     Q_DISABLE_COPY(QGstCaps)
-    friend class QGValue;
+    friend class QGstValue;
 public:
     static QGstCapsPtr newEmpty();
     static QGstCapsPtr newAny();
@@ -34,6 +34,7 @@ public:
 
     void makeWritable();
     void appendStructure(const QGstStructure & structure);
+    uint getSize() const;
 
     static QGstCapsPtr fromString(const char *string);
     QByteArray toString() const;

@@ -97,7 +97,6 @@ void CallWindow::setupUi()
     d->ui.setupUi(this);
     setupActions();
 
-    d->ui.videoInputWidget->hide();
     d->ui.participantsDock->hide();
     d->ui.logDock->hide();
     disableUi();
@@ -108,8 +107,8 @@ void CallWindow::setupUi()
     d->statusLabel = new QLabel;
     statusBar()->addWidget(d->statusLabel);
 
-    setupGUI(QSize(320, 260), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
-    setAutoSaveSettings(QLatin1String("CallWindow"));
+    setupGUI(QSize(330, 330), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
+    setAutoSaveSettings(QLatin1String("CallWindow"), false);
 }
 
 void CallWindow::disableUi()
@@ -212,11 +211,21 @@ void CallWindow::onAudioOutputDeviceDestroyed()
 
 void CallWindow::onVideoInputDeviceCreated(QObject *balanceControl, QWidget *videoWidget)
 {
-    d->ui.verticalLayout->insertWidget(0, videoWidget);
-
     d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, true);
     d->ui.videoControlsTab->setEnabled(true);
     d->ui.videoInputBalanceWidget->setVideoBalanceControl(balanceControl);
+
+    setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
+
+    videoWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    d->ui.verticalLayout->insertWidget(0, videoWidget);
+
+    // force update of the size hint
+    d->ui.verticalLayout->update();
+    d->ui.verticalLayout->activate();
+
+    resize(sizeHint());
+    setUpdatesEnabled(true);
 }
 
 void CallWindow::onVideoInputDeviceDestroyed()
@@ -224,16 +233,32 @@ void CallWindow::onVideoInputDeviceDestroyed()
     d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
     d->ui.videoControlsTab->setEnabled(false);
     d->ui.videoInputBalanceWidget->setVideoBalanceControl(NULL);
+
+    // force update of the size hint
+    d->ui.verticalLayout->update();
+    d->ui.verticalLayout->activate();
+
+    // no idea why resize needs to be done twice, but it works...
+    // apparently the first time it only resizes horizontally and the second time it resizes vertically.
+    resize(sizeHint());
+    resize(sizeHint());
 }
 
 void CallWindow::onVideoOutputWidgetCreated(QWidget *widget, uint id)
 {
+    setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
+
+    widget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     QDockWidget *dock = new QDockWidget(this);
     dock->setObjectName("video-output-" + QString::number(id));
     dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     dock->setWidget(widget);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
     d->videoOutputWidgets[id] = dock;
+
+    QCoreApplication::processEvents(); // force update of the size hint
+    resize(sizeHint());
+    setUpdatesEnabled(true);
 }
 
 void CallWindow::onCloseVideoOutputWidget(uint id)
@@ -242,8 +267,15 @@ void CallWindow::onCloseVideoOutputWidget(uint id)
     if ( !dock ) {
         return;
     }
+
+    setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
+
     removeDockWidget(dock);
     dock->deleteLater();
+
+    QCoreApplication::processEvents(); // force update of the size hint
+    resize(sizeHint());
+    setUpdatesEnabled(true);
 }
 
 void CallWindow::onGroupMembersModelCreated(GroupMembersModel *model)

@@ -213,7 +213,7 @@ void FarsightMediaHandler::openVideoInputDevice(bool *success)
         return;
     }
 
-    d->videoInputWidget->renderer()->setAspectRatio(AbstractRenderer::AspectRatio4_3);
+    d->videoInputWidget->renderer()->setMovieSize(QSize(160, 120));
 
     d->pipeline->add(d->videoInputBin);
     d->pipeline->add(d->videoTee);
@@ -352,7 +352,7 @@ void FarsightMediaHandler::videoSrcPadAdded(QGstPadPtr srcPad)
 
     VideoWidget *widget =  d->deviceManager->newVideoWidget();
     Q_ASSERT(widget);
-    widget->renderer()->setAspectRatio(AbstractRenderer::AspectRatio4_3);
+    widget->renderer()->setMovieSize(QSize(320, 240));
 
     d->pipeline->add(widget->videoBin());
     widget->videoBin()->setState(QGstElement::Playing);

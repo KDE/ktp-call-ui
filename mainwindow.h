@@ -35,6 +35,9 @@ private slots:
     void onDialVideoButtonClicked();
     void makeDirectCall(bool useVideo);
 
+protected:
+    virtual void closeEvent(QCloseEvent *event);
+
 private:
     void setupActions();
     struct Private;

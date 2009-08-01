@@ -23,6 +23,7 @@
 #include <KStatusBar>
 #include <KAction>
 #include <KActionCollection>
+#include <KMessageBox>
 #include <KSettings/Dialog>
 #include <TelepathyQt4/Account>
 
@@ -147,6 +148,15 @@ void MainWindow::makeDirectCall(bool useVideo)
     }
     account->ensureChannel(request, QDateTime::currentDateTime(),
                            "org.freedesktop.Telepathy.Client.kcall_handler");
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    KMessageBox::information(this, i18n("You have requested to close KCall. Note that KCall will "
+                                        "not actually quit, but it will stay active in the system "
+                                        "tray waiting for incoming calls."),
+                             QString(), QLatin1String("CloseEventTrayNotification"));
+    KXmlGuiWindow::closeEvent(event);
 }
 
 #include "mainwindow.moc"

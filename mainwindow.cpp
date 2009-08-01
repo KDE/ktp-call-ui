@@ -28,23 +28,29 @@
 
 Q_DECLARE_METATYPE(Tp::AccountPtr)
 
+struct MainWindow::Private
+{
+    Ui::MainWindow ui;
+    KAction *goOnlineAction;
+};
+
 MainWindow::MainWindow()
     : KXmlGuiWindow(),
-      ui(new Ui::MainWindow)
+      d(new Private)
 {
     setWindowTitle(i18nc("@title:window", "KCall"));
 
     QWidget *centralWidget = new QWidget(this);
-    ui->setupUi(centralWidget);
+    d->ui.setupUi(centralWidget);
     setCentralWidget(centralWidget);
 
     QAbstractItemModel *model = KCallApplication::instance()->accountManager()->contactsModel();
-    ui->contactsTreeView->setModel(model);
-    new ContactListController(ui->contactsTreeView, model);
+    d->ui.contactsTreeView->setModel(model);
+    new ContactListController(d->ui.contactsTreeView, model);
 
-    ui->accountComboBox->setModel(model);
-    connect(ui->dialAudioButton, SIGNAL(clicked()), SLOT(onDialAudioButtonClicked()));
-    connect(ui->dialVideoButton, SIGNAL(clicked()), SLOT(onDialVideoButtonClicked()));
+    d->ui.accountComboBox->setModel(model);
+    connect(d->ui.dialAudioButton, SIGNAL(clicked()), SLOT(onDialAudioButtonClicked()));
+    connect(d->ui.dialVideoButton, SIGNAL(clicked()), SLOT(onDialVideoButtonClicked()));
 
     setupActions();
     setupGUI(QSize(340, 460));
@@ -52,13 +58,52 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete d;
 }
 
 void MainWindow::setupActions()
 {
     KStandardAction::quit(KCallApplication::instance(), SLOT(quit()), actionCollection());
     KStandardAction::preferences(this, SLOT(showSettingsDialog()), actionCollection());
+
+    d->goOnlineAction = new KAction(KIcon("network-connect"), i18nc("@action", "Connect"), this);
+    connect(d->goOnlineAction, SIGNAL(triggered()), this, SLOT(onGoOnlineTriggered()));
+    actionCollection()->addAction("go-online", d->goOnlineAction);
+    connect(KCallApplication::instance()->accountManager(),
+            SIGNAL(globalConnectionStatusChanged(Tp::ConnectionStatus)),
+            this, SLOT(onGlobalConnectionStatusChanged(Tp::ConnectionStatus)));
+}
+
+void MainWindow::onGoOnlineTriggered()
+{
+    switch ( KCallApplication::instance()->accountManager()->globalConnectionStatus() ) {
+    case Tp::ConnectionStatusDisconnected:
+        KCallApplication::instance()->accountManager()->connectAccounts();
+        break;
+    default:
+        KCallApplication::instance()->accountManager()->disconnectAccounts();
+        break;
+    }
+}
+
+void MainWindow::onGlobalConnectionStatusChanged(Tp::ConnectionStatus status)
+{
+    switch (status) {
+    case Tp::ConnectionStatusConnected:
+        statusBar()->showMessage(i18nc("@info:status", "Connected"));
+        d->goOnlineAction->setText(i18nc("@action", "Disconnect"));
+        break;
+    case Tp::ConnectionStatusConnecting:
+        statusBar()->showMessage(i18nc("@info:status", "Connecting..."));
+        d->goOnlineAction->setText(i18nc("@action", "Cancel connection attempt"));
+        break;
+    case Tp::ConnectionStatusDisconnected:
+        statusBar()->showMessage(i18nc("@info:status", "Disconnected"));
+        d->goOnlineAction->setText(i18nc("@action", "Connect"));
+        break;
+    default:
+        Q_ASSERT(false);
+    }
 }
 
 void MainWindow::showSettingsDialog()
@@ -81,13 +126,13 @@ void MainWindow::onDialVideoButtonClicked()
 
 void MainWindow::makeDirectCall(bool useVideo)
 {
-    int row = ui->accountComboBox->currentIndex();
-    QString id = ui->contactHandleLineEdit->text();
+    int row = d->ui.accountComboBox->currentIndex();
+    QString id = d->ui.contactHandleLineEdit->text();
     if ( row < 0  || id.isEmpty() ) {
         return;
     }
 
-    QAbstractItemModel *model = ui->accountComboBox->model();
+    QAbstractItemModel *model = d->ui.accountComboBox->model();
     Tp::AccountPtr account = model->index(row, 0).data(KCall::ObjectPtrRole).value<Tp::AccountPtr>();
     Q_ASSERT( !account.isNull() );
 

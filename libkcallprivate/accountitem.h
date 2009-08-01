@@ -27,13 +27,12 @@ public:
     AccountItem(const Tp::AccountPtr & account, TreeModelItem *parent);
 
     virtual QVariant data(int role) const;
+    inline Tp::AccountPtr account() const { return m_account; }
 
 private slots:
     void onAccountReady(Tp::PendingOperation *op);
     void onAccountHaveConnectionChanged(bool);
     void onContactsReady(Tp::PendingOperation*);
-    void onAccountInvalidated(Tp::DBusProxy *proxy, const QString & errorName,
-                              const QString & errorMessage);
     //make emitDataChange available as a slot
     inline void emitDataChange() { TreeModelItem::emitDataChange(); }
 

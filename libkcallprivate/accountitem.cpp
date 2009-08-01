@@ -88,11 +88,8 @@ void AccountItem::onAccountReady(Tp::PendingOperation *op)
         return; //TODO and then what?
     }
 
-    connect(m_account.data(), SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
-            SLOT(onAccountInvalidated(Tp::DBusProxy*, QString, QString)));
     connect(m_account.data(), SIGNAL(haveConnectionChanged(bool)),
             SLOT(onAccountHaveConnectionChanged(bool)) );
-
     connect(m_account.data(), SIGNAL(stateChanged(bool)), SLOT(emitDataChange()));
     connect(m_account.data(), SIGNAL(displayNameChanged(const QString &)), SLOT(emitDataChange()));
     connect(m_account.data(), SIGNAL(nicknameChanged(const QString &)), SLOT(emitDataChange()));
@@ -110,19 +107,6 @@ void AccountItem::onAccountReady(Tp::PendingOperation *op)
     }
 
     emitDataChange();
-}
-
-void AccountItem::onAccountInvalidated(Tp::DBusProxy *proxy, const QString & errorName,
-                                       const QString & errorMessage)
-{
-    Q_UNUSED(proxy);
-    kDebug() << "Account" << m_account->displayName() << "was invalidated:"
-             << errorName << errorMessage;
-
-    if ( childrenCount() > 0 ) {
-        removeChildren(0, childrenCount()-1);
-    }
-    parentItem()->removeChild(parentItem()->rowOfChild(this)); //NOTE 'this' is deleted here
 }
 
 void AccountItem::onAccountHaveConnectionChanged(bool hasConnection)

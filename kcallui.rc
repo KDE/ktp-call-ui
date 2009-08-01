@@ -12,4 +12,9 @@
     </Menu>
   </MenuBar>
 
+  <ToolBar name="mainToolBar" >
+    <text>Main Toolbar</text>
+    <Action name="go-online" />
+  </ToolBar>
+
 </gui>

@@ -18,7 +18,7 @@
 #define MAINWINDOW_H
 
 #include <KXmlGuiWindow>
-namespace Ui { class MainWindow; }
+#include <TelepathyQt4/Constants>
 
 class MainWindow : public KXmlGuiWindow
 {
@@ -28,6 +28,8 @@ public:
     virtual ~MainWindow();
 
 private slots:
+    void onGoOnlineTriggered();
+    void onGlobalConnectionStatusChanged(Tp::ConnectionStatus status);
     void showSettingsDialog();
     void onDialAudioButtonClicked();
     void onDialVideoButtonClicked();
@@ -35,7 +37,8 @@ private slots:
 
 private:
     void setupActions();
-    Ui::MainWindow *ui;
+    struct Private;
+    Private *const d;
 };
 
 #endif

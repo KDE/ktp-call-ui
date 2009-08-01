@@ -19,6 +19,7 @@
 
 #include "kcallprivate_export.h"
 #include <QtCore/QObject>
+#include <TelepathyQt4/Constants>
 class QAbstractItemModel;
 
 class KCALLPRIVATE_EXPORT AccountManager : public QObject
@@ -31,11 +32,25 @@ public:
     QAbstractItemModel *accountsModel() const;
     QAbstractItemModel *contactsModel() const;
 
+    Tp::ConnectionStatus globalConnectionStatus() const;
+
+public Q_SLOTS:
+    void connectAccounts();
+    void disconnectAccounts();
+
+Q_SIGNALS:
+    void globalConnectionStatusChanged(Tp::ConnectionStatus status);
+
 private:
     struct Private;
     Private *const d;
     Q_PRIVATE_SLOT(d, void onAccountManagerReady(Tp::PendingOperation *op))
     Q_PRIVATE_SLOT(d, void onAccountCreated(const QString & path))
+    Q_PRIVATE_SLOT(d, void onAccountReady(Tp::PendingOperation *op))
+    Q_PRIVATE_SLOT(d, void onAccountRemoved(const QString & path))
+    Q_PRIVATE_SLOT(d, void onAccountValidityChanged(const QString & path, bool isValid))
+    Q_PRIVATE_SLOT(d, void onAccountConnectionStatusChanged(Tp::ConnectionStatus,
+                                                            Tp::ConnectionStatusReason))
 };
 
 #endif

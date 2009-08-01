@@ -68,7 +68,6 @@ public:
     virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
     virtual bool hasChildren(const QModelIndex & parent = QModelIndex()) const;
 
-protected:
     inline TreeModelItem *root() const { return m_root; }
 
 private:

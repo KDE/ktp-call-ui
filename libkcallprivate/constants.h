@@ -14,35 +14,28 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CONTACTSMODEL_H
-#define CONTACTSMODEL_H
+#ifndef _KCALL_CONSTANTS_H
+#define _KCALL_CONSTANTS_H
 
-#include "treemodel.h"
-#include <KIcon>
-#include <TelepathyQt4/Constants>
+#include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
 
-class ContactsModelItem : public QObject, public TreeModelItem
+namespace KCall
 {
-    Q_OBJECT
-public:
-    ContactsModelItem(TreeModelItem *parent, TreeModel *model);
+    enum ExtraModelRoles {
+        ItemTypeRole = Qt::UserRole,
+        ObjectPtrRole,
+        GroupMembersListTypeRole,
+        PresenceRole
+    };
 
-protected:
-    KIcon iconForPresence(Tp::ConnectionPresenceType presenceType) const;
+    enum GroupMembersListType {
+        CurrentMembers,
+        LocalPendingMembers,
+        RemotePendingMembers
+    };
+}
 
-protected slots:
-    //make emitDataChange available as a slot
-    inline void emitDataChange() { TreeModelItem::emitDataChange(); }
-};
-
-class KCALLPRIVATE_EXPORT ContactsModel : public TreeModel
-{
-    Q_OBJECT
-public:
-    explicit ContactsModel(QObject *parent = 0);
-
-public slots:
-    void addAccount(const QString & busName, const QString & path);
-};
+Q_DECLARE_METATYPE(KCall::GroupMembersListType)
 
 #endif

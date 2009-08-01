@@ -19,7 +19,7 @@
 
 #include <KUniqueApplication>
 namespace Tp { class PendingOperation; }
-class ContactsModel;
+class AccountManager;
 
 class KCallApplication : public KUniqueApplication
 {
@@ -29,17 +29,13 @@ public:
     virtual ~KCallApplication();
 
     virtual int newInstance();
-    ContactsModel *contactsModel() const;
+    AccountManager *accountManager() const;
 
     static inline KCallApplication *instance()
     { return static_cast<KCallApplication*>(QCoreApplication::instance()); }
 
 public slots:
     void showHideMainWindow();
-
-private slots:
-    void onAccountManagerReady(Tp::PendingOperation *op);
-    void onAccountCreated(const QString & path);
 
 private:
     struct Private;

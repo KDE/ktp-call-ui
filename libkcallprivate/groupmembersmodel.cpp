@@ -21,8 +21,8 @@ class GroupContactItem : public ContactItem
 {
 public:
     inline GroupContactItem(const Tp::ContactPtr & contact, KCall::GroupMembersListType listType,
-                            TreeModelItem *parent, TreeModel *model)
-        : ContactItem(contact, parent, model), m_listType(listType)
+                            TreeModelItem *parent)
+        : ContactItem(contact, parent), m_listType(listType)
     {
     }
 
@@ -90,7 +90,7 @@ void GroupMembersModel::addContact(const Tp::ContactPtr & contact,
     if ( d->contactItems.contains(contact->id()) ) {
         d->contactItems[contact->id()]->setListType(listType);
     } else {
-        GroupContactItem *item = new GroupContactItem(contact, listType, root(), this);
+        GroupContactItem *item = new GroupContactItem(contact, listType, root());
         d->contactItems[contact->id()] = item;
         root()->appendChild(item);
     }

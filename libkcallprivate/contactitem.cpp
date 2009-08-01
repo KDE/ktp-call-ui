@@ -15,9 +15,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "contactitem.h"
+#include "constants.h"
+#include <KIcon>
+#include <KDebug>
+#include <TelepathyQt4/Constants>
 
-ContactItem::ContactItem(const Tp::ContactPtr & contact, TreeModelItem *parent, TreeModel *model)
-    : ContactsModelItem(parent, model), m_contact(contact)
+ContactItem::ContactItem(const Tp::ContactPtr & contact, TreeModelItem *parent)
+    : QObject(), TreeModelItem(parent), m_contact(contact)
 {
     connect(m_contact.data(), SIGNAL(aliasChanged(QString)), SLOT(emitDataChange()));
     connect(m_contact.data(), SIGNAL(simplePresenceChanged(QString, uint, QString)),
@@ -30,7 +34,7 @@ QVariant ContactItem::data(int role) const
     case Qt::DisplayRole:
         return m_contact->alias();
     case Qt::DecorationRole:
-        return iconForPresence((Tp::ConnectionPresenceType)m_contact->presenceType());
+        return KIcon(iconForPresence(m_contact->presenceType()));
     case KCall::ItemTypeRole:
         return QByteArray("contact");
     case KCall::ObjectPtrRole:
@@ -39,3 +43,26 @@ QVariant ContactItem::data(int role) const
         return QVariant();
     }
 }
+
+QString ContactItem::iconForPresence(uint presenceType) const
+{
+    switch (presenceType) {
+    case Tp::ConnectionPresenceTypeOffline:
+        return QLatin1String("user-offline");
+    case Tp::ConnectionPresenceTypeAvailable:
+        return QLatin1String("user-online");
+    case Tp::ConnectionPresenceTypeAway:
+        return QLatin1String("user-away");
+    case Tp::ConnectionPresenceTypeExtendedAway:
+        return QLatin1String("user-away-extended");
+    case Tp::ConnectionPresenceTypeHidden:
+        return QLatin1String("user-invisible");
+    case Tp::ConnectionPresenceTypeBusy:
+        return QLatin1String("user-busy");
+    default:
+        kWarning() << "presence type is unset/unknown/invalid. value:" << presenceType;
+        return QString();
+    }
+}
+
+#include "contactitem.moc"

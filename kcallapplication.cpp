@@ -18,17 +18,14 @@
 #include "mainwindow.h"
 #include "systrayicon.h"
 #include "knotifyapprover.h"
-#include "libkcallprivate/contactsmodel.h"
+#include "libkcallprivate/accountmanager.h"
 #include <KDebug>
-#include <TelepathyQt4/AccountManager>
-#include <TelepathyQt4/PendingReady>
 #include <TelepathyQt4/ClientRegistrar>
 
 struct KCallApplication::Private
 {
     QPointer<MainWindow> mainWindow;
-    ContactsModel *contactsModel;
-    Tp::AccountManagerPtr accountManager;
+    AccountManager *accountManager;
     Tp::ClientRegistrarPtr registrar;
     Tp::SharedPtr<SystrayIcon> systrayIcon;
     Tp::SharedPtr<KNotifyApprover> knotifyApprover;
@@ -38,11 +35,7 @@ KCallApplication::KCallApplication()
     : KUniqueApplication(), d(new Private)
 {
     d->mainWindow = NULL;
-    d->contactsModel = new ContactsModel(this);
-    d->accountManager = Tp::AccountManager::create();
-    connect(d->accountManager->becomeReady(),
-            SIGNAL(finished(Tp::PendingOperation *)),
-            SLOT(onAccountManagerReady(Tp::PendingOperation *)));
+    d->accountManager = new AccountManager(this);
 
     d->registrar = Tp::ClientRegistrar::create();
     d->systrayIcon = Tp::SharedPtr<SystrayIcon>(new SystrayIcon());
@@ -65,9 +58,9 @@ int KCallApplication::newInstance()
     return 0;
 }
 
-ContactsModel *KCallApplication::contactsModel() const
+AccountManager *KCallApplication::accountManager() const
 {
-    return d->contactsModel;
+    return d->accountManager;
 }
 
 void KCallApplication::showHideMainWindow()
@@ -78,25 +71,6 @@ void KCallApplication::showHideMainWindow()
     } else {
         d->mainWindow->setVisible( !d->mainWindow->isVisible() );
     }
-}
-
-void KCallApplication::onAccountManagerReady(Tp::PendingOperation *op)
-{
-    if ( op->isError() ) {
-        kError() << "Account manager failed to become ready:" << op->errorMessage();
-        return; //TODO handle this error
-    }
-
-    foreach(const QString & a, d->accountManager->validAccountPaths()) {
-        d->contactsModel->addAccount(d->accountManager->busName(), a);
-    }
-
-    connect(d->accountManager.data(), SIGNAL(accountCreated(QString)), SLOT(onAccountCreated(QString)));
-}
-
-void KCallApplication::onAccountCreated(const QString & path)
-{
-    d->contactsModel->addAccount(d->accountManager->busName(), path);
 }
 
 #include "kcallapplication.moc"

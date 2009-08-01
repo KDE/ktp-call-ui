@@ -25,7 +25,8 @@ class TreeModelItem
 {
     Q_DISABLE_COPY(TreeModelItem);
 public:
-    TreeModelItem(TreeModelItem *parent, TreeModel *model);
+    TreeModelItem(TreeModel *model);
+    TreeModelItem(TreeModelItem *parent);
     virtual ~TreeModelItem();
 
     virtual QVariant data(int role) const;
@@ -74,23 +75,5 @@ private:
     friend class TreeModelItem;
     TreeModelItem *m_root;
 };
-
-namespace KCall
-{
-    enum ExtraModelRoles {
-        ItemTypeRole = Qt::UserRole,
-        ObjectPtrRole,
-        GroupMembersListTypeRole,
-        PresenceRole
-    };
-
-    enum GroupMembersListType {
-        CurrentMembers,
-        LocalPendingMembers,
-        RemotePendingMembers
-    };
-}
-
-Q_DECLARE_METATYPE(KCall::GroupMembersListType)
 
 #endif

@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "contactlistcontroller.h"
-#include "libkcallprivate/contactsmodel.h"
+#include "libkcallprivate/constants.h"
 #include <QtGui/QAbstractItemView>
 #include <KDebug>
 #include <KIcon>

@@ -3,7 +3,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(libkcallprivate_SRCS
     treemodel.cpp
-    contactsmodel.cpp
+    accountmanager.cpp
     pendingcontacts.cpp
     accountitem.cpp
     contactitem.cpp

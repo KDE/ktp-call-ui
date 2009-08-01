@@ -18,7 +18,8 @@
 #include "ui_mainwindow.h"
 #include "kcallapplication.h"
 #include "contactlistcontroller.h"
-#include "libkcallprivate/contactsmodel.h"
+#include "libkcallprivate/accountmanager.h"
+#include "libkcallprivate/constants.h"
 #include <KStatusBar>
 #include <KAction>
 #include <KActionCollection>
@@ -37,10 +38,11 @@ MainWindow::MainWindow()
     ui->setupUi(centralWidget);
     setCentralWidget(centralWidget);
 
-    ui->contactsTreeView->setModel(KCallApplication::instance()->contactsModel());
-    new ContactListController(ui->contactsTreeView, KCallApplication::instance()->contactsModel());
+    QAbstractItemModel *model = KCallApplication::instance()->accountManager()->contactsModel();
+    ui->contactsTreeView->setModel(model);
+    new ContactListController(ui->contactsTreeView, model);
 
-    ui->accountComboBox->setModel(KCallApplication::instance()->contactsModel());
+    ui->accountComboBox->setModel(model);
     connect(ui->dialAudioButton, SIGNAL(clicked()), SLOT(onDialAudioButtonClicked()));
     connect(ui->dialVideoButton, SIGNAL(clicked()), SLOT(onDialVideoButtonClicked()));
 
@@ -85,9 +87,7 @@ void MainWindow::makeDirectCall(bool useVideo)
         return;
     }
 
-    TreeModel *model = qobject_cast<TreeModel*>(ui->accountComboBox->model());
-    Q_ASSERT(model);
-
+    QAbstractItemModel *model = ui->accountComboBox->model();
     Tp::AccountPtr account = model->index(row, 0).data(KCall::ObjectPtrRole).value<Tp::AccountPtr>();
     Q_ASSERT( !account.isNull() );
 

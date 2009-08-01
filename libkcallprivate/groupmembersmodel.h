@@ -18,6 +18,7 @@
 #define GROUPMEMBERSMODEL_H
 
 #include "treemodel.h"
+#include "constants.h"
 #include <TelepathyQt4/Channel>
 
 class KCALLPRIVATE_EXPORT GroupMembersModel : public TreeModel

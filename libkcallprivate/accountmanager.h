@@ -14,29 +14,28 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CONTACTITEM_H
-#define CONTACTITEM_H
+#ifndef ACCOUNTMANAGER_H
+#define ACCOUNTMANAGER_H
 
-#include "treemodel.h"
-#include <TelepathyQt4/Contact>
+#include "kcallprivate_export.h"
+#include <QtCore/QObject>
+class QAbstractItemModel;
 
-class ContactItem : public QObject, public TreeModelItem
+class KCALLPRIVATE_EXPORT AccountManager : public QObject
 {
     Q_OBJECT
 public:
-    ContactItem(const Tp::ContactPtr & contact, TreeModelItem *parent);
+    explicit AccountManager(QObject *parent = 0);
+    virtual ~AccountManager();
 
-    virtual QVariant data(int role) const;
-
-protected slots:
-    //make emitDataChange available as a slot
-    inline void emitDataChange() { TreeModelItem::emitDataChange(); }
+    QAbstractItemModel *accountsModel() const;
+    QAbstractItemModel *contactsModel() const;
 
 private:
-    QString iconForPresence(uint presenceType) const;
-    Tp::ContactPtr m_contact;
+    struct Private;
+    Private *const d;
+    Q_PRIVATE_SLOT(d, void onAccountManagerReady(Tp::PendingOperation *op))
+    Q_PRIVATE_SLOT(d, void onAccountCreated(const QString & path))
 };
-
-Q_DECLARE_METATYPE(Tp::ContactPtr);
 
 #endif

@@ -17,15 +17,16 @@
 #include "accountitem.h"
 #include "pendingcontacts.h"
 #include "contactitem.h"
+#include "constants.h"
 #include <KLocalizedString>
+#include <KIcon>
 #include <KDebug>
 #include <TelepathyQt4/PendingReady>
 
-AccountItem::AccountItem(const QString & busName, const QString & path,
-                         TreeModelItem *parent, TreeModel *model)
-    : ContactsModelItem(parent, model)
+AccountItem::AccountItem(const Tp::AccountPtr & account, TreeModelItem *parent)
+    : QObject(), TreeModelItem(parent)
 {
-    m_account = Tp::Account::create(busName, path);
+    m_account = account;
     connect(m_account->becomeReady(), SIGNAL(finished(Tp::PendingOperation*)),
             SLOT(onAccountReady(Tp::PendingOperation*)));
 }
@@ -49,7 +50,10 @@ QVariant AccountItem::data(int role) const
                              m_account->protocol(), m_account->displayName());
             }
         case Qt::DecorationRole:
-            return iconForPresence((Tp::ConnectionPresenceType)data(KCall::PresenceRole).value<Tp::SimplePresence>().type);
+        {
+            uint presenceType = data(KCall::PresenceRole).value<Tp::SimplePresence>().type;
+            return KIcon(iconForPresence(presenceType));
+        }
         case KCall::PresenceRole:
         {
             Tp::SimplePresence presence = m_account->currentPresence();
@@ -146,9 +150,30 @@ void AccountItem::onContactsReady(Tp::PendingOperation *op)
 
     QVector<TreeModelItem*> contactItems;
     foreach(const Tp::ContactPtr & contact, pc->contacts()) {
-        contactItems.append(new ContactItem(contact, this, model()));
+        contactItems.append(new ContactItem(contact, this));
     }
     appendChildren(contactItems);
+}
+
+QString AccountItem::iconForPresence(uint presenceType) const
+{
+    switch (presenceType) {
+    case Tp::ConnectionPresenceTypeOffline:
+        return QLatin1String("user-offline");
+    case Tp::ConnectionPresenceTypeAvailable:
+        return QLatin1String("user-online");
+    case Tp::ConnectionPresenceTypeAway:
+        return QLatin1String("user-away");
+    case Tp::ConnectionPresenceTypeExtendedAway:
+        return QLatin1String("user-away-extended");
+    case Tp::ConnectionPresenceTypeHidden:
+        return QLatin1String("user-invisible");
+    case Tp::ConnectionPresenceTypeBusy:
+        return QLatin1String("user-busy");
+    default:
+        kWarning() << "presence type is unset/unknown/invalid. value:" << presenceType;
+        return QString();
+    }
 }
 
 #include "accountitem.moc"

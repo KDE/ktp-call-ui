@@ -17,15 +17,14 @@
 #ifndef ACCOUNTITEM_H
 #define ACCOUNTITEM_H
 
-#include "contactsmodel.h"
+#include "treemodel.h"
 #include <TelepathyQt4/Account>
 
-class AccountItem : public ContactsModelItem
+class AccountItem : public QObject, public TreeModelItem
 {
     Q_OBJECT
 public:
-    AccountItem(const QString & busName, const QString & path,
-                TreeModelItem *parent, TreeModel *model);
+    AccountItem(const Tp::AccountPtr & account, TreeModelItem *parent);
 
     virtual QVariant data(int role) const;
 
@@ -35,8 +34,11 @@ private slots:
     void onContactsReady(Tp::PendingOperation*);
     void onAccountInvalidated(Tp::DBusProxy *proxy, const QString & errorName,
                               const QString & errorMessage);
+    //make emitDataChange available as a slot
+    inline void emitDataChange() { TreeModelItem::emitDataChange(); }
 
 private:
+    QString iconForPresence(uint presenceType) const;
     Tp::AccountPtr m_account;
 };
 

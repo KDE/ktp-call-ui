@@ -26,11 +26,20 @@ struct TreeModelItem::Private
     QList<TreeModelItem*> children;
 };
 
-TreeModelItem::TreeModelItem(TreeModelItem *parent, TreeModel *model)
+TreeModelItem::TreeModelItem(TreeModel *model)
     : d(new Private)
 {
-    d->parent = parent;
+    Q_ASSERT(model);
+    d->parent = NULL;
     d->model = model;
+}
+
+TreeModelItem::TreeModelItem(TreeModelItem *parent)
+    : d(new Private)
+{
+    Q_ASSERT(parent && parent->model());
+    d->parent = parent;
+    d->model = parent->model();
 }
 
 TreeModelItem::~TreeModelItem()
@@ -143,7 +152,7 @@ void TreeModelItem::emitDataChange()
 TreeModel::TreeModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    m_root = new TreeModelItem(NULL, this);
+    m_root = new TreeModelItem(this);
 }
 
 TreeModel::~TreeModel()

@@ -51,10 +51,7 @@ KCallApplication::~KCallApplication()
 
 int KCallApplication::newInstance()
 {
-    if ( !d->mainWindow ) {
-        d->mainWindow = new MainWindow;
-        d->mainWindow->show();
-    }
+    mainWindow()->show();
     return 0;
 }
 
@@ -63,14 +60,12 @@ AccountManager *KCallApplication::accountManager() const
     return d->accountManager;
 }
 
-void KCallApplication::showHideMainWindow()
+MainWindow *KCallApplication::mainWindow() const
 {
     if ( !d->mainWindow ) {
         d->mainWindow = new MainWindow;
-        d->mainWindow->show();
-    } else {
-        d->mainWindow->setVisible( !d->mainWindow->isVisible() );
     }
+    return d->mainWindow;
 }
 
 #include "kcallapplication.moc"

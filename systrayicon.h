@@ -33,6 +33,9 @@ protected slots:
 private slots:
     void onActivateRequested(bool active, const QPoint & pos);
 
+protected:
+    virtual bool eventFilter(QObject *watched, QEvent *event);
+
 private:
     struct Private;
     Private *const d;

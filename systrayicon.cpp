@@ -16,6 +16,7 @@
 */
 #include "systrayicon.h"
 #include "kcallapplication.h"
+#include "mainwindow.h"
 #include <QtCore/QSet>
 #include <KLocalizedString>
 #include <KDebug>
@@ -53,10 +54,12 @@ SystrayIcon::SystrayIcon()
     d->notificationItem->setIconByName("internet-telephony");
     d->notificationItem->setAttentionIconByName("voicecall");
     d->notificationItem->setCategory(Experimental::KNotificationItem::Communications);
-    d->notificationItem->setStatus(Experimental::KNotificationItem::Passive);
+    d->notificationItem->setStatus(Experimental::KNotificationItem::Active);
 
     connect(d->notificationItem, SIGNAL(activateRequested(bool, QPoint)),
             SLOT(onActivateRequested(bool, QPoint)));
+
+    KCallApplication::instance()->mainWindow()->installEventFilter(this);
 }
 
 SystrayIcon::~SystrayIcon()
@@ -87,8 +90,39 @@ void SystrayIcon::onActivateRequested(bool active, const QPoint & pos)
     if ( d->currentRequest ) {
         d->currentRequest->accept();
     } else {
-        KCallApplication::instance()->showHideMainWindow();
+        MainWindow *mw = KCallApplication::instance()->mainWindow();
+        //reinstall the event filter because the mainwindow is deleted on close, so in some cases
+        //a new mainwindow is returned here.
+        mw->removeEventFilter(this);
+        mw->installEventFilter(this);
+        if ( !mw->isVisible() ) {
+            mw->show();
+            mw->raise();
+            mw->activateWindow();
+        } else {
+            mw->hide();
+        }
     }
+}
+
+bool SystrayIcon::eventFilter(QObject *watched, QEvent *event)
+{
+    if ( watched != KCallApplication::instance()->mainWindow() ) {
+        return AbstractClientApprover::eventFilter(watched, event);
+    }
+
+    switch (event->type()) {
+    case QEvent::Show:
+        d->notificationItem->setStatus(Experimental::KNotificationItem::Passive);
+        break;
+    case QEvent::Hide:
+    case QEvent::Close:
+        d->notificationItem->setStatus(Experimental::KNotificationItem::Active);
+        break;
+    default:
+        break;
+    }
+    return false;
 }
 
 #include "systrayicon.moc"

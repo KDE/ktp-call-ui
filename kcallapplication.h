@@ -20,6 +20,7 @@
 #include <KUniqueApplication>
 namespace Tp { class PendingOperation; }
 class AccountManager;
+class MainWindow;
 
 class KCallApplication : public KUniqueApplication
 {
@@ -30,12 +31,10 @@ public:
 
     virtual int newInstance();
     AccountManager *accountManager() const;
+    MainWindow *mainWindow() const;
 
     static inline KCallApplication *instance()
     { return static_cast<KCallApplication*>(QCoreApplication::instance()); }
-
-public slots:
-    void showHideMainWindow();
 
 private:
     struct Private;

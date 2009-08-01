@@ -48,17 +48,16 @@ QString ContactItem::iconForPresence(uint presenceType) const
 {
     switch (presenceType) {
     case Tp::ConnectionPresenceTypeOffline:
-        return QLatin1String("user-offline");
+        return QLatin1String("im-user-offline");
     case Tp::ConnectionPresenceTypeAvailable:
-        return QLatin1String("user-online");
+        return QLatin1String("im-user");
     case Tp::ConnectionPresenceTypeAway:
-        return QLatin1String("user-away");
     case Tp::ConnectionPresenceTypeExtendedAway:
-        return QLatin1String("user-away-extended");
+        return QLatin1String("im-user-away");
     case Tp::ConnectionPresenceTypeHidden:
-        return QLatin1String("user-invisible");
+        return QLatin1String("im-invisible-user");
     case Tp::ConnectionPresenceTypeBusy:
-        return QLatin1String("user-busy");
+        return QLatin1String("im-user-busy");
     default:
         kWarning() << "presence type is unset/unknown/invalid. value:" << presenceType;
         return QString();

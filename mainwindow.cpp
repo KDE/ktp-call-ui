@@ -67,11 +67,15 @@ void MainWindow::setupActions()
     KStandardAction::quit(KCallApplication::instance(), SLOT(quit()), actionCollection());
     KStandardAction::preferences(this, SLOT(showSettingsDialog()), actionCollection());
 
-    d->goOnlineAction = new KAction(KIcon("network-connect"), i18nc("@action", "Connect"), this);
-    connect(d->goOnlineAction, SIGNAL(triggered()), this, SLOT(onGoOnlineTriggered()));
+    d->goOnlineAction = new KAction(this);
+    d->goOnlineAction->setIcon(KIcon("network-connect"));
     actionCollection()->addAction("go-online", d->goOnlineAction);
-    connect(KCallApplication::instance()->accountManager(),
-            SIGNAL(globalConnectionStatusChanged(Tp::ConnectionStatus)),
+
+    AccountManager *accountManager = KCallApplication::instance()->accountManager();
+    onGlobalConnectionStatusChanged(accountManager->globalConnectionStatus());
+
+    connect(d->goOnlineAction, SIGNAL(triggered()), this, SLOT(onGoOnlineTriggered()));
+    connect(accountManager, SIGNAL(globalConnectionStatusChanged(Tp::ConnectionStatus)),
             this, SLOT(onGlobalConnectionStatusChanged(Tp::ConnectionStatus)));
 }
 

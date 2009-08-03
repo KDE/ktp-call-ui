@@ -27,6 +27,7 @@
 #include <Solid/DeviceNotifier>
 #include <Solid/AudioInterface>
 #include <solid/video.h>
+#include <kdeversion.h>
 
 namespace KGstDevices {
 
@@ -255,15 +256,20 @@ void DeviceManagerPrivate::addDevice(const Solid::Device & solidDevice)
         const Solid::Video *solidVideoDevice = solidDevice.as<Solid::Video>();
 
         if ( solidVideoDevice->supportedProtocols().contains("video4linux") ) {
-            if ( solidVideoDevice->supportedDrivers("video4linux").contains("video4linux") ) {
-                Solid::Device vendorDevice = solidDevice;
-                while ( vendorDevice.isValid() && vendorDevice.vendor().isEmpty() ) {
-                    vendorDevice = Solid::Device(vendorDevice.parentUdi());
-                }
-                DevicePrivate device;
-                device.name = QString("%1 - %2").arg(vendorDevice.vendor(), solidDevice.product());
-                device.udi = solidDevice.udi();
+            Solid::Device vendorDevice = solidDevice;
+            while ( vendorDevice.isValid() && vendorDevice.vendor().isEmpty() ) {
+                vendorDevice = Solid::Device(vendorDevice.parentUdi());
+            }
+            DevicePrivate device;
+            device.name = QString("%1 - %2").arg(vendorDevice.vendor(), solidDevice.product());
+            device.udi = solidDevice.udi();
+            if ( solidVideoDevice->supportedDrivers("video4linux").contains("video4linux2") ) {
                 device.driver = "v4l2src";
+                device.driverHandle = solidVideoDevice->driverHandle("video4linux2");
+                m_availableDevices[DeviceManager::VideoInput].append(Device(device));
+                emit q->devicesChanged(DeviceManager::VideoInput);
+            } else if ( solidVideoDevice->supportedDrivers("video4linux").contains("video4linux") ) {
+                device.driver = "v4lsrc";
                 device.driverHandle = solidVideoDevice->driverHandle("video4linux");
                 m_availableDevices[DeviceManager::VideoInput].append(Device(device));
                 emit q->devicesChanged(DeviceManager::VideoInput);
@@ -466,22 +472,28 @@ QtGstreamer::QGstElementPtr DeviceManager::newVideoInputElement()
         return QGstElementPtr();
     }
 
-    if ( device.driver() == "v4l2src" ) {
+    if ( device.driver() == "v4l2src" || device.driver() == "v4lsrc" ) {
         element->setProperty("device", device.driverHandle().toByteArray());
     }
 
+//this part is for kdelibs < r1006441
+#if !KDE_IS_VERSION(4, 3, 63)
+# ifdef Q_CC_GNU
+#  warning "Using the v4l2 vs v4l1 detection hack"
+# endif
     //HACK to detect if the device has a v4l1 or v4l2 driver
-    if ( device.driver() == "v4l2src" && !element->setState(QGstElement::Paused) ) {
-        QGstElementPtr element_v4l1 = QGstElementFactory::make("v4lsrc");
-        if ( element_v4l1.isNull() ) {
-            kWarning() << "Could not construct v4lsrc";
-            //fall back and return the v4l2src, although it is not going to work...
+    if ( device.driver() == "v4lsrc" && !element->setState(QGstElement::Paused) ) {
+        QGstElementPtr element_v4l2 = QGstElementFactory::make("v4l2src");
+        if ( element_v4l2.isNull() ) {
+            kWarning() << "Could not construct v4l2src";
+            //fall back and return the v4lsrc, although it is not going to work...
             return element;
         }
 
-        element_v4l1->setProperty("device", device.driverHandle().toByteArray());
-        return element_v4l1;
+        element_v4l2->setProperty("device", device.driverHandle().toByteArray());
+        return element_v4l2;
     }
+#endif
 
     return element;
 }

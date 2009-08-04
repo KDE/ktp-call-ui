@@ -72,6 +72,10 @@ void KNotifyApprover::requestFinished(ApproverRequest *request)
         d->notifications[request]->close();
     }
     d->notifications.remove(request);
+
+    if ( d->notifications.isEmpty() ) {
+        QCoreApplication::quit();
+    }
 }
 
 #include "knotifyapprover.moc"

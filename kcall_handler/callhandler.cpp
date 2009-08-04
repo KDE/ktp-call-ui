@@ -26,13 +26,7 @@ static inline Tp::ChannelClassList channelClassList()
                                     QDBusVariant(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
     class1[TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"] = QDBusVariant(Tp::HandleTypeContact);
 
-    QMap<QString, QDBusVariant> class2;
-    class2[TELEPATHY_INTERFACE_CHANNEL ".ChannelType"] =
-                                    QDBusVariant(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
-    class2[TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"] = QDBusVariant(Tp::HandleTypeContact);
-    class2[TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialAudio"] = QDBusVariant(true);
-
-    return Tp::ChannelClassList() << Tp::ChannelClass(class1) << Tp::ChannelClass(class2);
+    return Tp::ChannelClassList() << Tp::ChannelClass(class1);
 }
 
 CallHandler::CallHandler()

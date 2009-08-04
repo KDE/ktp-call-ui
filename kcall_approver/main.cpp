@@ -41,6 +41,7 @@ int main(int argc, char **argv)
     }
 
     KUniqueApplication app;
+    app.disableSessionManagement();
 
     Tp::registerTypes();
     Tp::enableDebug(true);

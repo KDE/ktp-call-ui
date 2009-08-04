@@ -55,7 +55,6 @@ set(kcall_SRCS
     kcallapplication.cpp
     mainwindow.cpp
     contactlistcontroller.cpp
-    abstractclientapprover.cpp
     systrayicon.cpp
     knotifyapprover.cpp
 )

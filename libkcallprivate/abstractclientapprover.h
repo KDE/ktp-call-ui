@@ -17,11 +17,12 @@
 #ifndef ABSTRACTCLIENTAPPROVER_H
 #define ABSTRACTCLIENTAPPROVER_H
 
+#include "kcallprivate_export.h"
 #include <QtCore/QObject>
 #include <TelepathyQt4/AbstractClientApprover>
 namespace Tp { class PendingOperation; class DBusProxy; }
 
-class ApproverRequest : public QObject
+class KCALLPRIVATE_EXPORT ApproverRequest : public QObject
 {
     Q_OBJECT
 public:
@@ -54,7 +55,7 @@ private:
     Private *const d;
 };
 
-class AbstractClientApprover : public QObject, public Tp::AbstractClientApprover
+class KCALLPRIVATE_EXPORT AbstractClientApprover : public QObject, public Tp::AbstractClientApprover
 {
     Q_OBJECT
 public:

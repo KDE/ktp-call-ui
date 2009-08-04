@@ -17,7 +17,7 @@
 #ifndef KNOTIFYAPPROVER_H
 #define KNOTIFYAPPROVER_H
 
-#include "abstractclientapprover.h"
+#include "libkcallprivate/abstractclientapprover.h"
 
 class KNotifyApprover : public AbstractClientApprover
 {

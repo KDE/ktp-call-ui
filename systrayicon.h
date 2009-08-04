@@ -17,7 +17,7 @@
 #ifndef SYSTRAYICON_H
 #define SYSTRAYICON_H
 
-#include "abstractclientapprover.h"
+#include "libkcallprivate/abstractclientapprover.h"
 
 class SystrayIcon : public AbstractClientApprover
 {

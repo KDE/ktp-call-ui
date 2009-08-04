@@ -8,6 +8,7 @@ set(libkcallprivate_SRCS
     accountitem.cpp
     contactitem.cpp
     groupmembersmodel.cpp
+    abstractclientapprover.cpp
 )
 
 kde4_add_library(kcallprivate SHARED ${libkcallprivate_SRCS})

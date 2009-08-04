@@ -17,7 +17,6 @@
 #include "kcallapplication.h"
 #include "mainwindow.h"
 #include "systrayicon.h"
-#include "knotifyapprover.h"
 #include "libkcallprivate/accountmanager.h"
 #include <KDebug>
 #include <TelepathyQt4/ClientRegistrar>
@@ -28,7 +27,6 @@ struct KCallApplication::Private
     AccountManager *accountManager;
     Tp::ClientRegistrarPtr registrar;
     Tp::SharedPtr<SystrayIcon> systrayIcon;
-    Tp::SharedPtr<KNotifyApprover> knotifyApprover;
 };
 
 KCallApplication::KCallApplication()
@@ -39,9 +37,8 @@ KCallApplication::KCallApplication()
 
     d->registrar = Tp::ClientRegistrar::create();
     d->systrayIcon = Tp::SharedPtr<SystrayIcon>(new SystrayIcon());
-    d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->systrayIcon), "kcall_approver_systray");
-    d->knotifyApprover = Tp::SharedPtr<KNotifyApprover>(new KNotifyApprover());
-    d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->knotifyApprover), "kcall_approver_knotify");
+    d->registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(d->systrayIcon),
+                                 "kcall_approver_systray");
 }
 
 KCallApplication::~KCallApplication()

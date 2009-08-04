@@ -46,6 +46,7 @@ add_subdirectory(libqtgstreamer)
 add_subdirectory(libkgstdevices)
 add_subdirectory(libqtpfarsight)
 add_subdirectory(kcall_handler)
+add_subdirectory(kcall_approver)
 add_subdirectory(kcm)
 
 ##########
@@ -56,7 +57,6 @@ set(kcall_SRCS
     mainwindow.cpp
     contactlistcontroller.cpp
     systrayicon.cpp
-    knotifyapprover.cpp
 )
 
 kde4_add_ui_files(kcall_SRCS mainwindow.ui)
@@ -68,4 +68,3 @@ target_link_libraries(kcall ${KDE4_KUTILS_LIBS}
 
 install(TARGETS kcall ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES kcallui.rc DESTINATION ${DATA_INSTALL_DIR}/kcall)
-install(FILES kcall.notifyrc DESTINATION ${DATA_INSTALL_DIR}/kcall)

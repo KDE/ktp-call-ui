@@ -166,6 +166,11 @@ void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
         break;
     case Tp::MediaStreamTypeVideo:
         emit videoStreamAdded();
+        if ( stream->direction() & Tp::MediaStreamDirectionSend ) {
+            emit sendVideoStateChanged(true);
+        } else {
+            emit sendVideoStateChanged(false);
+        }
         break;
     default:
         Q_ASSERT(false);
@@ -184,6 +189,7 @@ void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
         break;
     case Tp::MediaStreamTypeVideo:
         emit videoStreamRemoved();
+        emit sendVideoStateChanged(false);
         break;
     default:
         Q_ASSERT(false);
@@ -200,6 +206,14 @@ void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
 
     emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
                     "Stream %1 direction changed to: %2.", stream->id(), stream->direction()));
+
+    if ( stream->type() == Tp::MediaStreamTypeVideo ) {
+        if ( direction & Tp::MediaStreamDirectionSend ) {
+            emit sendVideoStateChanged(true);
+        } else {
+            emit sendVideoStateChanged(false);
+        }
+    }
 }
 
 void ChannelHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
@@ -273,6 +287,44 @@ bool ChannelHandler::requestClose()
         Q_ASSERT(false);
     }
     return true; //warnings--
+}
+
+void ChannelHandler::setSendVideo(bool enabled)
+{
+    foreach (const Tp::MediaStreamPtr &stream, d->channel->streams()) {
+        if ( stream->type() == Tp::MediaStreamTypeVideo ) {
+            int newDirection;
+            if ( enabled ) {
+                newDirection = stream->direction() | Tp::MediaStreamDirectionSend;
+            } else {
+                newDirection = stream->direction() & ~Tp::MediaStreamDirectionSend;
+            }
+            stream->requestDirection(static_cast<Tp::MediaStreamDirection>(newDirection));
+            return;
+        }
+    }
+
+    if (enabled) {
+        foreach (const Tp::ContactPtr & contact, d->channel->groupContacts()) {
+            Tp::PendingMediaStreams *ps = d->channel->requestStream(contact, Tp::MediaStreamTypeVideo);
+            connect(ps, SIGNAL(finished(Tp::PendingOperation*)),
+                    SLOT(onPendingMediaStreamFinished(Tp::PendingOperation*)));
+        }
+    }
+}
+
+//This is called from setSendVideo when a new sending video stream is to be created
+void ChannelHandler::onPendingMediaStreamFinished(Tp::PendingOperation *op)
+{
+    if ( op->isError() ) {
+        kError() << "Failed to request video stream" << op->errorName() << op->errorMessage();
+        return;
+    }
+
+    Tp::PendingMediaStreams *ps = qobject_cast<Tp::PendingMediaStreams*>(op);
+    foreach(const Tp::MediaStreamPtr & stream, ps->streams()) {
+        stream->requestDirection(Tp::MediaStreamDirectionSend);
+    }
 }
 
 #include "channelhandler.moc"

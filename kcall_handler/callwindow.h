@@ -51,6 +51,8 @@ private slots:
     void onAudioStreamRemoved();
     void onVideoStreamAdded();
     void onVideoStreamRemoved();
+    void onSendVideoStateChanged(bool enabled);
+    void toggleSendVideo();
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

@@ -32,6 +32,7 @@ public:
 
     enum State { NotReady, Connecting, Ringing, InCall, HangingUp, Disconnected, Error };
     bool requestClose();
+    void setSendVideo(bool enabled);
 
 public slots:
     void hangupCall();
@@ -46,6 +47,7 @@ signals:
     void audioStreamRemoved();
     void videoStreamAdded();
     void videoStreamRemoved();
+    void sendVideoStateChanged(bool enabled);
 
 private:
     void setState(State s);
@@ -65,6 +67,7 @@ private slots:
                                const Tp::Contacts & groupRemotePendingMembersAdded,
                                const Tp::Contacts & groupMembersRemoved,
                                const Tp::Channel::GroupMemberChangeDetails & details);
+    void onPendingMediaStreamFinished(Tp::PendingOperation *op);
 
 private:
     struct Private;

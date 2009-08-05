@@ -7,8 +7,10 @@
                          http://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd" >
 
   <MenuBar>
-    <Menu name="file" >
+    <Menu name="call" >
+      <text>Call</text>
       <Action name="hangup" />
+      <Action name="sendVideo" />
     </Menu>
     <Menu name="view">
       <Action name="showParticipants" />
@@ -19,6 +21,7 @@
   <ToolBar name="mainToolBar" >
     <text>Main Toolbar</text>
     <Action name="hangup" />
+    <Action name="sendVideo" />
   </ToolBar>
 
 </gui>

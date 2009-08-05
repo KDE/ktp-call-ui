@@ -35,6 +35,8 @@ enum TabIndices { VolumeTabIndex, VideoControlsTabIndex, DialpadTabIndex };
 struct CallWindow::Private
 {
     KAction *hangupAction;
+    KAction *sendVideoAction;
+    bool sendingVideo;
     ChannelHandler *channelHandler;
     QTime callDuration;
     QTimer callDurationTimer;
@@ -65,6 +67,8 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
     connect(d->channelHandler, SIGNAL(audioStreamRemoved()), SLOT(onAudioStreamRemoved()));
     connect(d->channelHandler, SIGNAL(videoStreamAdded()), SLOT(onVideoStreamAdded()));
     connect(d->channelHandler, SIGNAL(videoStreamRemoved()), SLOT(onVideoStreamRemoved()));
+    connect(d->channelHandler, SIGNAL(sendVideoStateChanged(bool)),
+            SLOT(onSendVideoStateChanged(bool)));
 
     setupUi();
 
@@ -87,6 +91,13 @@ void CallWindow::setupActions()
     d->hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
     connect(d->hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangupCall()));
     actionCollection()->addAction("hangup", d->hangupAction);
+
+    d->sendVideoAction = new KAction(this);
+    d->sendVideoAction->setIcon(KIcon("webcamsend"));
+    connect(d->sendVideoAction, SIGNAL(triggered()), this, SLOT(toggleSendVideo()));
+    actionCollection()->addAction("sendVideo", d->sendVideoAction);
+    d->sendingVideo = true;
+    onSendVideoStateChanged(false); //to initialize the text of the action
 
     QAction *showParticipants = d->ui.participantsDock->toggleViewAction();
     showParticipants->setText(i18nc("@action:inmenu", "Show participants"));
@@ -337,6 +348,26 @@ void CallWindow::onVideoStreamRemoved()
 {
     Q_ASSERT(d->videoStatusIcon);
     statusBar()->removeWidget(d->videoStatusIcon);
+}
+
+void CallWindow::onSendVideoStateChanged(bool enabled)
+{
+    if ( enabled == d->sendingVideo ) {
+        return;
+    }
+
+    if ( enabled ) {
+        d->sendVideoAction->setText(i18nc("@action", "Stop sending video"));
+    } else {
+        d->sendVideoAction->setText(i18nc("@action", "Send video"));
+    }
+
+    d->sendingVideo = enabled;
+}
+
+void CallWindow::toggleSendVideo()
+{
+    d->channelHandler->setSendVideo(!d->sendingVideo);
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

@@ -322,6 +322,7 @@ void CallWindow::onAudioStreamAdded()
         d->audioStatusIcon = label;
         statusBar()->insertPermanentWidget(1, d->audioStatusIcon);
     } else {
+        statusBar()->insertPermanentWidget(1, d->audioStatusIcon);
         d->audioStatusIcon->show();
     }
 }
@@ -340,6 +341,7 @@ void CallWindow::onVideoStreamAdded()
         d->videoStatusIcon = label;
         statusBar()->insertPermanentWidget(1, d->videoStatusIcon);
     } else {
+        statusBar()->insertPermanentWidget(1, d->videoStatusIcon);
         d->videoStatusIcon->show();
     }
 }

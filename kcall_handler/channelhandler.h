@@ -42,6 +42,10 @@ signals:
     void groupMembersModelCreated(GroupMembersModel *model);
     void dtmfHandlerCreated(DtmfHandler *handler);
     void logMessage(CallLog::LogType logType, const QString & message);
+    void audioStreamAdded();
+    void audioStreamRemoved();
+    void videoStreamAdded();
+    void videoStreamRemoved();
 
 private:
     void setState(State s);

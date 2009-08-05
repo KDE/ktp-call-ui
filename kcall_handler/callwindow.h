@@ -47,6 +47,10 @@ private slots:
     void onGroupMembersModelCreated(GroupMembersModel *model);
     void onDtmfHandlerCreated(DtmfHandler *handler);
     void onCallDurationTimerTimeout();
+    void onAudioStreamAdded();
+    void onAudioStreamRemoved();
+    void onVideoStreamAdded();
+    void onVideoStreamRemoved();
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

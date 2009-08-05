@@ -110,21 +110,7 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
     kDebug() << streams.size();
 
     foreach (const Tp::MediaStreamPtr &stream, streams) {
-        kDebug() << "  type:" <<
-            (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video");
-        kDebug() << "  direction:" << stream->direction();
-        kDebug() << "  state:" << stream->state();
-
-        if ( stream->type() == Tp::MediaStreamTypeAudio ) {
-            emit logMessage(CallLog::Information, i18n("Audio stream created. Stream id: %1.",
-                                                       stream->id()));
-        } else {
-            emit logMessage(CallLog::Information, i18n("Video stream created. Stream id: %1.",
-                                                       stream->id()));
-        }
-
-        emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
-                        "Stream %1 direction is: %2.", stream->id(), stream->direction()));
+        onStreamAdded(stream);
     }
 
     //The user must have accepted the call already, using the approver.
@@ -173,6 +159,17 @@ void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
     if ( stream->type() == Tp::MediaStreamTypeVideo && stream->pendingSend() ) {
         stream->requestDirection(Tp::MediaStreamDirectionReceive);
     }
+
+    switch (stream->type()) {
+    case Tp::MediaStreamTypeAudio:
+        emit audioStreamAdded();
+        break;
+    case Tp::MediaStreamTypeVideo:
+        emit videoStreamAdded();
+        break;
+    default:
+        Q_ASSERT(false);
+    }
 }
 
 void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
@@ -180,6 +177,17 @@ void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream removed";
     emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
                     "Stream %1 removed.", stream->id()));
+
+    switch (stream->type()) {
+    case Tp::MediaStreamTypeAudio:
+        emit audioStreamRemoved();
+        break;
+    case Tp::MediaStreamTypeVideo:
+        emit videoStreamRemoved();
+        break;
+    default:
+        Q_ASSERT(false);
+    }
 }
 
 void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,

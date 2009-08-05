@@ -42,6 +42,8 @@ struct CallWindow::Private
     QLabel *statusLabel;
     Ui::CallWindow ui;
     CallLog *callLog;
+    QPointer<QWidget> audioStatusIcon;
+    QPointer<QWidget> videoStatusIcon;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -59,6 +61,10 @@ CallWindow::CallWindow(Tp::StreamedMediaChannelPtr channel)
             SLOT(onGroupMembersModelCreated(GroupMembersModel*)));
     connect(d->channelHandler, SIGNAL(dtmfHandlerCreated(DtmfHandler*)),
             SLOT(onDtmfHandlerCreated(DtmfHandler*)));
+    connect(d->channelHandler, SIGNAL(audioStreamAdded()), SLOT(onAudioStreamAdded()));
+    connect(d->channelHandler, SIGNAL(audioStreamRemoved()), SLOT(onAudioStreamRemoved()));
+    connect(d->channelHandler, SIGNAL(videoStreamAdded()), SLOT(onVideoStreamAdded()));
+    connect(d->channelHandler, SIGNAL(videoStreamRemoved()), SLOT(onVideoStreamRemoved()));
 
     setupUi();
 
@@ -295,6 +301,42 @@ void CallWindow::onCallDurationTimerTimeout()
 {
     d->callDuration = d->callDuration.addSecs(1);
     statusBar()->changeItem(d->callDuration.toString(), 1);
+}
+
+void CallWindow::onAudioStreamAdded()
+{
+    if ( !d->audioStatusIcon ) {
+        QLabel *label = new QLabel;
+        label->setPixmap(KIcon("voicecall").pixmap(16));
+        d->audioStatusIcon = label;
+        statusBar()->insertPermanentWidget(1, d->audioStatusIcon);
+    } else {
+        d->audioStatusIcon->show();
+    }
+}
+
+void CallWindow::onAudioStreamRemoved()
+{
+    Q_ASSERT(d->audioStatusIcon);
+    statusBar()->removeWidget(d->audioStatusIcon);
+}
+
+void CallWindow::onVideoStreamAdded()
+{
+    if ( !d->videoStatusIcon ) {
+        QLabel *label = new QLabel;
+        label->setPixmap(KIcon("camera-web").pixmap(16));
+        d->videoStatusIcon = label;
+        statusBar()->insertPermanentWidget(1, d->videoStatusIcon);
+    } else {
+        d->videoStatusIcon->show();
+    }
+}
+
+void CallWindow::onVideoStreamRemoved()
+{
+    Q_ASSERT(d->videoStatusIcon);
+    statusBar()->removeWidget(d->videoStatusIcon);
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

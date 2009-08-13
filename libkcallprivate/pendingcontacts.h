@@ -32,6 +32,7 @@ public:
 
 private slots:
     void onConnectionReady(Tp::PendingOperation *op);
+    void onContactsReady(Tp::PendingOperation *op);
 
 private:
     Tp::AccountPtr m_account;

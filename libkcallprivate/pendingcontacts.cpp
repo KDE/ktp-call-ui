@@ -19,6 +19,7 @@
 #include <TelepathyQt4/Connection>
 #include <TelepathyQt4/PendingReady>
 #include <TelepathyQt4/ContactManager>
+#include <TelepathyQt4/PendingContacts>
 
 PendingContacts::PendingContacts(Tp::AccountPtr account, QObject *parent)
     : Tp::PendingOperation(parent), m_account(account)
@@ -53,6 +54,20 @@ void PendingContacts::onConnectionReady(Tp::PendingOperation *op)
 
         m_contacts = connection->contactManager()->allKnownContacts();
         kDebug() << "received" << m_contacts.size() << "contacts";
+
+        QSet<Tp::Contact::Feature> features;
+        features << Tp::Contact::FeatureAlias << Tp::Contact::FeatureSimplePresence;
+        connect(connection->contactManager()->upgradeContacts(m_contacts.toList(), features),
+                SIGNAL(finished(Tp::PendingOperation*)),
+                SLOT(onContactsReady(Tp::PendingOperation*)));
+    }
+}
+
+void PendingContacts::onContactsReady(Tp::PendingOperation *op)
+{
+    if ( op->isError() ) {
+        setFinishedWithError(op->errorName(), op->errorMessage());
+    } else {
         setFinished();
     }
 }

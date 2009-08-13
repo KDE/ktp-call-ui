@@ -26,7 +26,7 @@ class QGstObject : public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(QGstObject)
-    friend class QGstValue;
+    QGST_WRAPPER(GstObject)
 public:
     static QGstObjectPtr fromGstObject(GstObject *gstObject);
     virtual ~QGstObject();
@@ -34,6 +34,19 @@ public:
     QGstValue property(const char *name) const;
     template <class T> T property(const char *name) const;
     void setProperty(const char *name, const QGstValue & value);
+
+    /** Returns the internal GstObject pointer, without any extra reference count.
+     * This is useful if you want to use a native function on the object.
+     * @sa getNativeObject
+     */
+    inline GstObject *peekNativeObject();
+
+    /** Returns the internal GstObject with an extra reference count on it.
+     * This is useful if you want to extract the GstObject and destroy the QGstObject.
+     * Equivalent to gst_object_ref(qgstobjectptr->peekNativeObject());
+     * @sa peekNativeObject
+     */
+    GstObject *getNativeObject();
 
 protected:
     QGstObject(GstObject *gstObject);
@@ -44,6 +57,11 @@ template <class T>
 T QGstObject::property(const char *name) const
 {
     return property(name).value<T>();
+}
+
+inline GstObject *QGstObject::peekNativeObject()
+{
+    return m_object;
 }
 
 }

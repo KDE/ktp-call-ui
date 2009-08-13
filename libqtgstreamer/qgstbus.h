@@ -27,6 +27,7 @@ class QGstBus : public QGstObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(QGstBus)
+    QGST_WRAPPER(GstBus)
     friend class QGstBusPrivate;
 public:
     static QGstBusPtr fromGstBus(GstBus *gstBus);
@@ -36,8 +37,7 @@ public:
     void removeSignalWatch();
 
 Q_SIGNALS:
-    //FIXME this should emit a QGstMessagePtr
-    void message(GstMessage *message);
+    void message(const QtGstreamer::QGstMessagePtr & message);
 
 protected:
     QGstBus(GstBus *gstBus);

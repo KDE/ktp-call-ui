@@ -14,6 +14,8 @@ set(QtGstreamer_SRCS
     qgstvalue.cpp
     qgstcaps.cpp
     qgststructure.cpp
+    qgstminiobject.cpp
+    qgstmessage.cpp
     interfaces/qgstxoverlay.cpp
 )
 

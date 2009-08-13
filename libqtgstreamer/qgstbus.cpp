@@ -15,10 +15,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "qgstbus.h"
+#include "qgstmessage.h"
 //the gstreamer headers are broken. we can't include <gst/gstbus.h> here
 #include <gst/gst.h>
 
 namespace QtGstreamer {
+
+QGST_WRAPPER_GTYPE(QGstBus, GST_TYPE_BUS)
 
 class QGstBusPrivate
 {
@@ -29,7 +32,7 @@ public:
 //static
 void QGstBusPrivate::bus_message(GstBus *bus, GstMessage *message, QGstBus *self)
 {
-    emit self->message(message);
+    emit self->message(QGstMessage::fromGstMessage(message));
 }
 
 QGstBus::QGstBus(GstBus *gstBus)

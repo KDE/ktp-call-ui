@@ -20,6 +20,8 @@
 
 namespace QtGstreamer {
 
+QGST_WRAPPER_GTYPE(QGstBin, GST_TYPE_BIN)
+
 QGstBin::QGstBin(const char *name)
     : QGstElement(gst_bin_new(name))
 {
@@ -48,7 +50,7 @@ QGstBin::~QGstBin()
 
 bool QGstBin::add(const QGstElementPtr & element)
 {
-    return gst_bin_add(GST_BIN(m_object), GST_ELEMENT(element->m_object));
+    return gst_bin_add(GST_BIN(m_object), GST_ELEMENT(element->peekNativeObject()));
 }
 
 QGstBin & QGstBin::operator<<(const QGstElementPtr & element)
@@ -59,7 +61,7 @@ QGstBin & QGstBin::operator<<(const QGstElementPtr & element)
 
 bool QGstBin::remove(const QGstElementPtr & element)
 {
-    return gst_bin_remove(GST_BIN(m_object), GST_ELEMENT(element->m_object));
+    return gst_bin_remove(GST_BIN(m_object), GST_ELEMENT(element->peekNativeObject()));
 }
 
 QGstElementPtr QGstBin::getByName(const char *name)

@@ -16,6 +16,7 @@
 */
 #include "qtfchannel.h"
 #include "../libqtgstreamer/qgstbus.h"
+#include "../libqtgstreamer/qgstmessage.h"
 #include <QtCore/QMutex>
 #include <KDebug>
 #include <TelepathyQt4/Farsight/Channel>
@@ -33,12 +34,11 @@ public:
     void init(Tp::StreamedMediaChannelPtr channel, QGstBusPtr bus);
 
     //slots
-    void onBusMessage(GstMessage *message);
+    void onBusMessage(QtGstreamer::QGstMessagePtr message);
     void onAudioSrcPadAdded(QtGstreamer::QGstPadPtr pad);
     void onVideoSrcPadAdded(QtGstreamer::QGstPadPtr pad);
     void onConferencePadRemoved(QtGstreamer::QGstPadPtr pad);
 
-    static gboolean busWatch(GstBus *bus, GstMessage *message, QTfChannel::Private *self);
     static void onTfChannelClosed(TfChannel *tfChannel, QTfChannel::Private *self);
     static void onSessionCreated(TfChannel *tfChannel, FsConference *conference,
                              FsParticipant *participant, QTfChannel::Private *self);
@@ -91,7 +91,8 @@ void QTfChannel::Private::init(Tp::StreamedMediaChannelPtr channel, QGstBusPtr b
                      G_CALLBACK(&QTfChannel::Private::onStreamGetCodecConfig), this);
 
     m_bus = bus;
-    connect(bus.data(), SIGNAL(message(GstMessage*)), q, SLOT(onBusMessage(GstMessage*)));
+    connect(bus.data(), SIGNAL(message(QtGstreamer::QGstMessagePtr)),
+            q, SLOT(onBusMessage(QtGstreamer::QGstMessagePtr)));
 
     connect(q, SIGNAL(audioSrcPadAdded(QtGstreamer::QGstPadPtr)),
             q, SLOT(onAudioSrcPadAdded(QtGstreamer::QGstPadPtr)));
@@ -101,9 +102,9 @@ void QTfChannel::Private::init(Tp::StreamedMediaChannelPtr channel, QGstBusPtr b
     qRegisterMetaType<QGstPadPtr>();
 }
 
-void QTfChannel::Private::onBusMessage(GstMessage *message)
+void QTfChannel::Private::onBusMessage(QGstMessagePtr message)
 {
-    tf_channel_bus_message(m_tfChannel, message);
+    tf_channel_bus_message(m_tfChannel, GST_MESSAGE(message->peekNativeObject()));
 }
 
 void QTfChannel::Private::onAudioSrcPadAdded(QGstPadPtr pad)

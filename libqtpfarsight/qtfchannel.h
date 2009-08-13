@@ -56,7 +56,7 @@ private:
     class Private;
     friend class Private;
     Private *const d;
-    Q_PRIVATE_SLOT(d, void onBusMessage(GstMessage *message));
+    Q_PRIVATE_SLOT(d, void onBusMessage(QtGstreamer::QGstMessagePtr message));
     Q_PRIVATE_SLOT(d, void onAudioSrcPadAdded(QtGstreamer::QGstPadPtr pad));
     Q_PRIVATE_SLOT(d, void onVideoSrcPadAdded(QtGstreamer::QGstPadPtr pad));
     Q_PRIVATE_SLOT(d, void onConferencePadRemoved(QtGstreamer::QGstPadPtr pad));

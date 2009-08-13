@@ -21,6 +21,18 @@
 #include "constants.h"
 #include <TelepathyQt4/Channel>
 
+/** This class takes a channel that supports the group interface
+ * and exports all the members of the group as a list model.
+ * Extra roles supported in this model for QAbstractItemModel::data() are:
+ * <ul>
+ * <li> KCall::ItemTypeRole: Returns QByteArray("contact"), as all items are contacts.
+ * <li> KCall::ObjectPtrRole: Returns a Tp::ContactPtr that points to the contact
+ * that is represented by the chosen item.
+ * <li> KCall::GroupMembersListTypeRole: This is of type KCall::GroupMembersListType
+ * and represents the group in which the contact is currently in
+ * (members, local pending members or remote pending members).
+ * </ul>
+ */
 class KCALLPRIVATE_EXPORT GroupMembersModel : public TreeModel
 {
     Q_OBJECT

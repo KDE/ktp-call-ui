@@ -22,6 +22,10 @@
 #include <TelepathyQt4/Constants>
 class QAbstractItemModel;
 
+/** This class handles connection with the account manager, constructs models
+ * for showing all the available accounts and contacts and offers some global
+ * connection status tracking.
+ */
 class KCALLPRIVATE_EXPORT AccountManager : public QObject
 {
     Q_OBJECT
@@ -29,16 +33,36 @@ public:
     explicit AccountManager(QObject *parent = 0);
     virtual ~AccountManager();
 
+    /** Returns a model that lists all the available accounts. */
     QAbstractItemModel *accountsModel() const;
+
+    /** Returns a model that lists all the available contacts.
+     * Currently this is the same as accountsModel() and returns a tree model
+     * showing the accounts in the first level and the contacts for each
+     * account in the second level.
+     * @todo Write a proper contacts model.
+     */
     QAbstractItemModel *contactsModel() const;
 
+    /** Returns the global connection status. This is "Offline" if all accounts are offline,
+     * "Connecting" if at least one account is connecting and all others are offline and
+     * "Connected" if at least one account is connected.
+     */
     Tp::ConnectionStatus globalConnectionStatus() const;
 
 public Q_SLOTS:
+    /** Attempts to put all the enabled accounts online, by setting their
+     * "RequestedPresence" property to the value of their "AutomaticPresence" property.
+     */
     void connectAccounts();
+
+    /** Attempts to disconnect all the enabled accounts by setting their "RequestedPresence"
+     * property to Tp::ConnectionPresenceTypeOffline/"offline".
+     */
     void disconnectAccounts();
 
 Q_SIGNALS:
+    /** This is emmited when the value of globalConnectionStatus() changes. */
     void globalConnectionStatusChanged(Tp::ConnectionStatus status);
 
 private:

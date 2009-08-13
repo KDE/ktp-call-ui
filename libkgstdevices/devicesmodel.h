@@ -22,6 +22,11 @@
 
 namespace KGstDevices {
 
+/** This class offers a read-only model that exports all the available devices
+ * of a given type from a DeviceManager instance. To use it, call the populate()
+ * function with the DeviceManager instance to be used and the type of the
+ * devices to be listed as arguments.
+ */
 class KGSTDEVICES_EXPORT DevicesModel : public QAbstractTableModel
 {
     Q_OBJECT

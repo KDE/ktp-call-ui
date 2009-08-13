@@ -22,11 +22,22 @@
 
 namespace KGstDevices {
 
+/** This class offers a table-like widget for selecting preferred devices.
+ * It populates itself with all the devices of a given type from a given
+ * DeviceManager instance, monitors for changes in the devices and always
+ * keeps in sync the "current" device on the manager with the device that
+ * is selected on the table. It also offers a "test" button to let the user
+ * test the device. This can be used to implement configuration dialogs.
+ */
 class KGSTDEVICES_EXPORT TableDeviceChooser : public QWidget
 {
     Q_OBJECT
 public:
-    TableDeviceChooser(DeviceManager *manager, DeviceManager::DeviceType type, QWidget *parent = 0);
+    /** Constructs a TableDeviceChooser that selects devices of the given
+     * @a type from the given @a manager.
+     */
+    TableDeviceChooser(DeviceManager *manager, DeviceManager::DeviceType type,
+                       QWidget *parent = 0);
     virtual ~TableDeviceChooser();
 
 private:

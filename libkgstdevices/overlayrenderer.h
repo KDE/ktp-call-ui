@@ -23,9 +23,19 @@ namespace KGstDevices {
 
 class OverlayWidget;
 
+/** This is an AbstractRenderer implementation that takes a video sink element
+ * that supports the GstXOverlay interface and embeds it on the QWidget where
+ * video should be drawn. Most gstreamer video sink elements on X11 and Windows
+ * support this interface. This is not suitable though for places where you
+ * might want full control over the widget, like on a QGraphicsView for example.
+ */
 class KGSTDEVICES_EXPORT OverlayRenderer : public AbstractRenderer
 {
 public:
+    /** Constructs an overlay renderer that embeds the given @a element.
+     * You should ensure that @a element is a valid video sink element
+     * that supports GstXOverlay.
+     */
     OverlayRenderer(const QtGstreamer::QGstElementPtr & element, QObject *parent = 0);
     virtual ~OverlayRenderer();
 

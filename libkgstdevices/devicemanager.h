@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_DEVICEMANAGER_H
-#define _KGSTDEVICES_DEVICEMANAGER_H
+#ifndef KGSTDEVICES_DEVICEMANAGER_H
+#define KGSTDEVICES_DEVICEMANAGER_H
 
 #include "kgstdevices_export.h"
 #include "../libqtgstreamer/qgstelement.h"

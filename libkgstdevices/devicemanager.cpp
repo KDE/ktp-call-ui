@@ -478,7 +478,7 @@ QtGstreamer::QGstElementPtr DeviceManager::newVideoInputElement()
 
 //this part is for kdelibs < r1006441
 #if !KDE_IS_VERSION(4, 3, 63)
-# ifdef Q_CC_GNU
+# ifdef __GNUC__
 #  warning "Using the v4l2 vs v4l1 detection hack"
 # endif
     //HACK to detect if the device has a v4l1 or v4l2 driver

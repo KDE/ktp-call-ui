@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_VIDEOWIDGET_H
-#define _KGSTDEVICES_VIDEOWIDGET_H
+#ifndef KGSTDEVICES_VIDEOWIDGET_H
+#define KGSTDEVICES_VIDEOWIDGET_H
 
 #include "kgstdevices_export.h"
 #include "../libqtgstreamer/qgstdeclarations.h"

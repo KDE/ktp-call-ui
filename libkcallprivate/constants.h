@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KCALL_CONSTANTS_H
-#define _KCALL_CONSTANTS_H
+#ifndef KCALL_CONSTANTS_H
+#define KCALL_CONSTANTS_H
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>

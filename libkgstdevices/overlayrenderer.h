@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_OVERLAYRENDERER_H
-#define _KGSTDEVICES_OVERLAYRENDERER_H
+#ifndef KGSTDEVICES_OVERLAYRENDERER_H
+#define KGSTDEVICES_OVERLAYRENDERER_H
 
 #include "abstractrenderer.h"
 
@@ -36,7 +36,7 @@ public:
      * You should ensure that @a element is a valid video sink element
      * that supports GstXOverlay.
      */
-    OverlayRenderer(const QtGstreamer::QGstElementPtr & element, QObject *parent = 0);
+    explicit OverlayRenderer(const QtGstreamer::QGstElementPtr & element, QObject *parent = 0);
     virtual ~OverlayRenderer();
 
     virtual void beginRendering(QWidget *videoWidget);

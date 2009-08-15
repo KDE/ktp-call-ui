@@ -77,17 +77,17 @@ QVariant DevicesModel::data(const QModelIndex & index, int role) const
     case 1:
     {
         QByteArray driver = d->m_manager->availableDevices(d->m_type)[index.row()].driver();
-        if ( driver.startsWith("auto") ) {
+        if ( driver.startsWith("auto") ) { //krazy:exclude=strings
             return i18nc("autodetected audio or video system", "Autodetected");
-        } else if ( driver.startsWith("alsa") ) {
+        } else if ( driver.startsWith("alsa") ) { //krazy:exclude=strings
             return i18n("ALSA");
-        } else if ( driver.startsWith("oss") ) {
+        } else if ( driver.startsWith("oss") ) { //krazy:exclude=strings
             return i18n("OSS");
-        } else if ( driver.startsWith("jack") ) {
+        } else if ( driver.startsWith("jack") ) { //krazy:exclude=strings
             return i18n("JACK");
-        } else if ( driver.startsWith("pulse") ) {
+        } else if ( driver.startsWith("pulse") ) { //krazy:exclude=strings
             return i18n("PULSE");
-        } else if ( driver.startsWith("v4l") ) {
+        } else if ( driver.startsWith("v4l") ) { //krazy:exclude=strings
             return i18n("Video4Linux");
         } else {
             return i18nc("Unknown audio or video system", "Unknown");

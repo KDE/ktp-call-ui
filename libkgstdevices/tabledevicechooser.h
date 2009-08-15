@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_TABLEDEVICECHOOSER_H
-#define _KGSTDEVICES_TABLEDEVICECHOOSER_H
+#ifndef KGSTDEVICES_TABLEDEVICECHOOSER_H
+#define KGSTDEVICES_TABLEDEVICECHOOSER_H
 
 #include "devicemanager.h"
 #include <QtGui/QWidget>

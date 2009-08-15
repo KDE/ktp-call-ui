@@ -33,7 +33,7 @@ public:
         Error
     };
 
-    CallLog(QPlainTextEdit *logView, QObject *parent = 0);
+    explicit CallLog(QPlainTextEdit *logView, QObject *parent = 0);
     bool errorHasBeenLogged() const { return m_errorLogged; }
 
 public slots:

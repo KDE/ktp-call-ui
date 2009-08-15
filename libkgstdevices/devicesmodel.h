@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_DEVICESMODEL_H
-#define _KGSTDEVICES_DEVICESMODEL_H
+#ifndef KGSTDEVICES_DEVICESMODEL_H
+#define KGSTDEVICES_DEVICESMODEL_H
 
 #include "devicemanager.h"
 #include <QtCore/QAbstractListModel>

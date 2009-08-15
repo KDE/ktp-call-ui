@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _KGSTDEVICES_ABSTRACTRENDERER_H
-#define _KGSTDEVICES_ABSTRACTRENDERER_H
+#ifndef KGSTDEVICES_ABSTRACTRENDERER_H
+#define KGSTDEVICES_ABSTRACTRENDERER_H
 
 #include "kgstdevices_export.h"
 #include "../libqtgstreamer/qgstdeclarations.h"
@@ -66,12 +66,12 @@ public:
      * element and @a parent as a parent. @a element can be later retrieved
      * using the videoSink() function.
      */
-    AbstractRenderer(const QtGstreamer::QGstElementPtr & element, QObject *parent = 0);
+    explicit AbstractRenderer(const QtGstreamer::QGstElementPtr & element, QObject *parent = 0);
     virtual ~AbstractRenderer();
 
     /** Sets the widget where video should be painted on. This function must
      * be called for video rendering to begin. It should be called only once
-     * in the beggining. If no widget is set, this will lead to undefined behavior
+     * in the beginning. If no widget is set, this will lead to undefined behavior
      * when the pipeline goes into PLAYING mode.
      */
     virtual void beginRendering(QWidget *videoWidget) = 0;

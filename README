@@ -18,6 +18,7 @@ At runtime, you will also need the following:
 
 - telepathy-mission-control (version 5.1.0 or later)
 - telepathy-gabble
+- gstreamer-plugins-base and gstreamer-plugins-good (also recommended are gstreamer-plugins-bad)
 - optionally, telepathy-accounts-kcm, for configuring accounts
   (svn://anonsvn.kde.org/home/kde/trunk/playground/network/telepathy-accounts-kcm)
 

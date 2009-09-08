@@ -1,3 +1,11 @@
+0. About KCall
+--------------
+
+KCall is a GUI VoIP client software which uses the telepathy framework underneath.
+You can find the latest version of KCall at the kde svn:
+HTTP URL: http://websvn.kde.org/trunk/playground/network/kcall/
+SVN URL: svn://anonsvn.kde.org/home/kde/trunk/playground/network/kcall/
+
 1. Dependencies
 ---------------
 
@@ -117,4 +125,5 @@ kcall_handler deadlocks.
 
 
 ---
-Last updated: 13 August 2009
+George Kiagiadakis <kiagiadakis.george@gmail.com>
+Last updated: 8 Semptember 2009

@@ -1,10 +1,30 @@
 [Global]
 IconName=internet-telephony
 Comment=KCall
+Comment[da]=KCall
+Comment[es]=KCall
+Comment[et]=KCall
+Comment[fr]=KCall
+Comment[km]=KCall
+Comment[pt]=KCall
+Comment[ro]=KCall
+Comment[ru]=KCall
 Comment[sv]=Kcall
+Comment[tr]=KCall
+Comment[uk]=KCall
 Comment[x-test]=xxKCallxx
 Name=KCall
+Name[da]=KCall
+Name[es]=KCall
+Name[et]=KCall
+Name[fr]=KCall
+Name[km]=KCall
+Name[pt]=KCall
+Name[ro]=KCall
+Name[ru]=KCall
 Name[sv]=Kcall
+Name[tr]=KCall
+Name[uk]=KCall
 Name[x-test]=xxKCallxx
 
 [Event/newcall]
@@ -15,7 +35,6 @@ Name[et]=Saabuv kõne
 Name[fr]=Appel entrant
 Name[km]=ការ​ហៅ​ចូល
 Name[pt]=Chamada Recebida
-Name[pt_BR]=Chamada Recebida
 Name[ro]=Apel de intrare
 Name[ru]=Входящие вызовы
 Name[sv]=Inkommande samtal

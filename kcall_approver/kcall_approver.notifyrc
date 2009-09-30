@@ -2,6 +2,7 @@
 IconName=internet-telephony
 Comment=KCall
 Comment[da]=KCall
+Comment[de]=KCall
 Comment[es]=KCall
 Comment[et]=KCall
 Comment[fr]=KCall
@@ -15,6 +16,7 @@ Comment[uk]=KCall
 Comment[x-test]=xxKCallxx
 Name=KCall
 Name[da]=KCall
+Name[de]=KCall
 Name[es]=KCall
 Name[et]=KCall
 Name[fr]=KCall

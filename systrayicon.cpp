@@ -37,19 +37,19 @@ struct SystrayIcon::Private
 {
     QSet<ApproverRequest*> requests;
     QPointer<ApproverRequest> currentRequest;
-    KNotificationItem *notificationItem;
-    KNotificationItem::ItemStatus restoreStatus;
+    KStatusNotifierItem *notificationItem;
+    KStatusNotifierItem::ItemStatus restoreStatus;
 };
 
 SystrayIcon::SystrayIcon()
     : AbstractClientApprover(channelClassList()), d(new Private)
 {
-    d->notificationItem = new KNotificationItem(this);
+    d->notificationItem = new KStatusNotifierItem(this);
     d->notificationItem->setTitle(i18n("KCall"));
     d->notificationItem->setIconByName("internet-telephony");
     d->notificationItem->setAttentionIconByName("voicecall");
-    d->notificationItem->setCategory(KNotificationItem::Communications);
-    d->notificationItem->setStatus(KNotificationItem::Active);
+    d->notificationItem->setCategory(KStatusNotifierItem::Communications);
+    d->notificationItem->setStatus(KStatusNotifierItem::Active);
 
     connect(d->notificationItem, SIGNAL(activateRequested(bool, QPoint)),
             SLOT(onActivateRequested(bool, QPoint)));
@@ -67,10 +67,10 @@ void SystrayIcon::newRequest(ApproverRequest *request)
     d->requests.insert(request);
     d->currentRequest = request;
     //if we are not already showing a notification, save the current icon status for restoring later
-    if ( d->notificationItem->status() != KNotificationItem::NeedsAttention ) {
+    if ( d->notificationItem->status() != KStatusNotifierItem::NeedsAttention ) {
         d->restoreStatus = d->notificationItem->status();
     }
-    d->notificationItem->setStatus(KNotificationItem::NeedsAttention);
+    d->notificationItem->setStatus(KStatusNotifierItem::NeedsAttention);
 }
 
 void SystrayIcon::requestFinished(ApproverRequest *request)
@@ -110,20 +110,20 @@ bool SystrayIcon::eventFilter(QObject *watched, QEvent *event)
         return AbstractClientApprover::eventFilter(watched, event);
     }
 
-    KNotificationItem::ItemStatus newStatus;
+    KStatusNotifierItem::ItemStatus newStatus;
 
     switch (event->type()) {
     case QEvent::Show:
-        newStatus = KNotificationItem::Passive;
+        newStatus = KStatusNotifierItem::Passive;
         break;
     case QEvent::Close:
-        newStatus = KNotificationItem::Active;
+        newStatus = KStatusNotifierItem::Active;
         break;
     default:
         return false;
     }
 
-    if ( d->notificationItem->status() != KNotificationItem::NeedsAttention ) {
+    if ( d->notificationItem->status() != KStatusNotifierItem::NeedsAttention ) {
         //there is no request currently, so we should directly update the icon status
         d->notificationItem->setStatus(newStatus);
     } else {

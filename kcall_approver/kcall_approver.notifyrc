@@ -32,6 +32,7 @@ Name[x-test]=xxKCallxx
 [Event/newcall]
 Name=Incoming Call
 Name[da]=Indkommende opkald
+Name[de]=Eingehender Anruf
 Name[es]=Llamada entrante
 Name[et]=Saabuv kõne
 Name[fr]=Appel entrant

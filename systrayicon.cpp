@@ -20,7 +20,7 @@
 #include <QtCore/QSet>
 #include <KLocalizedString>
 #include <KDebug>
-#include <knotificationitem.h>
+#include <KStatusNotifierItem>
 #include <TelepathyQt4/Constants>
 
 static inline Tp::ChannelClassList channelClassList()

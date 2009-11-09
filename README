@@ -12,9 +12,7 @@ SVN URL: svn://anonsvn.kde.org/home/kde/trunk/playground/network/kcall/
 For compiling KCall, you will need the following development software:
 
 - Qt developement headers and tools (version 4.5.0 or later)
-- kdelibs developement headers and tools (version 4.2.0 or later)
-- libknotificationitem-1 (shipped in kdelibs-experimental, but if you compile
-  kdelibs from svn, this library will be installed with kdelibs)
+- kdelibs developement headers and tools (version 4.3.74 or later)
 - telepathy-qt4 0.1.8 or later with telepathy-qt4-farsight compiled (requires telepathy-farsight)
 - telepathy-farsight
 - GStreamer 0.10 (version 0.10.23 or later)
@@ -126,4 +124,4 @@ kcall_handler deadlocks.
 
 ---
 George Kiagiadakis <kiagiadakis.george@gmail.com>
-Last updated: 8 Semptember 2009
+Last updated: 9 November 2009

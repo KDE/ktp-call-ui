@@ -73,7 +73,7 @@ ContactListController::ContactListController(QAbstractItemView *view, QAbstractI
     d->setStatusAction->addAction(KIcon("user-away"), i18nc("@action:inmenu", "Away"));
     d->setStatusAction->addAction(KIcon("user-away"), i18nc("@action:inmenu", "Be right back"));
     d->setStatusAction->addAction(KIcon("user-busy"), i18nc("@action:inmenu", "Busy"));
-    d->setStatusAction->addAction(KIcon("user-busy"), i18nc("@action:inmenu", "Do not distrurb"));
+    d->setStatusAction->addAction(KIcon("user-busy"), i18nc("@action:inmenu", "Do not disturb"));
     d->setStatusAction->addAction(KIcon("user-away-extended"), i18nc("@action:inmenu", "Extended Away"));
     d->setStatusAction->addAction(KIcon("user-invisible"), i18nc("@action:inmenu", "Invisible"));
     d->setStatusAction->addAction(KIcon("user-offline"), i18nc("@action:inmenu", "Offline"));

@@ -16,7 +16,7 @@ install(FILES kcall_approver.notifyrc DESTINATION ${DATA_INSTALL_DIR}/kcall_appr
 
 configure_file(org.freedesktop.Telepathy.Client.kcall_approver.service.in
                 org.freedesktop.Telepathy.Client.kcall_approver.service)
-install(FILES ${CMAKE_BINARY_DIR}/org.freedesktop.Telepathy.Client.kcall_approver.service
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.Client.kcall_approver.service
         DESTINATION ${DBUS_SERVICES_INSTALL_DIR})
 
 # FIXME any better macro for ${XDG_DATA_DIRS} ?

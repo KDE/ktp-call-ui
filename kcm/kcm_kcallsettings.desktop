@@ -13,6 +13,7 @@ Name[sv]=Allmänt
 Name[tr]=Genel
 Name[uk]=Загальне
 Name[x-test]=xxGeneralxx
+Name[zh_CN]=常规
 Icon=internet-telephony
 Exec=kcmshell4 kcm_kcallsettings
 Type=Service

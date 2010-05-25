@@ -17,6 +17,7 @@ Comment[sv]=Kcall
 Comment[tr]=KCall
 Comment[uk]=KCall
 Comment[x-test]=xxKCallxx
+Comment[zh_CN]=KCall
 Name=KCall
 Name[da]=KCall
 Name[de]=KCall
@@ -34,6 +35,7 @@ Name[sv]=Kcall
 Name[tr]=KCall
 Name[uk]=KCall
 Name[x-test]=xxKCallxx
+Name[zh_CN]=KCall
 
 [Event/newcall]
 Name=Incoming Call
@@ -53,6 +55,7 @@ Name[sv]=Inkommande samtal
 Name[tr]=Gelen Çağrı
 Name[uk]=Вхідний дзвінок
 Name[x-test]=xxIncoming Callxx
+Name[zh_CN]=来电
 Sound=KDE-Im-Phone-Ring.ogg
 Action=Popup|Sound
 Flags=Persistent

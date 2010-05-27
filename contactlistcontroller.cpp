@@ -137,9 +137,9 @@ void ContactListController::callContact(bool useInitialVideo)
                    TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType", Tp::HandleTypeContact);
     request.insert(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle", contact->handle()[0]);
-    request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialAudio", true);
+    request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".InitialAudio", true);
     if ( useInitialVideo ) {
-        request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".FUTURE.InitialVideo", true);
+        request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".InitialVideo", true);
     }
     account->ensureChannel(request, QDateTime::currentDateTime(), "org.freedesktop.Telepathy.Client.kcall_handler");
 }

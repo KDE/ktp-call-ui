@@ -1,6 +1,7 @@
 [Global]
 IconName=internet-telephony
 Comment=KCall
+Comment[bg]=KCall
 Comment[da]=KCall
 Comment[de]=KCall
 Comment[en_GB]=KCall
@@ -19,6 +20,7 @@ Comment[uk]=KCall
 Comment[x-test]=xxKCallxx
 Comment[zh_CN]=KCall
 Name=KCall
+Name[bg]=KCall
 Name[da]=KCall
 Name[de]=KCall
 Name[en_GB]=KCall
@@ -40,6 +42,7 @@ Name[zh_CN]=KCall
 
 [Event/newcall]
 Name=Incoming Call
+Name[bg]=Входящо повикване
 Name[da]=Indkommende opkald
 Name[de]=Eingehender Anruf
 Name[en_GB]=Incoming Call

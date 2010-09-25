@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009-2010  George Kiagiadakis <kiagiadakis.george@gmail.com>
 
     This library is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -17,8 +17,8 @@
 #ifndef QTFCHANNEL_H
 #define QTFCHANNEL_H
 
-#include "../libqtgstreamer/qgstpad.h"
-#include "../libqtgstreamer/qgstelement.h"
+#include <QGst/Pad>
+#include <QGst/Element>
 #include <TelepathyQt4/StreamedMediaChannel>
 
 /** This is a wrapper class around TfChannel and TfStream that provides a saner Qt-ish API.
@@ -32,8 +32,8 @@ public:
     /** Constructs a QTfChannel that corresponds to the specified @a channel.
      * @a bus should be the GstBus of the pipeline.
      */
-    QTfChannel(Tp::StreamedMediaChannelPtr channel, QtGstreamer::QGstBusPtr bus,
-               QObject *parent = 0);
+    QTfChannel(const Tp::StreamedMediaChannelPtr & channel,
+               const QGst::BusPtr & bus, QObject *parent = 0);
     virtual ~QTfChannel();
 
     /** Sets the filename of the file where codec preferences should be read from.
@@ -46,7 +46,7 @@ Q_SIGNALS:
     /** Emmited when the session starts. @a conference is the FsConference element
      * that should be added in the pipeline and set to PLAYING state.
      */
-    void sessionCreated(QtGstreamer::QGstElementPtr conference);
+    void sessionCreated(QGst::ElementPtr conference);
 
     /** Emmited when the channel is closed. The pipeline should be stopped when
      * this signal is received.
@@ -62,7 +62,7 @@ Q_SIGNALS:
     /** Emmited when an audio sink pad is added on the conference.
      * @a sinkPad should be connected with the audio input device.
      */
-    void audioSinkPadAdded(QtGstreamer::QGstPadPtr sinkPad);
+    void audioSinkPadAdded(QGst::PadPtr sinkPad);
 
     /** Emmited when the audio input device can be closed */
     void closeAudioInputDevice();
@@ -76,7 +76,7 @@ Q_SIGNALS:
     /** Emmited when a video sink pad is added on the conference.
      * @a sinkPad should be connected with the video input device.
      */
-    void videoSinkPadAdded(QtGstreamer::QGstPadPtr sinkPad);
+    void videoSinkPadAdded(QGst::PadPtr sinkPad);
 
     /** Emmited when the video input device can be closed */
     void closeVideoInputDevice();
@@ -90,12 +90,12 @@ Q_SIGNALS:
     /** Emmited when an audio source pad is added on the conference.
      * @a srcPad should be connected with the audio output device.
      */
-    void audioSrcPadAdded(QtGstreamer::QGstPadPtr srcPad);
+    void audioSrcPadAdded(QGst::PadPtr srcPad);
 
     /** Emmited when an audio source pad is removed from the conference.
      * @a srcPad should be disconnected from the audio output device.
      */
-    void audioSrcPadRemoved(QtGstreamer::QGstPadPtr srcPad);
+    void audioSrcPadRemoved(QGst::PadPtr srcPad);
 
 
     /** Emmited when the video output device should be initialized. @a suceess should
@@ -106,21 +106,19 @@ Q_SIGNALS:
     /** Emmited when a video source pad is added on the conference.
      * @a srcPad should be connected with a video widget.
      */
-    void videoSrcPadAdded(QtGstreamer::QGstPadPtr srcPad);
+    void videoSrcPadAdded(QGst::PadPtr srcPad);
 
     /** Emmited when a video source pad is removed from the conference.
      * @a srcPad should be disconnected from the video widget.
      */
-    void videoSrcPadRemoved(QtGstreamer::QGstPadPtr srcPad);
+    void videoSrcPadRemoved(QGst::PadPtr srcPad);
 
 private:
     class Private;
     friend class Private;
     Private *const d;
-    Q_PRIVATE_SLOT(d, void onBusMessage(QtGstreamer::QGstMessagePtr message));
-    Q_PRIVATE_SLOT(d, void onAudioSrcPadAdded(QtGstreamer::QGstPadPtr pad));
-    Q_PRIVATE_SLOT(d, void onVideoSrcPadAdded(QtGstreamer::QGstPadPtr pad));
-    Q_PRIVATE_SLOT(d, void onConferencePadRemoved(QtGstreamer::QGstPadPtr pad));
+    Q_PRIVATE_SLOT(d, void _p_onAudioSrcPadAdded(QGst::PadPtr pad));
+    Q_PRIVATE_SLOT(d, void _p_onVideoSrcPadAdded(QGst::PadPtr pad));
 };
 
 #endif

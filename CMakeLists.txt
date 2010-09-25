@@ -17,10 +17,10 @@ add_definitions(${KDE4_DEFINITIONS})
 add_definitions(-DUSE_TEST_DEVICES)
 
 add_subdirectory(libkcallprivate)
-add_subdirectory(libkgstdevices)
+#add_subdirectory(libkgstdevices)
 add_subdirectory(libqtpfarsight)
-add_subdirectory(kcall_handler)
-add_subdirectory(kcm)
+#add_subdirectory(kcall_handler)
+#add_subdirectory(kcm)
 
 ##########
 

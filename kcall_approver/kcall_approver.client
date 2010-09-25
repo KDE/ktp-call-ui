@@ -1,6 +1,0 @@
-[org.freedesktop.Telepathy.Client]
-Interfaces=org.freedesktop.Telepathy.Client.Approver;
-
-[org.freedesktop.Telepathy.Client.Approver.ApproverChannelFilter 0]
-org.freedesktop.Telepathy.Channel.ChannelType s=org.freedesktop.Telepathy.Channel.Type.StreamedMedia
-org.freedesktop.Telepathy.Channel.TargetHandleType u=1

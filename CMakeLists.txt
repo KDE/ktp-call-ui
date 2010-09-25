@@ -20,7 +20,6 @@ add_subdirectory(libkcallprivate)
 add_subdirectory(libkgstdevices)
 add_subdirectory(libqtpfarsight)
 add_subdirectory(kcall_handler)
-add_subdirectory(kcall_approver)
 add_subdirectory(kcm)
 
 ##########

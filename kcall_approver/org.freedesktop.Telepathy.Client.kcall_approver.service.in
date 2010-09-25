@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=org.freedesktop.Telepathy.Client.kcall_approver
-Exec=@CMAKE_INSTALL_PREFIX@/bin/kcall_approver

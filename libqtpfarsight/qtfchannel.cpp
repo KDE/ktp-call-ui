@@ -20,7 +20,30 @@
 #include <QGst/Message>
 #include <QtCore/QMutex>
 #include <KDebug>
-#include <TelepathyQt4/Farsight/Channel>
+
+//BEGIN Ugly forward declarations
+
+/* These declarations are copied here instead of including the proper headers,
+ * because the proper headers also include too many unrelated stuff and we have
+ * to depend on many useless (at build time) external libraries (such as dbus-glib,
+ * libxml2, gstreamer) for no good reason.
+ */
+
+typedef int gboolean;
+typedef char gchar;
+typedef struct _GList GList;
+typedef struct _TfChannel TfChannel;
+
+extern "C" {
+GList *fs_codec_list_from_keyfile (const gchar *filename, GError **error);
+gboolean tf_channel_bus_message(TfChannel *channel, GstMessage *message);
+}
+
+namespace Tp {
+Q_DECL_IMPORT TfChannel *createFarsightChannel(const StreamedMediaChannelPtr &channel);
+}
+//END Ugly forward declarations
+
 
 QGLIB_REGISTER_BOXED_TYPE(GList*)
 QGLIB_REGISTER_VALUEIMPL_FOR_BOXED_TYPE(GList*)

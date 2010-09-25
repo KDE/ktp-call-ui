@@ -6,15 +6,7 @@ find_package(KDE4 REQUIRED)
 find_package(TelepathyQt4 REQUIRED)
 find_package(TelepathyQt4Farsight REQUIRED)
 find_package(QtGstreamer REQUIRED)
-
-find_package(GStreamer REQUIRED)
-find_package(GObject REQUIRED)
-find_package(GLIB2 REQUIRED)
 find_package(TpFarsight REQUIRED)
-# dbus-glib and libxml2 are not really used, but headers from other libs include stuff from those,
-# so we need their INCLUDE_DIR variable
-find_package(DbusGlib REQUIRED)
-find_package(LibXml2 REQUIRED)
 
 include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR})

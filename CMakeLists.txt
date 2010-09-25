@@ -21,6 +21,7 @@ add_subdirectory(libkcallprivate)
 add_subdirectory(libqtpfarsight)
 #add_subdirectory(kcall_handler)
 #add_subdirectory(kcm)
+add_subdirectory(libtelepathy-kde-call)
 
 ##########
 

@@ -60,14 +60,6 @@ struct CallWindow::Private
 CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
     : KXmlGuiWindow(), d(new Private)
 {
-    //create ui
-    setupUi();
-
-    d->callLog = new CallLog(d->ui.logView, this);
-    connect(d->callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
-
-    connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
-
     //setup the channel
     d->channel = channel;
     //The user must have accepted the call already, using the approver.
@@ -86,8 +78,16 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
     connect(d->stateHandler, SIGNAL(videoStreamRemoved()), SLOT(onVideoStreamRemoved()));
     connect(d->stateHandler, SIGNAL(sendVideoStateChanged(bool)),
             SLOT(onSendVideoStateChanged(bool)));
+
+    //create ui
+    setupUi(); //must be called after creating the state handler
+
+    d->callLog = new CallLog(d->ui.logView, this);
+    connect(d->callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
     connect(d->stateHandler, SIGNAL(logMessage(CallLog::LogType, QString)),
             d->callLog, SLOT(logMessage(CallLog::LogType, QString)));
+
+    connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 
     //create the gstreamer handler
     d->channelHandler = new CallChannelHandler(d->channel, this);

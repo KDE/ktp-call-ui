@@ -29,12 +29,14 @@
  * libxml2, gstreamer) for no good reason.
  */
 
+typedef unsigned long GType;
 typedef int gboolean;
 typedef char gchar;
 typedef struct _GList GList;
 typedef struct _TfChannel TfChannel;
 
 extern "C" {
+GType fs_codec_list_get_type (void);
 GList *fs_codec_list_from_keyfile (const gchar *filename, GError **error);
 gboolean tf_channel_bus_message(TfChannel *channel, GstMessage *message);
 }
@@ -45,7 +47,8 @@ Q_DECL_IMPORT TfChannel *createFarsightChannel(const StreamedMediaChannelPtr &ch
 //END Ugly forward declarations
 
 
-QGLIB_REGISTER_BOXED_TYPE(GList*)
+QGLIB_REGISTER_TYPE(GList*)
+QGLIB_REGISTER_TYPE_IMPLEMENTATION(GList*, fs_codec_list_get_type())
 QGLIB_REGISTER_VALUEIMPL_FOR_BOXED_TYPE(GList*)
 Q_DECLARE_METATYPE(QGst::PadPtr)
 

@@ -29,6 +29,8 @@ public:
     explicit StateHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
     virtual ~StateHandler();
 
+    void init();
+
     enum State { Connecting, Ringing, InCall, HangingUp, Disconnected, Error };
     bool requestClose();
     void setSendVideo(bool enabled);

@@ -56,6 +56,16 @@ StateHandler::StateHandler(const Tp::StreamedMediaChannelPtr & channel, QObject 
                                        Tp::Contacts, Tp::Channel::GroupMemberChangeDetails)),
             SLOT(onGroupMembersChanged(Tp::Contacts, Tp::Contacts, Tp::Contacts,
                                        Tp::Contacts, Tp::Channel::GroupMemberChangeDetails)));
+}
+
+StateHandler::~StateHandler()
+{
+    delete d;
+}
+
+void StateHandler::init()
+{
+    kDebug() << "Initializing the state handler";
 
     Tp::MediaStreams streams = d->channel->streams();
     kDebug() << streams.size();
@@ -63,11 +73,6 @@ StateHandler::StateHandler(const Tp::StreamedMediaChannelPtr & channel, QObject 
     foreach (const Tp::MediaStreamPtr &stream, streams) {
         onStreamAdded(stream);
     }
-}
-
-StateHandler::~StateHandler()
-{
-    delete d;
 }
 
 void StateHandler::setState(State s)

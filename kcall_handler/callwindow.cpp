@@ -89,6 +89,9 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
 
     connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 
+    //must be called after creating the UI and connecting all of stateHandler's signals
+    d->stateHandler->init();
+
     //create the gstreamer handler
     d->channelHandler = new CallChannelHandler(d->channel, this);
     connect(d->channelHandler, SIGNAL(participantJoined(CallParticipant*)),

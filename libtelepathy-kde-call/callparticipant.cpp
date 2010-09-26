@@ -175,7 +175,7 @@ void CallParticipantPrivate::setAudioPads(QGst::PipelinePtr & pipeline,
     m_audioBin->getStaticPad("sink")->link(srcPad);
     m_audioBin->setState(QGst::StatePlaying);
 
-    Q_EMIT q->audioStreamAdded();
+    Q_EMIT q->audioStreamAdded(q);
 }
 
 void CallParticipantPrivate::removeAudioPads(QGst::PipelinePtr & pipeline)
@@ -185,7 +185,7 @@ void CallParticipantPrivate::removeAudioPads(QGst::PipelinePtr & pipeline)
     pipeline->remove(m_audioBin);
     m_audioBin = QGst::BinPtr(); //drop reference and destroy the bin and its contents
 
-    Q_EMIT q->audioStreamRemoved();
+    Q_EMIT q->audioStreamRemoved(q);
 }
 
 void CallParticipantPrivate::setVideoPads(QGst::PipelinePtr & pipeline,
@@ -236,17 +236,19 @@ void CallParticipantPrivate::setVideoPads(QGst::PipelinePtr & pipeline,
     m_videoBin->getStaticPad("sink")->link(srcPad);
     m_videoBin->setState(QGst::StatePlaying);
 
-    Q_EMIT q->videoStreamAdded();
+    Q_EMIT q->videoStreamAdded(q);
 }
 
 void CallParticipantPrivate::removeVideoPads(QGst::PipelinePtr & pipeline)
 {
     m_colorBalanceControl = QGst::ColorBalancePtr(); //drop reference
+    m_videoWidget.data()->setVideoSink(QGst::ElementPtr()); //drop the widget's reference to the video sink
+
     m_videoBin->setState(QGst::StateNull);
     pipeline->remove(m_videoBin);
     m_videoBin = QGst::BinPtr(); //drop reference and destroy the bin and its contents
 
-    Q_EMIT q->videoStreamRemoved();
+    Q_EMIT q->videoStreamRemoved(q);
 }
 
 #include "callparticipant.moc"

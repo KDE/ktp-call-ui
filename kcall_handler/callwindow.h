@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2010 Collabora Ltd. <info@collabora.co.uk>
+      @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,14 +19,15 @@
 #ifndef CALLWINDOW_H
 #define CALLWINDOW_H
 
-#include "channelhandler.h"
+#include "statehandler.h"
 #include <KXmlGuiWindow>
+class CallParticipant;
 
 class CallWindow : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
-    CallWindow(Tp::StreamedMediaChannelPtr channel);
+    CallWindow(const Tp::StreamedMediaChannelPtr & channel);
     virtual ~CallWindow();
 
 private:
@@ -33,19 +36,9 @@ private:
     void disableUi();
 
 private slots:
-    void setState(ChannelHandler::State state);
+    void setState(StateHandler::State state);
     void setStatus(const QString & msg);
-    void onMediaHandlerCreated(AbstractMediaHandler *handler);
-    void onAudioInputDeviceCreated(QObject *control);
-    void onAudioInputDeviceDestroyed();
-    void onAudioOutputDeviceCreated(QObject *control);
-    void onAudioOutputDeviceDestroyed();
-    void onVideoInputDeviceCreated(QObject *balanceControl, QWidget *videoWidget);
-    void onVideoInputDeviceDestroyed();
-    void onVideoOutputWidgetCreated(QWidget *widget, uint id);
-    void onCloseVideoOutputWidget(uint id);
-    void onGroupMembersModelCreated(GroupMembersModel *model);
-    void onDtmfHandlerCreated(DtmfHandler *handler);
+
     void onCallDurationTimerTimeout();
     void onAudioStreamAdded();
     void onAudioStreamRemoved();
@@ -53,6 +46,14 @@ private slots:
     void onVideoStreamRemoved();
     void onSendVideoStateChanged(bool enabled);
     void toggleSendVideo();
+
+    void onParticipantJoined(CallParticipant *participant);
+    void onParticipantLeft(CallParticipant *participant);
+    void onParticipantAudioStreamAdded(CallParticipant *participant);
+    void onParticipantAudioStreamRemoved(CallParticipant *participant);
+    void onParticipantVideoStreamAdded(CallParticipant *participant);
+    void onParticipantVideoStreamRemoved(CallParticipant *participant);
+    void logErrorMessage(const QString & error);
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

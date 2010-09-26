@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2010 Collabora Ltd. <info@collabora.co.uk>
+      @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,23 +16,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef CHANNELHANDLER_H
-#define CHANNELHANDLER_H
+#ifndef STATEHANDLER_H
+#define STATEHANDLER_H
 
 #include "calllog.h"
 #include <TelepathyQt4/StreamedMediaChannel>
-class AbstractMediaHandler;
-class GroupMembersModel;
-class DtmfHandler;
 
-class ChannelHandler : public QObject
+class StateHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit ChannelHandler(Tp::StreamedMediaChannelPtr channel, QObject *parent = 0);
-    virtual ~ChannelHandler();
+    explicit StateHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
+    virtual ~StateHandler();
 
-    enum State { NotReady, Connecting, Ringing, InCall, HangingUp, Disconnected, Error };
+    enum State { Connecting, Ringing, InCall, HangingUp, Disconnected, Error };
     bool requestClose();
     void setSendVideo(bool enabled);
 
@@ -38,10 +37,7 @@ public slots:
     void hangupCall();
 
 signals:
-    void stateChanged(ChannelHandler::State newState);
-    void mediaHandlerCreated(AbstractMediaHandler *handler);
-    void groupMembersModelCreated(GroupMembersModel *model);
-    void dtmfHandlerCreated(DtmfHandler *handler);
+    void stateChanged(StateHandler::State newState);
     void logMessage(CallLog::LogType logType, const QString & message);
     void audioStreamAdded();
     void audioStreamRemoved();
@@ -53,7 +49,6 @@ private:
     void setState(State s);
 
 private slots:
-    void onChannelReady(Tp::PendingOperation *op);
     void onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
                               const QString &errorMessage);
     void onStreamAdded(const Tp::MediaStreamPtr & stream);

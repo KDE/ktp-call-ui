@@ -64,10 +64,10 @@ public:
     void setSaturation(int saturation);
 
 Q_SIGNALS:
-    void audioStreamAdded();
-    void audioStreamRemoved();
-    void videoStreamAdded();
-    void videoStreamRemoved();
+    void audioStreamAdded(CallParticipant *self);
+    void audioStreamRemoved(CallParticipant *self);
+    void videoStreamAdded(CallParticipant *self);
+    void videoStreamRemoved(CallParticipant *self);
 
 private:
     friend class CallChannelHandlerPrivate;

@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2010 Collabora Ltd. <info@collabora.co.uk>
+      @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,78 +16,27 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "channelhandler.h"
-#include "abstractmediahandler.h"
-#include "dtmfhandler.h"
-#include "../libkcallprivate/groupmembersmodel.h"
+#include "statehandler.h"
 #include <KDebug>
 #include <KLocalizedString>
 #include <TelepathyQt4/Connection>
 #include <TelepathyQt4/PendingReady>
 
-struct ChannelHandler::Private
+struct StateHandler::Private
 {
     Tp::StreamedMediaChannelPtr channel;
     State state;
-    AbstractMediaHandler *mediaHandler;
 };
 
-ChannelHandler::ChannelHandler(Tp::StreamedMediaChannelPtr channel, QObject *parent)
+StateHandler::StateHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent)
     : QObject(parent), d(new Private)
 {
-    d->state = NotReady;
+    d->state = Connecting;
     d->channel = channel;
-    d->mediaHandler = NULL;
 
-    Tp::PendingReady *pr = d->channel->becomeReady(QSet<Tp::Feature>()
-                                                    << Tp::StreamedMediaChannel::FeatureCore
-                                                    << Tp::StreamedMediaChannel::FeatureStreams);
-
-    connect(pr, SIGNAL(finished(Tp::PendingOperation*)),
-            SLOT(onChannelReady(Tp::PendingOperation*)));
     connect(d->channel.data(),
             SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
             SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
-}
-
-ChannelHandler::~ChannelHandler()
-{
-    delete d;
-}
-
-void ChannelHandler::setState(State s)
-{
-    d->state = s;
-    emit stateChanged(s);
-}
-
-void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
-{
-    Q_ASSERT(d->state == NotReady);
-
-    if ( op->isError() ) {
-        kError() << "StreamedMediaChannel failed to become ready:"
-                 << op->errorName() << op->errorMessage();
-        emit logMessage(CallLog::Error, i18n("Could not initialize the channel"));
-        setState(Error);
-        return;
-    }
-
-    if ( d->channel->handlerStreamingRequired() ) {
-        d->mediaHandler = AbstractMediaHandler::create(d->channel, this);
-        connect(d->mediaHandler, SIGNAL(logMessage(CallLog::LogType, QString)),
-                this, SIGNAL(logMessage(CallLog::LogType, QString)));
-        emit mediaHandlerCreated(d->mediaHandler);
-    }
-
-    if ( d->channel->interfaces().contains(TELEPATHY_INTERFACE_CHANNEL_INTERFACE_DTMF) ) {
-        kDebug() << "Creating DTMF handler";
-        emit dtmfHandlerCreated(new DtmfHandler(d->channel, this));
-    }
-
-    GroupMembersModel *model = new GroupMembersModel(Tp::ChannelPtr::staticCast(d->channel), this);
-    emit groupMembersModelCreated(model);
-
     connect(d->channel.data(),
             SIGNAL(streamAdded(Tp::MediaStreamPtr)),
             SLOT(onStreamAdded(Tp::MediaStreamPtr)));
@@ -112,17 +63,20 @@ void ChannelHandler::onChannelReady(Tp::PendingOperation *op)
     foreach (const Tp::MediaStreamPtr &stream, streams) {
         onStreamAdded(stream);
     }
-
-    //The user must have accepted the call already, using the approver.
-    //No need to ask the user again...
-    if ( d->channel->awaitingLocalAnswer() ) {
-        d->channel->acceptCall();
-    }
-
-    setState(Connecting);
 }
 
-void ChannelHandler::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
+StateHandler::~StateHandler()
+{
+    delete d;
+}
+
+void StateHandler::setState(State s)
+{
+    d->state = s;
+    emit stateChanged(s);
+}
+
+void StateHandler::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName,
                                           const QString &errorMessage)
 {
     Q_UNUSED(proxy);
@@ -137,7 +91,7 @@ void ChannelHandler::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &e
     }
 }
 
-void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
+void StateHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
 {
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream created";
     kDebug() << " direction:" << stream->direction();
@@ -177,7 +131,7 @@ void ChannelHandler::onStreamAdded(const Tp::MediaStreamPtr & stream)
     }
 }
 
-void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
+void StateHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
 {
     kDebug() << (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") << "stream removed";
     emit logMessage(CallLog::Information, i18nc("1 is the stream's id",
@@ -196,7 +150,7 @@ void ChannelHandler::onStreamRemoved(const Tp::MediaStreamPtr & stream)
     }
 }
 
-void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
+void StateHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
                                               Tp::MediaStreamDirection direction,
                                               Tp::MediaStreamPendingSend pendingSend)
 {
@@ -216,7 +170,7 @@ void ChannelHandler::onStreamDirectionChanged(const Tp::MediaStreamPtr & stream,
     }
 }
 
-void ChannelHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
+void StateHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
                                           Tp::MediaStreamState state)
 {
     kDebug() <<  (stream->type() == Tp::MediaStreamTypeAudio ? "Audio" : "Video") <<
@@ -235,7 +189,7 @@ void ChannelHandler::onStreamStateChanged(const Tp::MediaStreamPtr & stream,
     }
 }
 
-void ChannelHandler::onGroupMembersChanged(const Tp::Contacts & groupMembersAdded,
+void StateHandler::onGroupMembersChanged(const Tp::Contacts & groupMembersAdded,
                                            const Tp::Contacts & groupLocalPendingMembersAdded,
                                            const Tp::Contacts & groupRemotePendingMembersAdded,
                                            const Tp::Contacts & groupMembersRemoved,
@@ -261,14 +215,14 @@ void ChannelHandler::onGroupMembersChanged(const Tp::Contacts & groupMembersAdde
     }
 }
 
-void ChannelHandler::hangupCall()
+void StateHandler::hangupCall()
 {
     Q_ASSERT(!d->channel.isNull() && d->state != HangingUp && d->state != Disconnected && d->state != Error);
     setState(HangingUp);
     d->channel->requestClose();
 }
 
-bool ChannelHandler::requestClose()
+bool StateHandler::requestClose()
 {
     switch(d->state) {
     case Ringing:
@@ -281,7 +235,6 @@ bool ChannelHandler::requestClose()
     case Connecting: //FIXME is it ok to just close the window here?
     case Disconnected:
     case Error:
-    case NotReady:
         return true;
     default:
         Q_ASSERT(false);
@@ -289,7 +242,7 @@ bool ChannelHandler::requestClose()
     return true; //warnings--
 }
 
-void ChannelHandler::setSendVideo(bool enabled)
+void StateHandler::setSendVideo(bool enabled)
 {
     foreach (const Tp::MediaStreamPtr &stream, d->channel->streams()) {
         if ( stream->type() == Tp::MediaStreamTypeVideo ) {
@@ -314,7 +267,7 @@ void ChannelHandler::setSendVideo(bool enabled)
 }
 
 //This is called from setSendVideo when a new sending video stream is to be created
-void ChannelHandler::onPendingMediaStreamFinished(Tp::PendingOperation *op)
+void StateHandler::onPendingMediaStreamFinished(Tp::PendingOperation *op)
 {
     if ( op->isError() ) {
         kError() << "Failed to request video stream" << op->errorName() << op->errorMessage();
@@ -327,4 +280,4 @@ void ChannelHandler::onPendingMediaStreamFinished(Tp::PendingOperation *op)
     }
 }
 
-#include "channelhandler.moc"
+#include "statehandler.moc"

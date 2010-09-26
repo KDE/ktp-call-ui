@@ -47,7 +47,10 @@ int main(int argc, char **argv)
     Tp::enableDebug(true);
     Tp::enableWarnings(true);
 
-    Tp::ClientRegistrarPtr registrar = Tp::ClientRegistrar::create();
+    //TODO cleanup after tp-qt4's api break
+    Tp::ClientRegistrarPtr registrar =
+            Tp::ClientRegistrar::create(Tp::AccountFactory::create(QDBusConnection::sessionBus()),
+                                        Tp::ConnectionFactory::create(QDBusConnection::sessionBus()));
     Tp::SharedPtr<CallHandler> callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
     registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "kcall_handler");
 

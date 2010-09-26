@@ -143,7 +143,7 @@ void CallParticipant::setSaturation(int saturation)
 }
 
 void CallParticipantPrivate::setAudioPads(QGst::PipelinePtr & pipeline,
-                                          const QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad)
+                                          QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad)
 {
     m_audioBin = QGst::Bin::create();
 
@@ -158,7 +158,7 @@ void CallParticipantPrivate::setAudioPads(QGst::PipelinePtr & pipeline,
 
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
     m_audioBin->add(queue);
-    queue->getStaticPad("sink")->link(tee->getRequestPad("src%d"));
+    tee->getRequestPad("src%d")->link(queue->getStaticPad("sink"));
 
     QGst::ElementPtr audioConvert = QGst::ElementFactory::make("audioconvert");
     m_audioBin->add(audioConvert);
@@ -172,7 +172,7 @@ void CallParticipantPrivate::setAudioPads(QGst::PipelinePtr & pipeline,
 
     pipeline->add(m_audioBin);
     m_audioBin->getStaticPad("src")->link(sinkPad);
-    m_audioBin->getStaticPad("sink")->link(srcPad);
+    srcPad->link(m_audioBin->getStaticPad("sink"));
     m_audioBin->setState(QGst::StatePlaying);
 
     Q_EMIT q->audioStreamAdded(q);
@@ -189,7 +189,7 @@ void CallParticipantPrivate::removeAudioPads(QGst::PipelinePtr & pipeline)
 }
 
 void CallParticipantPrivate::setVideoPads(QGst::PipelinePtr & pipeline,
-                                          const QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad)
+                                          QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad)
 {
     m_videoBin = QGst::Bin::create();
 
@@ -203,7 +203,7 @@ void CallParticipantPrivate::setVideoPads(QGst::PipelinePtr & pipeline,
 
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
     m_videoBin->add(queue);
-    queue->getStaticPad("sink")->link(tee->getRequestPad("src%d"));
+    tee->getRequestPad("src%d")->link(queue->getStaticPad("sink"));
 
     QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
     m_videoBin->add(colorspace);
@@ -224,7 +224,7 @@ void CallParticipantPrivate::setVideoPads(QGst::PipelinePtr & pipeline,
     if (!sinkPad.isNull()) {
         QGst::ElementPtr queue2 = QGst::ElementFactory::make("queue");
         m_videoBin->add(queue2);
-        queue2->getStaticPad("sink")->link(tee->getRequestPad("src%d"));
+        tee->getRequestPad("src%d")->link(queue2->getStaticPad("sink"));
 
         m_videoBin->addPad(QGst::GhostPad::create(queue2->getStaticPad("src"), "src"));
     }
@@ -233,7 +233,7 @@ void CallParticipantPrivate::setVideoPads(QGst::PipelinePtr & pipeline,
     if (!sinkPad.isNull()) {
         m_videoBin->getStaticPad("src")->link(sinkPad);
     }
-    m_videoBin->getStaticPad("sink")->link(srcPad);
+    srcPad->link(m_videoBin->getStaticPad("sink"));
     m_videoBin->setState(QGst::StatePlaying);
 
     Q_EMIT q->videoStreamAdded(q);

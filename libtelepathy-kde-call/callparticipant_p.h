@@ -33,10 +33,10 @@ public:
     inline CallParticipantPrivate(CallParticipant *qq) : q(qq) {}
 
     void setAudioPads(QGst::PipelinePtr & pipeline,
-                      const QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad);
+                      QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad);
     void removeAudioPads(QGst::PipelinePtr & pipeline);
     void setVideoPads(QGst::PipelinePtr & pipeline,
-                      const QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad = QGst::PadPtr());
+                      QGst::PadPtr & srcPad, const QGst::PadPtr & sinkPad = QGst::PadPtr());
     void removeVideoPads(QGst::PipelinePtr & pipeline);
 
 public:

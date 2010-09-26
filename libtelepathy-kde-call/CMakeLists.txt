@@ -13,3 +13,4 @@ kde4_add_library(telepathy-kde-call STATIC ${libkcall_SRCS})
 target_link_libraries(telepathy-kde-call qtpfarsight ${KDE4_KDECORE_LIBS} ${KDE4_SOLID_LIBS}
                                          ${QTGSTREAMER_UI_LIBRARIES} ${TELEPATHY_QT4_LIBRARIES})
 install(TARGETS telepathy-kde-call ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES codec-preferences.ini DESTINATION ${DATA_INSTALL_DIR}/libtelepathy-kde-call)

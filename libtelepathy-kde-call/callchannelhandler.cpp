@@ -87,7 +87,7 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
     connect(m_qtfchannel, SIGNAL(videoSrcPadRemoved(QGst::PadPtr)),
             SLOT(videoSrcPadRemoved(QGst::PadPtr)));
 
-    QString codecsFile = KStandardDirs::locate("appdata", "codec-preferences.ini");
+    QString codecsFile = KStandardDirs::locate("data", "libtelepathy-kde-call/codec-preferences.ini");
     if ( !codecsFile.isEmpty() ) {
         kDebug() << "Reading codec preferences from" << codecsFile;
         m_qtfchannel->setCodecsConfigFile(codecsFile);

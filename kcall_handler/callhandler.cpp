@@ -58,14 +58,14 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
     Q_UNUSED(handlerInfo);
 
     foreach(const Tp::ChannelPtr & channel, channels) {
-        Tp::StreamedMediaChannel *smchannel = qobject_cast<Tp::StreamedMediaChannel*>(channel.data());
+        Tp::StreamedMediaChannelPtr smchannel = Tp::StreamedMediaChannelPtr::dynamicCast(channel);
         if ( !smchannel ) {
             kDebug() << "Channel is not a streamed media channel. Ignoring";
             continue;
         }
 
         kDebug() << "handling new channel";
-        CallWindow *cw = new CallWindow(Tp::StreamedMediaChannelPtr(smchannel));
+        CallWindow *cw = new CallWindow(smchannel);
         cw->show();
     }
 

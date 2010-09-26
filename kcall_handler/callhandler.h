@@ -18,9 +18,11 @@
 #define CALLHANDLER_H
 
 #include <TelepathyQt4/AbstractClientHandler>
+#include <TelepathyQt4/PendingReady>
 
-class CallHandler : public Tp::AbstractClientHandler
+class CallHandler : public QObject, public Tp::AbstractClientHandler
 {
+    Q_OBJECT
 public:
     CallHandler();
     virtual ~CallHandler();
@@ -33,8 +35,9 @@ public:
                                 const QList<Tp::ChannelRequestPtr> & requestsSatisfied,
                                 const QDateTime & userActionTime,
                                 const QVariantMap & handlerInfo);
-    //virtual void addRequest (const ChannelRequestPtr &request);
-    //virtual void removeRequest (const ChannelRequestPtr &request, const QString &errorName, const QString &errorMessage);
+
+private slots:
+    void onChannelReady(Tp::PendingOperation *operation);
 };
 
 #endif

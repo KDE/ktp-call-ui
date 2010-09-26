@@ -65,9 +65,27 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
         }
 
         kDebug() << "handling new channel";
-        CallWindow *cw = new CallWindow(smchannel);
-        cw->show();
+        connect(smchannel->becomeReady(Tp::Features()
+                                        << Tp::StreamedMediaChannel::FeatureCore
+                                        << Tp::StreamedMediaChannel::FeatureStreams),
+                SIGNAL(finished(Tp::PendingOperation*)),
+                SLOT(onChannelReady(Tp::PendingOperation*)));
     }
 
     context->setFinished();
 }
+
+void CallHandler::onChannelReady(Tp::PendingOperation *operation)
+{
+    Tp::PendingReady *pr = qobject_cast<Tp::PendingReady*>(operation);
+    if (pr->isError()) {
+        kError() << "Channel failed to become ready";
+        return;
+    }
+
+    Tp::StreamedMediaChannelPtr channel(qobject_cast<Tp::StreamedMediaChannel*>(pr->object()));
+    CallWindow *cw = new CallWindow(channel);
+    cw->show();
+}
+
+#include "callhandler.moc"

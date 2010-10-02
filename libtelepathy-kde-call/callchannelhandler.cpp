@@ -359,7 +359,8 @@ void CallChannelHandlerPrivate::audioSrcPadRemoved(QGst::PadPtr srcPad)
 void CallChannelHandlerPrivate::openVideoOutputDevice(bool *success)
 {
     kDebug() << "Opening video output device";
-    *success = true; //### we assume we can always construct a video widget
+    //succeed if we have qwidgetvideosink installed
+    *success = QGst::ElementFactory::find("qwidgetvideosink");
 }
 
 void CallChannelHandlerPrivate::videoSrcPadAdded(QGst::PadPtr srcPad)

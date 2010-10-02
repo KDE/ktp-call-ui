@@ -18,14 +18,11 @@
 */
 #include "callchannelhandler_p.h"
 #include "callparticipant_p.h"
-#include "devicemanager_p.h"
+#include "deviceelementfactory_p.h"
 #include "../libqtpfarsight/qtfchannel.h"
 #include <QGst/ElementFactory>
 #include <QGst/Bus>
 #include <KDebug>
-#include <KGlobal>
-#include <KConfig>
-#include <KConfigGroup>
 #include <KLocalizedString>
 #include <KStandardDirs>
 #include <TelepathyQt4/Connection>
@@ -92,9 +89,6 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
         kDebug() << "Reading codec preferences from" << codecsFile;
         m_qtfchannel->setCodecsConfigFile(codecsFile);
     }
-
-    m_deviceManager = new DeviceManager(this);
-    m_deviceManager->loadConfig(KGlobal::config()->group("Devices"));
 }
 
 void CallChannelHandlerPrivate::onSessionCreated(QGst::ElementPtr conference)
@@ -112,16 +106,8 @@ void CallChannelHandlerPrivate::openAudioInputDevice(bool *success)
 {
     kDebug() << "Opening audio input device";
 
-    QGst::ElementPtr element = m_deviceManager->newAudioInputElement();
+    QGst::ElementPtr element = DeviceElementFactory::makeAudioCaptureElement();
     if ( !element ) {
-        Q_EMIT q->error(i18n("The gstreamer element for the audio input device "
-                             "could not be created. Please check your gstreamer "
-                             "installation"));
-        *success = false;
-        return;
-    }
-
-    if ( !element->setState(QGst::StateReady) ) {
         Q_EMIT q->error(i18n("The audio input device could not be initialized"));
         *success = false;
         return;
@@ -192,14 +178,8 @@ void CallChannelHandlerPrivate::openVideoInputDevice(bool *success)
 {
     kDebug() << "Opening video input device";
 
-    QGst::ElementPtr element = m_deviceManager->newVideoInputElement();
+    QGst::ElementPtr element = DeviceElementFactory::makeVideoCaptureElement();
     if ( !element ) {
-        Q_EMIT q->error(i18n("The gstreamer element for the video input device "
-                             "could not be created. Please check your gstreamer "
-                             "installation."));
-        *success = false;
-        return;
-    } else if ( !element->setState(QGst::StateReady) ) {
         Q_EMIT q->error(i18n("The video input device could not be initialized."));
         *success = false;
         return;
@@ -270,16 +250,8 @@ void CallChannelHandlerPrivate::openAudioOutputDevice(bool *success)
 {
     kDebug() << "Opening audio output device";
 
-    QGst::ElementPtr element = m_deviceManager->newAudioOutputElement();
+    QGst::ElementPtr element = DeviceElementFactory::makeAudioOutputElement();
     if ( !element ) {
-        Q_EMIT q->error(i18n("The gstreamer element for the audio output device "
-                             "could not be created. Please check your gstreamer "
-                             "installation"));
-        *success = false;
-        return;
-    }
-
-    if ( !element->setState(QGst::StateReady) ) {
         Q_EMIT q->error(i18n("The audio output device could not be initialized"));
         *success = false;
         return;

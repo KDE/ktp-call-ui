@@ -23,7 +23,6 @@
 #include <TelepathyQt4/Contact>
 #include <TelepathyQt4/StreamedMediaChannel>
 class QTfChannel;
-class DeviceManager;
 
 class CallChannelHandlerPrivate : public QObject
 {
@@ -61,7 +60,6 @@ private:
     QHash<Tp::ContactPtr, CallParticipant*> m_participants;
 
     QTfChannel *m_qtfchannel;
-    DeviceManager *m_deviceManager;
 
     QGst::PipelinePtr m_pipeline;
     QGst::ElementPtr m_audioInputDevice;

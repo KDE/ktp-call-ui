@@ -6,11 +6,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTGSTREAMER_FLAGS} ${KDE4_ENABLE_EXCEP
 set(libkcall_SRCS
     callchannelhandler.cpp
     callparticipant.cpp
-    devicemanager.cpp
+    deviceelementfactory.cpp
+    phononintegration.cpp
 )
 
 kde4_add_library(telepathy-kde-call STATIC ${libkcall_SRCS})
 target_link_libraries(telepathy-kde-call qtpfarsight ${KDE4_KDECORE_LIBS} ${KDE4_SOLID_LIBS}
-                                         ${QTGSTREAMER_UI_LIBRARIES} ${TELEPATHY_QT4_LIBRARIES})
+                                         ${QT_QTDBUS_LIBRARY} ${QTGSTREAMER_UI_LIBRARIES}
+                                         ${TELEPATHY_QT4_LIBRARIES})
 install(TARGETS telepathy-kde-call ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES codec-preferences.ini DESTINATION ${DATA_INSTALL_DIR}/libtelepathy-kde-call)
+
+
+#####
+
+kde4_add_executable(configuration_test configuration_test.cpp deviceelementfactory.cpp phononintegration.cpp)
+target_link_libraries(configuration_test ${KDE4_KDECORE_LIBS} ${QT_QTDBUS_LIBRARY} ${QTGSTREAMER_LIBRARIES})

@@ -31,6 +31,7 @@ public:
 
 private:
     static QGst::ElementPtr tryElement(const char *name, const QString & device = QString());
+    static QGst::ElementPtr tryOverrideForKey(const char *keyName);
 };
 
 #endif // DEVICEELEMENTFACTORY_H

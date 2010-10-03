@@ -17,13 +17,22 @@
 */
 #include "deviceelementfactory_p.h"
 #include "phononintegration_p.h"
-#include <QGst/Element>
+#include <QGst/Bin>
 #include <QGst/ElementFactory>
 #include <KDebug>
+#include <KConfig>
+#include <KConfigGroup>
+#include <KGlobal>
 
 QGst::ElementPtr DeviceElementFactory::makeAudioCaptureElement()
 {
     QGst::ElementPtr element;
+
+    //allow overrides from the application's configuration file
+    element = tryOverrideForKey("audiosrc");
+    if (element) {
+        return element;
+    }
 
     //use gconf on non-kde environments
     if (qgetenv("KDE_FULL_SESSION").isEmpty()) {
@@ -68,6 +77,12 @@ QGst::ElementPtr DeviceElementFactory::makeAudioCaptureElement()
 QGst::ElementPtr DeviceElementFactory::makeAudioOutputElement()
 {
     QGst::ElementPtr element;
+
+    //allow overrides from the application's configuration file
+    element = tryOverrideForKey("audiosink");
+    if (element) {
+        return element;
+    }
 
     //use gconf on non-kde environments
     if (qgetenv("KDE_FULL_SESSION").isEmpty()) {
@@ -117,6 +132,12 @@ QGst::ElementPtr DeviceElementFactory::makeVideoCaptureElement()
 {
     QGst::ElementPtr element;
 
+    //allow overrides from the application's configuration file
+    element = tryOverrideForKey("videosrc");
+    if (element) {
+        return element;
+    }
+
     //use gconf on non-kde environments
     if (qgetenv("KDE_FULL_SESSION").isEmpty()) {
         element = tryElement("gconfvideosrc");
@@ -152,5 +173,30 @@ QGst::ElementPtr DeviceElementFactory::tryElement(const char *name, const QStrin
     }
 
     kDebug() << "Using element" << name << "with device string" << device;
+    return element;
+}
+
+QGst::ElementPtr DeviceElementFactory::tryOverrideForKey(const char *keyName)
+{
+    QGst::ElementPtr element;
+    const KConfigGroup configGroup = KGlobal::config()->group("GStreamer");
+
+    if (configGroup.hasKey(keyName)) {
+        QString binDescription = configGroup.readEntry(keyName);
+        element = QGst::Bin::fromDescription(binDescription.toUtf8());
+
+        if (!element) {
+            kDebug() << "Could not construct bin" << binDescription;
+            return element;
+        }
+
+        if (!element->setState(QGst::StateReady)) {
+            kDebug() << "Custom bin" << binDescription << "doesn't want to become ready";
+            return QGst::ElementPtr();
+        }
+
+        kDebug() << "Using custom bin" << binDescription;
+    }
+
     return element;
 }

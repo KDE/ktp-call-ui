@@ -59,6 +59,11 @@ struct PhononIntegrationPrivate
             //compatibility with kde 4.5
             qRegisterMetaTypeStreamOperators<Phonon::DeviceAccessList>("PhononDeviceAccessList");
         }
+
+        if (qMetaTypeId< QList<int> >()) {
+            qRegisterMetaType< QList<int> >();
+            qRegisterMetaTypeStreamOperators< QList<int> >("QList<int>");
+        }
     }
 
     QSettings phononSettings;

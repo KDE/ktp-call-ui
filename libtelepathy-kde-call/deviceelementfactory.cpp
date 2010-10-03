@@ -97,9 +97,9 @@ QGst::ElementPtr DeviceElementFactory::makeAudioOutputElement()
                 //use dmix instead of x-phonon, since we don't have phonon's alsa configuration file
                 QString deviceString = device.second;
                 deviceString.replace("x-phonon", "dmix");
-                element = tryElement("alsasrc", deviceString);
+                element = tryElement("alsasink", deviceString);
             } else if (device.first == "oss") {
-                element = tryElement("osssrc", device.second);
+                element = tryElement("osssink", device.second);
             }
 
             if (element) {

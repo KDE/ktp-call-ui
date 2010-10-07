@@ -40,7 +40,7 @@ CallChannelHandler::~CallChannelHandler()
 
 QList<CallParticipant*> CallChannelHandler::participants() const
 {
-    return d->participants().values();
+    return d->participants();
 }
 
 void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel)
@@ -126,8 +126,8 @@ void CallChannelHandlerPrivate::audioSinkPadAdded(QGst::PadPtr sinkPad)
     //create the participant if not already there
     Tp::ContactPtr contact = m_channel->connection()->selfContact();
     bool joined = false;
-    if (!m_participants.contains(contact)) {
-        m_participants[contact] = new CallParticipant(contact, q);
+    if (!m_participants.contains(Myself)) {
+        m_participants[Myself] = new CallParticipant(contact, q);
         joined = true;
     }
 
@@ -140,7 +140,7 @@ void CallChannelHandlerPrivate::audioSinkPadAdded(QGst::PadPtr sinkPad)
 
     //add the pads to the participant
     QGst::PadPtr srcPad = m_audioInputDevice->getStaticPad("src");
-    m_participants[contact]->d->setAudioPads(m_pipeline, srcPad, sinkPad);
+    m_participants[Myself]->d->setAudioPads(m_pipeline, srcPad, sinkPad);
 
     //set the input device to playing state
     if (currentState == QGst::StateReady) {
@@ -149,7 +149,7 @@ void CallChannelHandlerPrivate::audioSinkPadAdded(QGst::PadPtr sinkPad)
 
     //if we just created the participant, emit the joined signal
     if (joined) {
-        Q_EMIT q->participantJoined(m_participants[contact]);
+        Q_EMIT q->participantJoined(m_participants[Myself]);
     }
 }
 
@@ -159,7 +159,7 @@ void CallChannelHandlerPrivate::closeAudioInputDevice()
 
     //remove participant's audio pipeline
     Tp::ContactPtr contact = m_channel->connection()->selfContact();
-    m_participants[contact]->d->removeAudioPads(m_pipeline);
+    m_participants[Myself]->d->removeAudioPads(m_pipeline);
 
     //destroy the audio input device
     m_audioInputDevice->setState(QGst::StateNull);
@@ -167,8 +167,8 @@ void CallChannelHandlerPrivate::closeAudioInputDevice()
     m_audioInputDevice = QGst::ElementPtr();
 
     //remove the participant if it has no other stream on it
-    if (!m_participants[contact]->hasVideoStream()) {
-        CallParticipant *p = m_participants.take(contact);
+    if (!m_participants[Myself]->hasVideoStream()) {
+        CallParticipant *p = m_participants.take(Myself);
         Q_EMIT q->participantLeft(p);
         p->deleteLater();
     }
@@ -198,8 +198,8 @@ void CallChannelHandlerPrivate::videoSinkPadAdded(QGst::PadPtr sinkPad)
     //create the participant if not already there
     Tp::ContactPtr contact = m_channel->connection()->selfContact();
     bool joined = false;
-    if (!m_participants.contains(contact)) {
-        m_participants[contact] = new CallParticipant(contact, q);
+    if (!m_participants.contains(Myself)) {
+        m_participants[Myself] = new CallParticipant(contact, q);
         joined = true;
     }
 
@@ -212,7 +212,7 @@ void CallChannelHandlerPrivate::videoSinkPadAdded(QGst::PadPtr sinkPad)
 
     //add the pads to the participant
     QGst::PadPtr srcPad = m_videoInputDevice->getStaticPad("src");
-    m_participants[contact]->d->setVideoPads(m_pipeline, srcPad, sinkPad);
+    m_participants[Myself]->d->setVideoPads(m_pipeline, srcPad, sinkPad);
 
     //set the input device to playing state
     if (currentState == QGst::StateReady) {
@@ -221,7 +221,7 @@ void CallChannelHandlerPrivate::videoSinkPadAdded(QGst::PadPtr sinkPad)
 
     //if we just created the participant, emit the joined signal
     if (joined) {
-        Q_EMIT q->participantJoined(m_participants[contact]);
+        Q_EMIT q->participantJoined(m_participants[Myself]);
     }
 }
 
@@ -231,7 +231,7 @@ void CallChannelHandlerPrivate::closeVideoInputDevice()
 
     //remove participant's video pipeline
     Tp::ContactPtr contact = m_channel->connection()->selfContact();
-    m_participants[contact]->d->removeVideoPads(m_pipeline);
+    m_participants[Myself]->d->removeVideoPads(m_pipeline);
 
     //destroy the video input device
     m_videoInputDevice->setState(QGst::StateNull);
@@ -239,8 +239,8 @@ void CallChannelHandlerPrivate::closeVideoInputDevice()
     m_videoInputDevice = QGst::ElementPtr();
 
     //remove the participant if it has no other stream on it
-    if (!m_participants[contact]->hasAudioStream()) {
-        CallParticipant *p = m_participants.take(contact);
+    if (!m_participants[Myself]->hasAudioStream()) {
+        CallParticipant *p = m_participants.take(Myself);
         Q_EMIT q->participantLeft(p);
         p->deleteLater();
     }
@@ -309,8 +309,8 @@ void CallChannelHandlerPrivate::audioSrcPadAdded(QGst::PadPtr srcPad)
     //create the participant if not already there
     Tp::ContactPtr contact = findRemoteContact(m_channel);
     bool joined = false;
-    if (!m_participants.contains(contact)) {
-        m_participants[contact] = new CallParticipant(contact, q);
+    if (!m_participants.contains(RemoteContact)) {
+        m_participants[RemoteContact] = new CallParticipant(contact, q);
         joined = true;
     }
 
@@ -319,11 +319,11 @@ void CallChannelHandlerPrivate::audioSrcPadAdded(QGst::PadPtr srcPad)
     m_audioAdderPadsMap.insert(srcPad->property("name").get<QByteArray>(), sinkPad);
 
     //add the pads to the participant
-    m_participants[contact]->d->setAudioPads(m_pipeline, srcPad, sinkPad);
+    m_participants[RemoteContact]->d->setAudioPads(m_pipeline, srcPad, sinkPad);
 
     //if we just created the participant, emit the joined signal
     if (joined) {
-        Q_EMIT q->participantJoined(m_participants[contact]);
+        Q_EMIT q->participantJoined(m_participants[RemoteContact]);
     }
 }
 
@@ -332,8 +332,7 @@ void CallChannelHandlerPrivate::audioSrcPadRemoved(QGst::PadPtr srcPad)
     kDebug() << "Audio src pad removed";
 
     //remove participant's audio pipeline
-    Tp::ContactPtr contact = findRemoteContact(m_channel);
-    m_participants[contact]->d->removeAudioPads(m_pipeline);
+    m_participants[RemoteContact]->d->removeAudioPads(m_pipeline);
 
     //release the pad from the adder
     QGst::PadPtr sinkPad = m_audioAdderPadsMap.take(srcPad->property("name").get<QByteArray>());
@@ -349,8 +348,8 @@ void CallChannelHandlerPrivate::audioSrcPadRemoved(QGst::PadPtr srcPad)
     }
 
     //remove the participant if it has no other stream on it
-    if (!m_participants[contact]->hasVideoStream()) {
-        CallParticipant *p = m_participants.take(contact);
+    if (!m_participants[RemoteContact]->hasVideoStream()) {
+        CallParticipant *p = m_participants.take(RemoteContact);
         Q_EMIT q->participantLeft(p);
         p->deleteLater();
     }
@@ -370,17 +369,17 @@ void CallChannelHandlerPrivate::videoSrcPadAdded(QGst::PadPtr srcPad)
     //create the participant if not already there
     Tp::ContactPtr contact = findRemoteContact(m_channel);
     bool joined = false;
-    if (!m_participants.contains(contact)) {
-        m_participants[contact] = new CallParticipant(contact, q);
+    if (!m_participants.contains(RemoteContact)) {
+        m_participants[RemoteContact] = new CallParticipant(contact, q);
         joined = true;
     }
 
     //add the pads to the participant
-    m_participants[contact]->d->setVideoPads(m_pipeline, srcPad);
+    m_participants[RemoteContact]->d->setVideoPads(m_pipeline, srcPad);
 
     //if we just created the participant, emit the joined signal
     if (joined) {
-        Q_EMIT q->participantJoined(m_participants[contact]);
+        Q_EMIT q->participantJoined(m_participants[RemoteContact]);
     }
 }
 
@@ -391,12 +390,11 @@ void CallChannelHandlerPrivate::videoSrcPadRemoved(QGst::PadPtr srcPad)
     kDebug() << "Video src pad removed";
 
     //remove participant's video pipeline
-    Tp::ContactPtr contact = findRemoteContact(m_channel);
-    m_participants[contact]->d->removeVideoPads(m_pipeline);
+    m_participants[RemoteContact]->d->removeVideoPads(m_pipeline);
 
     //remove the participant if it has no other stream on it
-    if (!m_participants[contact]->hasAudioStream()) {
-        CallParticipant *p = m_participants.take(contact);
+    if (!m_participants[RemoteContact]->hasAudioStream()) {
+        CallParticipant *p = m_participants.take(RemoteContact);
         Q_EMIT q->participantLeft(p);
         p->deleteLater();
     }

@@ -18,6 +18,8 @@
 #include "callparticipant_p.h"
 #include <QGst/ElementFactory>
 #include <QGst/GhostPad>
+#include <TelepathyQt4/ContactManager>
+#include <TelepathyQt4/Connection>
 
 CallParticipant::CallParticipant(const Tp::ContactPtr & contact, QObject *parent)
     : QObject(parent), d(new CallParticipantPrivate(this))
@@ -43,6 +45,11 @@ CallParticipant::~CallParticipant()
 Tp::ContactPtr CallParticipant::contact() const
 {
     return d->m_contact;
+}
+
+bool CallParticipant::isMyself() const
+{
+    return d->m_contact == d->m_contact->manager()->connection()->selfContact();
 }
 
 bool CallParticipant::hasAudioStream() const

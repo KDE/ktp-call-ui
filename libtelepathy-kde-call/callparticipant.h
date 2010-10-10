@@ -36,6 +36,7 @@ class CallParticipant : public QObject
 public:
     // the contact
     Tp::ContactPtr contact() const;
+    bool isMyself() const;
 
     // the streams that we have
     bool hasAudioStream() const;

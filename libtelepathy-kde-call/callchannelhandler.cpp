@@ -43,6 +43,12 @@ QList<CallParticipant*> CallChannelHandler::participants() const
     return d->participants();
 }
 
+void CallChannelHandler::hangup(const QString & message)
+{
+    //no reason to handle the return value. invalidated() will be emited...
+    d->channel()->hangupCall(Tp::StreamedMediaChannel::StateChangeReasonUserRequested, QString(), message);
+}
+
 void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel)
 {
     m_channel = channel;
@@ -56,6 +62,10 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
 
     m_pipeline = QGst::Pipeline::create();
     m_pipeline->setState(QGst::StatePlaying);
+
+    connect(m_channel.data(),
+            SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
+            SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
 
     m_qtfchannel = new QTfChannel(channel, m_pipeline->bus(), this);
     connect(m_qtfchannel, SIGNAL(sessionCreated(QGst::ElementPtr)),
@@ -89,6 +99,16 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
         kDebug() << "Reading codec preferences from" << codecsFile;
         m_qtfchannel->setCodecsConfigFile(codecsFile);
     }
+}
+
+void CallChannelHandlerPrivate::onChannelInvalidated(Tp::DBusProxy *proxy,
+                                                     const QString & errorName,
+                                                     const QString & errorMessage)
+{
+    Q_UNUSED(proxy);
+    kDebug() << "Channel invalidated:" << errorName << errorMessage;
+
+    Q_EMIT q->callEnded(errorMessage);
 }
 
 void CallChannelHandlerPrivate::onSessionCreated(QGst::ElementPtr conference)

@@ -39,7 +39,6 @@ enum TabIndices { VolumeTabIndex, VideoControlsTabIndex, DialpadTabIndex };
 struct CallWindow::Private
 {
     Tp::StreamedMediaChannelPtr channel;
-    StateHandler *stateHandler;
     CallChannelHandler *channelHandler;
     KAction *hangupAction;
     KAction *sendVideoAction;
@@ -52,6 +51,7 @@ struct CallWindow::Private
     CallLog *callLog;
     QPointer<QWidget> audioStatusIcon;
     QPointer<QWidget> videoStatusIcon;
+    bool callEnded;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -62,35 +62,8 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
 {
     //setup the channel
     d->channel = channel;
-    //The user must have accepted the call already, using the approver.
-    //No need to ask the user again...
-    if ( d->channel->awaitingLocalAnswer() ) {
-        d->channel->acceptCall();
-    }
-
-    //create the state handler
-    d->stateHandler = new StateHandler(channel, this);
-    connect(d->stateHandler, SIGNAL(stateChanged(StateHandler::State)),
-            SLOT(setState(StateHandler::State)));
-    connect(d->stateHandler, SIGNAL(audioStreamAdded()), SLOT(onAudioStreamAdded()));
-    connect(d->stateHandler, SIGNAL(audioStreamRemoved()), SLOT(onAudioStreamRemoved()));
-    connect(d->stateHandler, SIGNAL(videoStreamAdded()), SLOT(onVideoStreamAdded()));
-    connect(d->stateHandler, SIGNAL(videoStreamRemoved()), SLOT(onVideoStreamRemoved()));
-    connect(d->stateHandler, SIGNAL(sendVideoStateChanged(bool)),
-            SLOT(onSendVideoStateChanged(bool)));
-
-    //create ui
-    setupUi(); //must be called after creating the state handler
-
-    d->callLog = new CallLog(d->ui.logView, this);
-    connect(d->callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
-    connect(d->stateHandler, SIGNAL(logMessage(CallLog::LogType, QString)),
-            d->callLog, SLOT(logMessage(CallLog::LogType, QString)));
-
-    connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
-
-    //must be called after creating the UI and connecting all of stateHandler's signals
-    d->stateHandler->init();
+    d->channel->acceptCall();
+    d->callEnded = false;
 
     //create the gstreamer handler
     d->channelHandler = new CallChannelHandler(d->channel, this);
@@ -99,6 +72,15 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
     connect(d->channelHandler, SIGNAL(participantLeft(CallParticipant*)),
             this, SLOT(onParticipantLeft(CallParticipant*)));
     connect(d->channelHandler, SIGNAL(error(QString)), this, SLOT(logErrorMessage(QString)));
+    connect(d->channelHandler, SIGNAL(callEnded(QString)), this, SLOT(onCallEnded(QString)));
+
+    //create ui
+    setupUi(); //must be called after creating the state handler
+
+    d->callLog = new CallLog(d->ui.logView, this);
+    connect(d->callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
+
+    connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 
     //enable dtmf
     if ( d->channel->interfaces().contains(TELEPATHY_INTERFACE_CHANNEL_INTERFACE_DTMF) ) {
@@ -114,7 +96,7 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
     d->ui.participantsDock->setEnabled(true);
     d->ui.participantsListView->setModel(model);
 
-    setState(StateHandler::Connecting);
+    setState(Connecting);
 }
 
 CallWindow::~CallWindow()
@@ -126,7 +108,7 @@ CallWindow::~CallWindow()
 void CallWindow::setupActions()
 {
     d->hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
-    connect(d->hangupAction, SIGNAL(triggered()), d->stateHandler, SLOT(hangupCall()));
+    connect(d->hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangup()));
     actionCollection()->addAction("hangup", d->hangupAction);
 
     d->sendVideoAction = new KAction(this);
@@ -167,7 +149,6 @@ void CallWindow::setupUi()
 
 void CallWindow::disableUi()
 {
-    d->hangupAction->setEnabled(false);
     d->ui.participantsDock->setEnabled(false);
     //d->ui.tabWidget->setTabEnabled(VolumeTabIndex, false);
     d->ui.microphoneGroupBox->setEnabled(false);
@@ -178,39 +159,25 @@ void CallWindow::disableUi()
     d->ui.dtmfWidget->setEnabled(false);
 }
 
-void CallWindow::setState(StateHandler::State state)
+void CallWindow::setState(State state)
 {
     switch (state) {
-    case StateHandler::Connecting:
+    case Connecting:
         setStatus(i18nc("@info:status", "Connecting..."));
-        d->hangupAction->setEnabled(false);
         break;
-    case StateHandler::Ringing:
-        setStatus(i18nc("@info:status", "Ringing..."));
-        d->hangupAction->setEnabled(true);
-        break;
-    case StateHandler::InCall:
+    case Connected:
         setStatus(i18nc("@info:status", "Talking..."));
-        d->hangupAction->setEnabled(true);
         d->callDurationTimer.start(1000);
         break;
-    case StateHandler::HangingUp:
-        setStatus(i18nc("@info:status", "Hanging up..."));
-        d->hangupAction->setEnabled(false);
-        break;
-    case StateHandler::Disconnected:
+    case Disconnected:
         setStatus(i18nc("@info:status", "Disconnected."));
         disableUi();
         d->callDurationTimer.stop();
+        d->callEnded = true;
         if ( KCallHandlerSettings::closeOnDisconnect() && !d->callLog->errorHasBeenLogged() ) {
             QTimer::singleShot(KCallHandlerSettings::closeOnDisconnectTimeout() * 1000,
                                this, SLOT(close()));
         }
-        break;
-    case StateHandler::Error:
-        setStatus(i18nc("@info:status", "Disconnected with error."));
-        disableUi();
-        d->callDurationTimer.stop();
         break;
     default:
         Q_ASSERT(false);
@@ -283,7 +250,7 @@ void CallWindow::onSendVideoStateChanged(bool enabled)
 
 void CallWindow::toggleSendVideo()
 {
-    d->stateHandler->setSendVideo(!d->sendingVideo);
+    //d->stateHandler->setSendVideo(!d->sendingVideo);
 }
 
 void CallWindow::onParticipantJoined(CallParticipant *participant)
@@ -302,6 +269,10 @@ void CallWindow::onParticipantJoined(CallParticipant *participant)
     }
     if (participant->hasVideoStream()) {
         onParticipantVideoStreamAdded(participant);
+    }
+
+    if (participant->isMyself()) {
+        setState(Connected);
     }
 }
 
@@ -326,7 +297,8 @@ void CallWindow::onParticipantLeft(CallParticipant *participant)
 
 void CallWindow::onParticipantAudioStreamAdded(CallParticipant *participant)
 {
-    if (participant->contact() == d->channel->connection()->selfContact()) {
+    if (participant->isMyself()) {
+        onAudioStreamAdded();
         d->ui.microphoneGroupBox->setEnabled(true);
         d->ui.inputVolumeWidget->setVolumeControl(participant);
     } else {
@@ -337,7 +309,8 @@ void CallWindow::onParticipantAudioStreamAdded(CallParticipant *participant)
 
 void CallWindow::onParticipantAudioStreamRemoved(CallParticipant *participant)
 {
-    if (participant->contact() == d->channel->connection()->selfContact()) {
+    if (participant->isMyself()) {
+        onAudioStreamRemoved();
         d->ui.microphoneGroupBox->setEnabled(false);
         d->ui.inputVolumeWidget->setVolumeControl(NULL);
     } else {
@@ -351,7 +324,9 @@ void CallWindow::onParticipantVideoStreamAdded(CallParticipant *participant)
     QWidget *videoWidget = participant->videoWidget();
     setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
 
-    if (participant->contact() == d->channel->connection()->selfContact()) {
+    if (participant->isMyself()) {
+        onVideoStreamAdded();
+
         d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, true);
         d->ui.videoControlsTab->setEnabled(true);
         d->ui.videoInputBalanceWidget->setVideoBalanceControl(participant);
@@ -380,7 +355,9 @@ void CallWindow::onParticipantVideoStreamRemoved(CallParticipant *participant)
 {
     setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
 
-    if (participant->contact() == d->channel->connection()->selfContact()) {
+    if (participant->isMyself()) {
+        onVideoStreamRemoved();
+
         d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
         d->ui.videoControlsTab->setEnabled(false);
         d->ui.videoInputBalanceWidget->setVideoBalanceControl(NULL);
@@ -414,12 +391,17 @@ void CallWindow::logErrorMessage(const QString & error)
     d->callLog->logMessage(CallLog::Error, error);
 }
 
+void CallWindow::onCallEnded(const QString & message)
+{
+    kDebug() << message;
+    setState(Disconnected);
+}
+
 void CallWindow::closeEvent(QCloseEvent *event)
 {
-    if ( !d->stateHandler->requestClose() ) {
+    if ( !d->callEnded ) {
         kDebug() << "Ignoring close event";
-        disconnect(d->stateHandler, SIGNAL(stateChanged(StateHandler::State)), this, 0);
-        connect(d->stateHandler, SIGNAL(stateChanged(StateHandler::State)), SLOT(close()));
+        d->channelHandler->hangup();
         event->ignore();
     } else {
         KXmlGuiWindow::closeEvent(event);

@@ -5,7 +5,6 @@ set(kcall_handler_SRCS
     callwindow.cpp
     calllog.cpp
     callhandler.cpp
-    statehandler.cpp
     dtmfhandler.cpp
     dtmfwidget.cpp
     volumewidget.cpp

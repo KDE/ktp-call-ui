@@ -19,7 +19,8 @@
 #ifndef CALLWINDOW_H
 #define CALLWINDOW_H
 
-#include "statehandler.h"
+#include "calllog.h"
+#include <TelepathyQt4/StreamedMediaChannel>
 #include <KXmlGuiWindow>
 class CallParticipant;
 
@@ -35,8 +36,10 @@ private:
     void setupUi();
     void disableUi();
 
+    enum State { Connecting, Connected, Disconnected };
+
 private slots:
-    void setState(StateHandler::State state);
+    void setState(State state);
     void setStatus(const QString & msg);
 
     void onCallDurationTimerTimeout();
@@ -54,6 +57,8 @@ private slots:
     void onParticipantVideoStreamAdded(CallParticipant *participant);
     void onParticipantVideoStreamRemoved(CallParticipant *participant);
     void logErrorMessage(const QString & error);
+
+    void onCallEnded(const QString & message);
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

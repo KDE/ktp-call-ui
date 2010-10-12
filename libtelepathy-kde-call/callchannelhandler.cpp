@@ -18,15 +18,19 @@
 */
 #include "callchannelhandler_p.h"
 #include "deviceelementfactory_p.h"
-#include "../libqtpfarsight/qtfchannel.h"
+#include <QGlib/Signal>
 #include <QGst/ElementFactory>
 #include <QGst/Bus>
 #include <QGst/GhostPad>
+#include <QGst/Message>
 #include <KDebug>
 #include <KLocalizedString>
 #include <KStandardDirs>
 #include <TelepathyQt4/Connection>
 
+QGLIB_REGISTER_TYPE(GList*)
+QGLIB_REGISTER_TYPE_IMPLEMENTATION(GList*, fs_codec_list_get_type())
+QGLIB_REGISTER_VALUEIMPL_FOR_BOXED_TYPE(GList*)
 
 #if 0
 static Tp::ContactPtr findRemoteContact(const Tp::ChannelPtr & channel)
@@ -71,10 +75,16 @@ void CallChannelHandler::hangup(const QString & message)
 void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel)
 {
     m_channel = channel;
+    m_participantData[Myself] = new ParticipantData(this, Myself);
+    m_participantData[RemoteContact] = new ParticipantData(this, RemoteContact);
+
+    connect(m_channel.data(),
+            SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
+            SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
 
     //initialize gstreamer
     static bool gstInitDone = false;
-    if ( !gstInitDone ) {
+    if (!gstInitDone) {
         QGst::init();
         gstInitDone = true;
     }
@@ -82,40 +92,21 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
     m_pipeline = QGst::Pipeline::create();
     m_pipeline->setState(QGst::StatePlaying);
 
-    connect(m_channel.data(),
-            SIGNAL(invalidated(Tp::DBusProxy*, QString, QString)),
-            SLOT(onChannelInvalidated(Tp::DBusProxy*, QString, QString)));
+    TfChannel *tfChannel = Tp::createFarsightChannel(channel);
+    Q_ASSERT(tfChannel);
+    m_tfChannel = QGlib::ObjectPtr::wrap(reinterpret_cast<GObject*>(tfChannel), false);
 
-    m_qtfchannel = new QTfChannel(channel, m_pipeline->bus(), this);
-    connect(m_qtfchannel, SIGNAL(sessionCreated(QGst::ElementPtr)), SLOT(onSessionCreated(QGst::ElementPtr)));
-    connect(m_qtfchannel, SIGNAL(closed()), SLOT(onQTfChannelClosed()));
-
-    connect(m_qtfchannel, SIGNAL(openAudioInputDevice(bool*)), SLOT(openAudioInputDevice(bool*)));
-    connect(m_qtfchannel, SIGNAL(audioSinkPadAdded(QGst::PadPtr)), SLOT(audioSinkPadAdded(QGst::PadPtr)));
-    connect(m_qtfchannel, SIGNAL(closeAudioInputDevice()), SLOT(closeAudioInputDevice()));
-
-    connect(m_qtfchannel, SIGNAL(openVideoInputDevice(bool*)), SLOT(openVideoInputDevice(bool*)));
-    connect(m_qtfchannel, SIGNAL(videoSinkPadAdded(QGst::PadPtr)), SLOT(videoSinkPadAdded(QGst::PadPtr)));
-    connect(m_qtfchannel, SIGNAL(closeVideoInputDevice()), SLOT(closeVideoInputDevice()));
-
-    connect(m_qtfchannel, SIGNAL(openAudioOutputDevice(bool*)), SLOT(openAudioOutputDevice(bool*)));
-    connect(m_qtfchannel, SIGNAL(audioSrcPadAdded(QGst::PadPtr)),
-            SLOT(audioSrcPadAdded(QGst::PadPtr)), Qt::DirectConnection);
-    connect(m_qtfchannel, SIGNAL(closeAudioOutputDevice()), SLOT(closeAudioOutputDevice()));
-
-    connect(m_qtfchannel, SIGNAL(openVideoOutputDevice(bool*)), SLOT(openVideoOutputDevice(bool*)));
-    connect(m_qtfchannel, SIGNAL(videoSrcPadAdded(QGst::PadPtr)),
-            SLOT(videoSrcPadAdded(QGst::PadPtr)), Qt::DirectConnection);
-    connect(m_qtfchannel, SIGNAL(closeVideoOutputDevice()), SLOT(closeVideoOutputDevice()));
-
-    QString codecsFile = KStandardDirs::locate("data", "libtelepathy-kde-call/codec-preferences.ini");
-    if ( !codecsFile.isEmpty() ) {
-        kDebug() << "Reading codec preferences from" << codecsFile;
-        m_qtfchannel->setCodecsConfigFile(codecsFile);
-    }
-
-    m_participantData[Myself] = new ParticipantData(this, Myself);
-    m_participantData[RemoteContact] = new ParticipantData(this, RemoteContact);
+    /* Set up the telepathy farsight channel */
+    QGlib::Signal::connect(m_tfChannel, "closed",
+                           this, &CallChannelHandlerPrivate::onTfChannelClosed);
+    QGlib::Signal::connect(m_tfChannel, "session-created",
+                           this, &CallChannelHandlerPrivate::onSessionCreated);
+    QGlib::Signal::connect(m_tfChannel, "stream-created",
+                           this, &CallChannelHandlerPrivate::onStreamCreated);
+    QGlib::Signal::connect(m_tfChannel, "stream-get-codec-config",
+                           this, &CallChannelHandlerPrivate::onStreamGetCodecConfig);
+    QGlib::Signal::connect(m_pipeline->bus(), "message",
+                           this, &CallChannelHandlerPrivate::onBusMessage);
 }
 
 void CallChannelHandlerPrivate::onChannelInvalidated(Tp::DBusProxy *proxy,
@@ -128,233 +119,163 @@ void CallChannelHandlerPrivate::onChannelInvalidated(Tp::DBusProxy *proxy,
     Q_EMIT q->callEnded(errorMessage);
 }
 
-void CallChannelHandlerPrivate::onSessionCreated(QGst::ElementPtr conference)
+
+void CallChannelHandlerPrivate::onSessionCreated(QGst::ElementPtr & conference)
 {
+    kDebug();
+    m_pipeline->bus()->addSignalWatch();
+    m_conference = conference;
     m_pipeline->add(conference);
     conference->setState(QGst::StatePlaying);
 }
 
-void CallChannelHandlerPrivate::onQTfChannelClosed()
+void CallChannelHandlerPrivate::onTfChannelClosed()
 {
+    kDebug();
+    m_pipeline->bus()->removeSignalWatch();
     m_pipeline->setState(QGst::StateNull);
 }
 
-void CallChannelHandlerPrivate::openAudioInputDevice(bool *success)
+void CallChannelHandlerPrivate::onBusMessage(const QGst::MessagePtr & message)
 {
-    kDebug() << "Opening audio input device";
-    *success = openInputDevice(true);
+    TfChannel *c = reinterpret_cast<TfChannel*>(static_cast<GObject*>(m_tfChannel));
+    tf_channel_bus_message(c, message);
 }
 
-void CallChannelHandlerPrivate::audioSinkPadAdded(QGst::PadPtr sinkPad)
+void CallChannelHandlerPrivate::onStreamCreated(const QGlib::ObjectPtr & stream)
 {
-    kDebug() << "Audio sink pad added";
-    Q_ASSERT(!m_audioInputDevice.isNull());
-    sinkPadAdded(sinkPad, true);
+    QGlib::Signal::connect(stream, "request-resource", this,
+                           &CallChannelHandlerPrivate::onRequestResource, QGlib::Signal::PassSender);
+    QGlib::Signal::connect(stream, "src-pad-added", this,
+                           &CallChannelHandlerPrivate::onSrcPadAdded, QGlib::Signal::PassSender);
+    QGlib::Signal::connect(stream, "free-resource", this,
+                           &CallChannelHandlerPrivate::onFreeResource, QGlib::Signal::PassSender);
 }
 
-void CallChannelHandlerPrivate::closeAudioInputDevice()
+GList *CallChannelHandlerPrivate::onStreamGetCodecConfig()
 {
-    kDebug() << "Closing audio input device";
-    closeInputDevice(true);
-}
-
-void CallChannelHandlerPrivate::openVideoInputDevice(bool *success)
-{
-    kDebug() << "Opening video input device";
-    *success = openInputDevice(false);
-}
-
-void CallChannelHandlerPrivate::videoSinkPadAdded(QGst::PadPtr sinkPad)
-{
-    kDebug() << "Video sink pad added";
-    Q_ASSERT(!m_videoInputDevice.isNull());
-    sinkPadAdded(sinkPad, false);
-}
-
-void CallChannelHandlerPrivate::closeVideoInputDevice()
-{
-    kDebug() << "Closing video input device";
-    closeInputDevice(false);
-}
-
-void CallChannelHandlerPrivate::openAudioOutputDevice(bool *success)
-{
-    kDebug() << "Opening audio output device";
-
-    QGst::ElementPtr element = DeviceElementFactory::makeAudioOutputElement();
-    if ( !element ) {
-        Q_EMIT q->error(i18n("The audio output device could not be initialized"));
-        *success = false;
-        return;
-    }
-
-    createAudioBin(m_participantData[RemoteContact]);
-
-    m_audioOutputDevice = element;
-    m_pipeline->add(m_audioOutputDevice);
-    m_pipeline->add(m_participantData[RemoteContact]->audioBin);
-    m_participantData[RemoteContact]->audioBin->link(m_audioOutputDevice);
-    m_audioOutputDevice->setState(QGst::StatePlaying);
-    m_participantData[RemoteContact]->audioBin->setState(QGst::StatePlaying);
-    *success = true;
-}
-
-void CallChannelHandlerPrivate::audioSrcPadAdded(QGst::PadPtr srcPad)
-{
-    kDebug() << "Audio src pad added";
-    Q_ASSERT(!m_audioOutputDevice.isNull());
-    srcPadAdded(srcPad, true);
-}
-
-void CallChannelHandlerPrivate::closeAudioOutputDevice()
-{
-    kDebug() << "Audio src pad removed";
-    closeOutputDevice(true);
-}
-
-void CallChannelHandlerPrivate::openVideoOutputDevice(bool *success)
-{
-    kDebug() << "Opening video output device";
-    //succeed if we have qwidgetvideosink installed
-    if (!QGst::ElementFactory::find("qwidgetvideosink")) {
-        *success = false;
-        return;
-    }
-
-    createVideoBin(m_participantData[RemoteContact], false);
-
-    m_pipeline->add(m_participantData[RemoteContact]->videoBin);
-    m_participantData[RemoteContact]->videoBin->setState(QGst::StatePlaying);
-    *success = true;
-}
-
-void CallChannelHandlerPrivate::videoSrcPadAdded(QGst::PadPtr srcPad)
-{
-    kDebug() << "Video src pad added";
-    srcPadAdded(srcPad, false);
-}
-
-void CallChannelHandlerPrivate::closeVideoOutputDevice()
-{
-    kDebug() << "Video src pad removed";
-    closeOutputDevice(false);
-}
-
-
-bool CallChannelHandlerPrivate::openInputDevice(bool audio)
-{
-    QGst::ElementPtr src = audio ? DeviceElementFactory::makeAudioCaptureElement()
-                                 : DeviceElementFactory::makeVideoCaptureElement();
-    if (!src) {
-        Q_EMIT q->error(audio ? i18n("The audio input device could not be initialized")
-                              : i18n("The video input device could not be initialized"));
-        return false;
-    }
-
-    QGst::BinPtr bin;
-    if (audio) {
-        createAudioBin(m_participantData[Myself]);
-        bin = m_participantData[Myself]->audioBin;
-        m_audioInputDevice = src;
+    QString codecsFile = KStandardDirs::locate("data", "libtelepathy-kde-call/codec-preferences.ini");
+    if (!codecsFile.isEmpty()) {
+        kDebug() << "Reading codec preferences from" << codecsFile;
+        return fs_codec_list_from_keyfile(QFile::encodeName(codecsFile), NULL);
     } else {
-        createVideoBin(m_participantData[Myself], true);
-        bin = m_participantData[Myself]->videoBin;
-        m_videoInputDevice = src;
+        return NULL;
+    }
+}
+
+
+bool CallChannelHandlerPrivate::onRequestResource(const QGlib::ObjectPtr & stream, uint direction)
+{
+    bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
+
+    switch(direction) {
+    case Tp::MediaStreamDirectionSend:
+    {
+        kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";
+
+        QGst::ElementPtr src = audio ? DeviceElementFactory::makeAudioCaptureElement()
+                                     : DeviceElementFactory::makeVideoCaptureElement();
+        if (!src) {
+            Q_EMIT q->error(audio ? i18n("The audio input device could not be initialized")
+                                  : i18n("The video input device could not be initialized"));
+            return false;
+        }
+
+        if (audio) {
+            createAudioBin(m_participantData[Myself]);
+            m_audioInputDevice = src;
+        } else {
+            createVideoBin(m_participantData[Myself], true);
+            m_videoInputDevice = src;
+        }
+
+        QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
+                                   : m_participantData[Myself]->videoBin;
+
+        m_pipeline->add(src);
+        m_pipeline->add(bin);
+
+        src->link(bin);
+        bin->getStaticPad("src")->link(stream->property("sink-pad").get<QGst::PadPtr>());
+
+        //set everything to playing state
+        bin->setState(QGst::StatePlaying);
+        src->setState(QGst::StatePlaying);
+
+        //create the participant if not already there
+        if (!m_participants.contains(Myself)) {
+            m_participants[Myself] = new CallParticipant(m_participantData[Myself], q);
+            Q_EMIT q->participantJoined(m_participants[Myself]);
+        }
+
+        if (audio) {
+            Q_EMIT m_participants[Myself]->audioStreamAdded(m_participants[Myself]);
+        } else {
+            Q_EMIT m_participants[Myself]->videoStreamAdded(m_participants[Myself]);
+        }
+
+        break;
+    }
+    case Tp::MediaStreamDirectionReceive:
+    {
+        kDebug() << "Opening" << (audio ? "audio" : "video") << "output device";
+
+        if (audio) {
+            QGst::ElementPtr element = DeviceElementFactory::makeAudioOutputElement();
+            if ( !element ) {
+                Q_EMIT q->error(i18n("The audio output device could not be initialized"));
+                return false;
+            }
+            m_audioOutputDevice = element;
+        } else {
+            //succeed if we have qwidgetvideosink installed
+            if (!QGst::ElementFactory::find("qwidgetvideosink")) {
+                return false;
+            }
+        }
+
+        if (audio) {
+            createAudioBin(m_participantData[RemoteContact]);
+        } else {
+            createVideoBin(m_participantData[RemoteContact], false);
+        }
+
+        if (audio) {
+            m_pipeline->add(m_audioOutputDevice);
+            m_pipeline->add(m_participantData[RemoteContact]->audioBin);
+            m_participantData[RemoteContact]->audioBin->link(m_audioOutputDevice);
+            m_audioOutputDevice->setState(QGst::StatePlaying);
+            m_participantData[RemoteContact]->audioBin->setState(QGst::StatePlaying);
+        } else {
+            m_pipeline->add(m_participantData[RemoteContact]->videoBin);
+            m_participantData[RemoteContact]->videoBin->setState(QGst::StatePlaying);
+        }
+
+        break;
+    }
+    default:
+        Q_ASSERT(false);
     }
 
-    m_pipeline->add(src);
-    m_pipeline->add(bin);
-    src->link(bin);
     return true;
 }
 
-void CallChannelHandlerPrivate::sinkPadAdded(const QGst::PadPtr & sinkPad, bool audio)
+/* WARNING this slot is called in a different thread. */
+void CallChannelHandlerPrivate::onSrcPadAdded(const QGlib::ObjectPtr & stream, QGst::PadPtr & pad)
 {
+    bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
+    QGst::BinPtr & bin = audio ? m_participantData[RemoteContact]->audioBin
+                               : m_participantData[RemoteContact]->videoBin;
+
+    kDebug() << (audio ? "Audio" : "Video") << "src pad added";
+
+    pad->link(bin->getStaticPad("sink"));
+
     //create the participant if not already there
-    bool joined = false;
-    if (!m_participants.contains(Myself)) {
-        m_participants[Myself] = new CallParticipant(m_participantData[Myself], q);
-        joined = true;
-    }
-
-    QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
-                               : m_participantData[Myself]->videoBin;
-    QGst::ElementPtr & src = audio ? m_audioInputDevice : m_videoInputDevice;
-
-    //link the pad
-    bin->getStaticPad("src")->link(sinkPad);
-
-    //set everything to playing state
-    bin->setState(QGst::StatePlaying);
-    src->setState(QGst::StatePlaying);
-
-    //if we just created the participant, emit the joined signal
-    if (joined) {
-        Q_EMIT q->participantJoined(m_participants[Myself]);
-    }
-
-    if (audio) {
-        Q_EMIT m_participants[Myself]->audioStreamAdded(m_participants[Myself]);
-    } else {
-        Q_EMIT m_participants[Myself]->videoStreamAdded(m_participants[Myself]);
-    }
-}
-
-void CallChannelHandlerPrivate::closeInputDevice(bool audio)
-{
-    QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
-                               : m_participantData[Myself]->videoBin;
-    QGst::ElementPtr & src = audio ? m_audioInputDevice : m_videoInputDevice;
-
-    bin->setState(QGst::StateNull);
-    src->setState(QGst::StateNull);
-    m_pipeline->remove(bin);
-    m_pipeline->remove(src);
-
-    //drop references to destroy the elements
-    if (audio) {
-        m_participantData[Myself]->volumeControl.clear();
-    } else {
-        m_participantData[Myself]->colorBalanceControl.clear();
-        m_participantData[Myself]->videoWidget.data()->setVideoSink(QGst::ElementPtr());
-    }
-    bin.clear();
-    src.clear();
-
-    if (audio) {
-        Q_EMIT m_participants[Myself]->audioStreamRemoved(m_participants[Myself]);
-    } else {
-        Q_EMIT m_participants[Myself]->videoStreamRemoved(m_participants[Myself]);
-    }
-
-    //remove the participant if it has no other stream on it
-    if ((audio && !m_participants[Myself]->hasVideoStream()) ||
-        (!audio && !m_participants[Myself]->hasAudioStream()))
-    {
-        CallParticipant *p = m_participants.take(Myself);
-        Q_EMIT q->participantLeft(p);
-        p->deleteLater();
-    }
-}
-
-void CallChannelHandlerPrivate::srcPadAdded(QGst::PadPtr srcPad, bool audio)
-{
-    //create the participant if not already there
-    bool joined = false;
     if (!m_participants.contains(RemoteContact)) {
         m_participants[RemoteContact] = new CallParticipant(m_participantData[RemoteContact]);
         m_participants[RemoteContact]->moveToThread(q->thread());
         m_participants[RemoteContact]->setParent(q);
-        joined = true;
-    }
-
-    QGst::BinPtr & bin = audio ? m_participantData[RemoteContact]->audioBin
-                               : m_participantData[RemoteContact]->videoBin;
-
-    srcPad->link(bin->getStaticPad("sink"));
-
-    //if we just created the participant, emit the joined signal
-    if (joined) {
         QMetaObject::invokeMethod(q, "participantJoined", Qt::QueuedConnection,
                                   Q_ARG(CallParticipant*, m_participants[RemoteContact]));
     }
@@ -364,41 +285,52 @@ void CallChannelHandlerPrivate::srcPadAdded(QGst::PadPtr srcPad, bool audio)
                               Q_ARG(CallParticipant*, m_participants[RemoteContact]));
 }
 
-void CallChannelHandlerPrivate::closeOutputDevice(bool audio)
+void CallChannelHandlerPrivate::onFreeResource(const QGlib::ObjectPtr & stream, uint direction)
 {
-    QGst::BinPtr & bin = audio ? m_participantData[RemoteContact]->audioBin
-                               : m_participantData[RemoteContact]->videoBin;
+    bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
+    Who who = direction == Tp::MediaStreamDirectionSend ? Myself : RemoteContact;
+
+    QGst::BinPtr & bin = audio ? m_participantData[who]->audioBin
+                               : m_participantData[who]->videoBin;
+    QGst::ElementPtr & element = audio ? (who == Myself ? m_audioInputDevice : m_audioOutputDevice)
+                                       : m_videoInputDevice;
+
+    kDebug() << "Closing" << (audio ? "audio" : "video")
+             << ((who == Myself) ? "input" : "output") << "device";
 
     bin->setState(QGst::StateNull);
-    if (audio)
-        m_audioOutputDevice->setState(QGst::StateNull);
+    if (audio || who != RemoteContact) {
+        element->setState(QGst::StateNull);
+    }
 
     m_pipeline->remove(bin);
-    if (audio) {
-        m_pipeline->remove(m_audioOutputDevice);
+    if (audio || who != RemoteContact) {
+        m_pipeline->remove(element);
     }
 
     //drop references to destroy the elements
     if (audio) {
-        m_participantData[RemoteContact]->volumeControl.clear();
-        m_audioOutputDevice.clear();
+        m_participantData[who]->volumeControl.clear();
     } else {
-        m_participantData[RemoteContact]->colorBalanceControl.clear();
-        m_participantData[RemoteContact]->videoWidget.data()->setVideoSink(QGst::ElementPtr());
+        m_participantData[who]->colorBalanceControl.clear();
+        m_participantData[who]->videoWidget.data()->setVideoSink(QGst::ElementPtr());
     }
     bin.clear();
+    if (audio || who != RemoteContact) {
+        element.clear();
+    }
 
     if (audio) {
-        Q_EMIT m_participants[Myself]->audioStreamRemoved(m_participants[Myself]);
+        Q_EMIT m_participants[who]->audioStreamRemoved(m_participants[who]);
     } else {
-        Q_EMIT m_participants[Myself]->videoStreamRemoved(m_participants[Myself]);
+        Q_EMIT m_participants[who]->videoStreamRemoved(m_participants[who]);
     }
 
     //remove the participant if it has no other stream on it
-    if ((audio && !m_participants[Myself]->hasVideoStream()) ||
-        (!audio && !m_participants[Myself]->hasAudioStream()))
+    if ((audio && !m_participants[who]->hasVideoStream()) ||
+        (!audio && !m_participants[who]->hasAudioStream()))
     {
-        CallParticipant *p = m_participants.take(Myself);
+        CallParticipant *p = m_participants.take(who);
         Q_EMIT q->participantLeft(p);
         p->deleteLater();
     }
@@ -463,13 +395,6 @@ void CallChannelHandlerPrivate::createVideoBin(QExplicitlySharedDataPointer<Part
 
         data->videoBin->addPad(QGst::GhostPad::create(queue2->getStaticPad("src"), "src"));
     }
-
-//    m_pipeline->add(data->videoBin);
-//     if (!sinkPad.isNull()) {
-//         m_videoBin->getStaticPad("src")->link(sinkPad);
-//     }
-//     srcPad->link(m_videoBin->getStaticPad("sink"));
-//    data->videoBin->setState(QGst::StatePlaying);
 }
 
 #include "callchannelhandler.moc"

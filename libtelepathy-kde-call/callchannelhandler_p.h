@@ -25,8 +25,34 @@
 #include <QGst/Ui/VideoWidget>
 #include <TelepathyQt4/Contact>
 #include <TelepathyQt4/StreamedMediaChannel>
-class QTfChannel;
 class ParticipantData;
+
+
+//BEGIN Ugly forward declarations
+
+/* These declarations are copied here instead of including the proper headers,
+ * because the proper headers also include too many unrelated stuff and we have
+ * to depend on many useless (at build time) external libraries (such as dbus-glib,
+ * libxml2, gstreamer) for no good reason.
+ */
+
+typedef unsigned long GType;
+typedef int gboolean;
+typedef char gchar;
+typedef struct _GList GList;
+typedef struct _TfChannel TfChannel;
+
+extern "C" {
+GType fs_codec_list_get_type (void);
+GList *fs_codec_list_from_keyfile (const gchar *filename, GError **error);
+gboolean tf_channel_bus_message(TfChannel *channel, GstMessage *message);
+}
+
+namespace Tp {
+Q_DECL_IMPORT TfChannel *createFarsightChannel(const StreamedMediaChannelPtr &channel);
+}
+//END Ugly forward declarations
+
 
 class CallChannelHandlerPrivate : public QObject
 {
@@ -45,32 +71,19 @@ private Q_SLOTS:
                               const QString & errorName,
                               const QString & errorMessage);
 
-    void onSessionCreated(QGst::ElementPtr conference);
-    void onQTfChannelClosed();
-
-    void openAudioInputDevice(bool *success);
-    void audioSinkPadAdded(QGst::PadPtr sinkPad);
-    void closeAudioInputDevice();
-
-    void openVideoInputDevice(bool *success);
-    void videoSinkPadAdded(QGst::PadPtr sinkPad);
-    void closeVideoInputDevice();
-
-    void openAudioOutputDevice(bool *success);
-    void audioSrcPadAdded(QGst::PadPtr srcPad);
-    void closeAudioOutputDevice();
-
-    void openVideoOutputDevice(bool *success);
-    void videoSrcPadAdded(QGst::PadPtr srcPad);
-    void closeVideoOutputDevice();
-
 private:
-    bool openInputDevice(bool audio);
-    void sinkPadAdded(const QGst::PadPtr & sinkPad, bool audio);
-    void closeInputDevice(bool audio);
+    void onBusMessage(const QGst::MessagePtr & message);
 
-    void srcPadAdded(QGst::PadPtr srcPad, bool audio);
-    void closeOutputDevice(bool audio);
+    // -- from TfChannel signals
+    void onTfChannelClosed();
+    void onSessionCreated(QGst::ElementPtr & conference);
+    void onStreamCreated(const QGlib::ObjectPtr & stream);
+    GList *onStreamGetCodecConfig();
+
+    // -- from TfStream signals
+    void onSrcPadAdded(const QGlib::ObjectPtr & stream, QGst::PadPtr & src);
+    bool onRequestResource(const QGlib::ObjectPtr & stream, uint direction);
+    void onFreeResource(const QGlib::ObjectPtr & stream, uint direction);
 
     void createAudioBin(QExplicitlySharedDataPointer<ParticipantData> & data);
     void createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool withSink);
@@ -83,12 +96,13 @@ private:
     QMap<Who, CallParticipant*> m_participants;
     QExplicitlySharedDataPointer<ParticipantData> m_participantData[2];
 
-    QTfChannel *m_qtfchannel;
-
     QGst::PipelinePtr m_pipeline;
     QGst::ElementPtr m_audioInputDevice;
     QGst::ElementPtr m_videoInputDevice;
     QGst::ElementPtr m_audioOutputDevice;
+
+    QGlib::ObjectPtr m_tfChannel;
+    QGst::ElementPtr m_conference;
 };
 
 class ParticipantData : public QSharedData

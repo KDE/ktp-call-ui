@@ -1,7 +1,0 @@
-include_directories(${QTGSTREAMER_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
-
-add_definitions(${QTGSTREAMER_DEFINITIONS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTGSTREAMER_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
-
-kde4_add_library(qtpfarsight STATIC qtfchannel.cpp)
-target_link_libraries(qtpfarsight ${TELEPATHY_QT4_FARSIGHT_LIBRARIES} ${TPFARSIGHT_LIBRARIES})

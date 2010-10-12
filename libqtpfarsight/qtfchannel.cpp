@@ -59,13 +59,8 @@ public:
 
     void init(const Tp::StreamedMediaChannelPtr & channel, const QGst::BusPtr & bus);
 
-    //Qt slots
-    void _p_onAudioSrcPadAdded(QGst::PadPtr pad);
-    void _p_onVideoSrcPadAdded(QGst::PadPtr pad);
-
     //GObject slots
     void onBusMessage(const QGst::MessagePtr & message);
-    void onConferencePadRemoved(const QGst::PadPtr & pad);
 
     // -- from TfChannel signals
     void onTfChannelClosed();
@@ -85,16 +80,7 @@ private:
 
     QGlib::ObjectPtr m_tfChannel;
     QGst::BusPtr m_bus;
-
-    QList<QByteArray> m_audioSrcPads;
-    QList<QByteArray> m_videoSrcPads;
     QGst::ElementPtr m_conference;
-
-    QMutex m_srcPadAddedMutex;
-    bool m_audioOutputDeviceIsOpen;
-    bool m_videoOutputDeviceIsOpen;
-    QGst::PadPtr m_tmpAudioSrcPad;
-    QGst::PadPtr m_tmpVideoSrcPad;
 };
 
 void QTfChannel::Private::init(const Tp::StreamedMediaChannelPtr & channel, const QGst::BusPtr & bus)
@@ -102,9 +88,6 @@ void QTfChannel::Private::init(const Tp::StreamedMediaChannelPtr & channel, cons
     TfChannel *tfChannel = Tp::createFarsightChannel(channel);
     Q_ASSERT(tfChannel);
     m_tfChannel = QGlib::ObjectPtr::wrap(reinterpret_cast<GObject*>(tfChannel), false);
-
-    m_audioOutputDeviceIsOpen = false;
-    m_videoOutputDeviceIsOpen = false;
 
     /* Set up the telepathy farsight channel */
     QGlib::Signal::connect(m_tfChannel, "closed",
@@ -119,51 +102,14 @@ void QTfChannel::Private::init(const Tp::StreamedMediaChannelPtr & channel, cons
     m_bus = bus;
     QGlib::Signal::connect(m_bus, "message", this, &QTfChannel::Private::onBusMessage);
 
-    connect(q, SIGNAL(audioSrcPadAdded(QGst::PadPtr)),
-            q, SLOT(_p_onAudioSrcPadAdded(QGst::PadPtr)));
-    connect(q, SIGNAL(videoSrcPadAdded(QGst::PadPtr)),
-            q, SLOT(_p_onVideoSrcPadAdded(QGst::PadPtr)));
-
     qRegisterMetaType<QGst::PadPtr>();
 }
-
-
-void QTfChannel::Private::_p_onAudioSrcPadAdded(QGst::PadPtr pad)
-{
-    m_audioSrcPads.append(pad->property("name").get<QByteArray>());
-}
-
-void QTfChannel::Private::_p_onVideoSrcPadAdded(QGst::PadPtr pad)
-{
-    m_videoSrcPads.append(pad->property("name").get<QByteArray>());
-}
-
 
 void QTfChannel::Private::onBusMessage(const QGst::MessagePtr & message)
 {
     TfChannel *c = reinterpret_cast<TfChannel*>(static_cast<GObject*>(m_tfChannel));
     tf_channel_bus_message(c, message);
 }
-
-void QTfChannel::Private::onConferencePadRemoved(const QGst::PadPtr & pad)
-{
-    if ( pad->direction() != QGst::PadSrc ) {
-        return;
-    }
-
-    QByteArray name = pad->property("name").get<QByteArray>();
-    int index = -1;
-    if ( (index = m_audioSrcPads.indexOf(name)) != -1 ) {
-        m_audioSrcPads.removeAt(index);
-        Q_EMIT q->audioSrcPadRemoved(pad);
-    } else if ( (index = m_videoSrcPads.indexOf(name)) != -1 ) {
-        m_videoSrcPads.removeAt(index);
-        Q_EMIT q->videoSrcPadRemoved(pad);
-    } else {
-        kWarning() << "Unknown pad" << name << "was removed from FsConference";
-    }
-}
-
 
 void QTfChannel::Private::onTfChannelClosed()
 {
@@ -175,8 +121,6 @@ void QTfChannel::Private::onSessionCreated(const QGst::ElementPtr & conference)
 {
     m_bus->addSignalWatch();
     m_conference = conference;
-    QGlib::Signal::connect(m_conference, "pad-removed",
-                           this, &QTfChannel::Private::onConferencePadRemoved);
     Q_EMIT q->sessionCreated(m_conference);
 }
 
@@ -200,32 +144,16 @@ GList *QTfChannel::Private::onStreamGetCodecConfig()
 }
 
 
-/* WARNING this method is called in a different thread. God knows why... !@*#&^*&^ */
+/* WARNING this method is called in a different thread. */
 void QTfChannel::Private::onSrcPadAdded(const QGlib::ObjectPtr & stream, const QGst::PadPtr & pad)
 {
-    /* The tp-farsight api is broken, so this signal may come either before or after
-       the request-resource signal, so that's why we have to use a mutex and the private
-       bool value to remember which function was called first. */
-
-    QMutexLocker l(&m_srcPadAddedMutex);
-
     switch (stream->property("media-type").get<uint>()) {
     case Tp::MediaStreamTypeAudio:
-        if ( m_audioOutputDeviceIsOpen ) {
-            QMetaObject::invokeMethod(q, "audioSrcPadAdded", Qt::QueuedConnection,
-                                      Q_ARG(QGst::PadPtr, pad));
-        } else {
-            m_tmpAudioSrcPad = pad;
-        }
+        Q_EMIT q->audioSrcPadAdded(pad);
         break;
     case Tp::MediaStreamTypeVideo:
-        if ( m_videoOutputDeviceIsOpen ) {
-            QMetaObject::invokeMethod(q, "videoSrcPadAdded", Qt::QueuedConnection,
-                                      Q_ARG(QGst::PadPtr, pad));
-        } else {
-            m_tmpVideoSrcPad = pad;
-        }
-        return;
+        Q_EMIT q->videoSrcPadAdded(pad);
+        break;
     default:
         Q_ASSERT(false);
     }
@@ -241,8 +169,6 @@ bool QTfChannel::Private::onRequestResource(const QGlib::ObjectPtr & stream, uin
         {
             QGst::PadPtr sinkPad = stream->property("sink-pad").get<QGst::PadPtr>();
 
-            //FIXME here I assume that only one stream can add an audio sink pad.
-            //The telepathy spec and the tp-farsight docs don't mention anything about that.
             bool success = false;
             Q_EMIT q->openAudioInputDevice(&success);
             if ( success ) {
@@ -252,24 +178,9 @@ bool QTfChannel::Private::onRequestResource(const QGlib::ObjectPtr & stream, uin
         }
         case Tp::MediaStreamDirectionReceive:
         {
-            /* The tp-farsight api is broken, so this signal may come either before or after
-               the src-pad-added signal, so that's why we have to use a mutex and the private
-               bool value to remember which function was called first. */
-
-            QMutexLocker l(&m_srcPadAddedMutex);
-            if ( !m_audioOutputDeviceIsOpen ) {
-                bool success = false;
-                Q_EMIT q->openAudioOutputDevice(&success);
-                m_audioOutputDeviceIsOpen = success;
-
-                if ( success && !m_tmpAudioSrcPad.isNull() ) {
-                    Q_EMIT q->audioSrcPadAdded(m_tmpAudioSrcPad);
-                    m_tmpAudioSrcPad = QGst::PadPtr();
-                }
-                return success;
-            } else {
-                return true; //audio output device is already open
-            }
+            bool success = false;
+            Q_EMIT q->openAudioOutputDevice(&success);
+            return success;
         }
         default:
             Q_ASSERT(false);
@@ -282,8 +193,6 @@ bool QTfChannel::Private::onRequestResource(const QGlib::ObjectPtr & stream, uin
         {
             QGst::PadPtr sinkPad = stream->property("sink-pad").get<QGst::PadPtr>();
 
-            //FIXME here I assume that only one stream can add a video sink pad.
-            //The telepathy spec and the tp-farsight docs don't mention anything about that.
             bool success = false;
             Q_EMIT q->openVideoInputDevice(&success);
             if ( success ) {
@@ -293,24 +202,9 @@ bool QTfChannel::Private::onRequestResource(const QGlib::ObjectPtr & stream, uin
         }
         case Tp::MediaStreamDirectionReceive:
         {
-            /* The tp-farsight api is broken, so this signal may come either before or after
-               the src-pad-added signal, so that's why we have to use a mutex and the private
-               bool value to remember which function was called first. */
-
-            QMutexLocker l(&m_srcPadAddedMutex);
-            if ( !m_videoOutputDeviceIsOpen ) {
-                bool success = false;
-                Q_EMIT q->openVideoOutputDevice(&success);
-                m_videoOutputDeviceIsOpen = success;
-
-                if ( success && !m_tmpVideoSrcPad.isNull() ) {
-                    Q_EMIT q->videoSrcPadAdded(m_tmpVideoSrcPad);
-                    m_tmpVideoSrcPad = QGst::PadPtr();
-                }
-                return success;
-            } else {
-                return true; //video output device is already open
-            }
+            bool success = false;
+            Q_EMIT q->openVideoOutputDevice(&success);
+            return success;
         }
         default:
             Q_ASSERT(false);
@@ -324,17 +218,26 @@ bool QTfChannel::Private::onRequestResource(const QGlib::ObjectPtr & stream, uin
 
 void QTfChannel::Private::onFreeResource(const QGlib::ObjectPtr & stream, uint direction)
 {
-    //the receive streams will be freed using the pad-removed signal on the conference.
-    if ( direction == Tp::MediaStreamDirectionReceive ) {
-        return;
-    }
-
     switch (stream->property("media-type").get<uint>()) {
     case Tp::MediaStreamTypeAudio:
-        Q_EMIT q->closeAudioInputDevice();
+        switch(direction) {
+        case Tp::MediaStreamDirectionReceive:
+            Q_EMIT q->closeAudioOutputDevice();
+            break;
+        case Tp::MediaStreamDirectionSend:
+            Q_EMIT q->closeAudioInputDevice();
+            break;
+        }
         break;
     case Tp::MediaStreamTypeVideo:
-        Q_EMIT q->closeVideoInputDevice();
+        switch(direction) {
+        case Tp::MediaStreamDirectionReceive:
+            Q_EMIT q->closeVideoOutputDevice();
+            break;
+        case Tp::MediaStreamDirectionSend:
+            Q_EMIT q->closeVideoInputDevice();
+            break;
+        }
         break;
     default:
         Q_ASSERT(false);

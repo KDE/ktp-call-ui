@@ -20,16 +20,21 @@
 
 #include "callchannelhandler.h"
 #include <QGst/Pipeline>
+#include <QGst/StreamVolume>
+#include <QGst/ColorBalance>
+#include <QGst/Ui/VideoWidget>
 #include <TelepathyQt4/Contact>
 #include <TelepathyQt4/StreamedMediaChannel>
 class QTfChannel;
+class ParticipantData;
 
 class CallChannelHandlerPrivate : public QObject
 {
     Q_OBJECT
 public:
-    inline CallChannelHandlerPrivate(CallChannelHandler *qq) : QObject(), q(qq) {}
+    enum Who { Myself = 0, RemoteContact = 1 };
 
+    inline CallChannelHandlerPrivate(CallChannelHandler *qq) : QObject(), q(qq) {}
     void init(const Tp::StreamedMediaChannelPtr & channel);
 
     inline Tp::StreamedMediaChannelPtr channel() const { return m_channel; }
@@ -53,19 +58,30 @@ private Q_SLOTS:
 
     void openAudioOutputDevice(bool *success);
     void audioSrcPadAdded(QGst::PadPtr srcPad);
-    void audioSrcPadRemoved(QGst::PadPtr srcPad);
+    void closeAudioOutputDevice();
 
     void openVideoOutputDevice(bool *success);
     void videoSrcPadAdded(QGst::PadPtr srcPad);
-    void videoSrcPadRemoved(QGst::PadPtr srcPad);
+    void closeVideoOutputDevice();
 
 private:
+    bool openInputDevice(bool audio);
+    void sinkPadAdded(const QGst::PadPtr & sinkPad, bool audio);
+    void closeInputDevice(bool audio);
+
+    void srcPadAdded(QGst::PadPtr srcPad, bool audio);
+    void closeOutputDevice(bool audio);
+
+    void createAudioBin(QExplicitlySharedDataPointer<ParticipantData> & data);
+    void createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool withSink);
+
+    // *** data ***
+
     CallChannelHandler *q;
     Tp::StreamedMediaChannelPtr m_channel;
 
-    //TODO when we start using the Call interface, remember to fix this to support more participants
-    enum Who { Myself, RemoteContact };
     QMap<Who, CallParticipant*> m_participants;
+    QExplicitlySharedDataPointer<ParticipantData> m_participantData[2];
 
     QTfChannel *m_qtfchannel;
 
@@ -73,8 +89,23 @@ private:
     QGst::ElementPtr m_audioInputDevice;
     QGst::ElementPtr m_videoInputDevice;
     QGst::ElementPtr m_audioOutputDevice;
-    QGst::ElementPtr m_audioOutputAdder;
-    QHash<QByteArray, QGst::PadPtr> m_audioAdderPadsMap;
+};
+
+class ParticipantData : public QSharedData
+{
+public:
+    inline ParticipantData() //just for being able to construct the array above without initialization
+        : handlerPriv(NULL), who(CallChannelHandlerPrivate::Myself) {}
+    inline ParticipantData(CallChannelHandlerPrivate *h, CallChannelHandlerPrivate::Who w)
+        : handlerPriv(h), who(w) {}
+
+    QGst::BinPtr audioBin;
+    QGst::BinPtr videoBin;
+    QGst::StreamVolumePtr volumeControl;
+    QGst::ColorBalancePtr colorBalanceControl;
+    QWeakPointer<QGst::Ui::VideoWidget> videoWidget;
+    CallChannelHandlerPrivate *handlerPriv;
+    CallChannelHandlerPrivate::Who who;
 };
 
 #endif

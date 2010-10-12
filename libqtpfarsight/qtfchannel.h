@@ -88,6 +88,7 @@ Q_SIGNALS:
     void openAudioOutputDevice(bool *success);
 
     /** Emmited when an audio source pad is added on the conference.
+     * \warning this signal comes in a different thread.
      * @a srcPad should be connected with the audio output device.
      */
     void audioSrcPadAdded(QGst::PadPtr srcPad);
@@ -95,7 +96,7 @@ Q_SIGNALS:
     /** Emmited when an audio source pad is removed from the conference.
      * @a srcPad should be disconnected from the audio output device.
      */
-    void audioSrcPadRemoved(QGst::PadPtr srcPad);
+    void closeAudioOutputDevice();
 
 
     /** Emmited when the video output device should be initialized. @a suceess should
@@ -104,6 +105,7 @@ Q_SIGNALS:
     void openVideoOutputDevice(bool *success);
 
     /** Emmited when a video source pad is added on the conference.
+     * \warning this signal comes in a different thread.
      * @a srcPad should be connected with a video widget.
      */
     void videoSrcPadAdded(QGst::PadPtr srcPad);
@@ -111,14 +113,12 @@ Q_SIGNALS:
     /** Emmited when a video source pad is removed from the conference.
      * @a srcPad should be disconnected from the video widget.
      */
-    void videoSrcPadRemoved(QGst::PadPtr srcPad);
+    void closeVideoOutputDevice();
 
 private:
     class Private;
     friend class Private;
     Private *const d;
-    Q_PRIVATE_SLOT(d, void _p_onAudioSrcPadAdded(QGst::PadPtr pad));
-    Q_PRIVATE_SLOT(d, void _p_onVideoSrcPadAdded(QGst::PadPtr pad));
 };
 
 #endif

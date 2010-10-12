@@ -20,7 +20,8 @@
 
 #include <QtCore/QObject>
 #include <TelepathyQt4/Types>
-class CallParticipantPrivate;
+class CallChannelHandlerPrivate;
+class ParticipantData;
 
 class CallParticipant : public QObject
 {
@@ -72,12 +73,14 @@ Q_SIGNALS:
 
 private:
     friend class CallChannelHandlerPrivate;
-    friend class CallParticipantPrivate;
 
-    CallParticipant(const Tp::ContactPtr & contact, QObject *parent = 0);
+    CallParticipant(const QExplicitlySharedDataPointer<ParticipantData> & dd, QObject *parent = 0);
     virtual ~CallParticipant();
+    Q_DISABLE_COPY(CallParticipant)
 
-    CallParticipantPrivate *const d;
+    QExplicitlySharedDataPointer<ParticipantData> d;
 };
+
+Q_DECLARE_METATYPE(CallParticipant*)
 
 #endif // CALLPARTICIPANT_H

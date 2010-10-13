@@ -32,22 +32,6 @@ QGLIB_REGISTER_TYPE(GList*)
 QGLIB_REGISTER_TYPE_IMPLEMENTATION(GList*, fs_codec_list_get_type())
 QGLIB_REGISTER_VALUEIMPL_FOR_BOXED_TYPE(GList*)
 
-#if 0
-static Tp::ContactPtr findRemoteContact(const Tp::ChannelPtr & channel)
-{
-    //HACK assuming we only have one other member, which is always the case with the StreamedMedia interface
-    Tp::Contacts contacts = channel->groupContacts();
-    Tp::ContactPtr contact;
-    Q_FOREACH(const Tp::ContactPtr & c, contacts) {
-        if (c != channel->groupSelfContact()) {
-            contact = c;
-        }
-    }
-    Q_ASSERT(contact);
-    return contact;
-}
-#endif
-
 
 CallChannelHandler::CallChannelHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent)
     : QObject(parent), d(new CallChannelHandlerPrivate(this))
@@ -107,6 +91,25 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
                            this, &CallChannelHandlerPrivate::onStreamGetCodecConfig);
     QGlib::Signal::connect(m_pipeline->bus(), "message",
                            this, &CallChannelHandlerPrivate::onBusMessage);
+}
+
+Tp::ContactPtr CallChannelHandlerPrivate::contactOfParticipant(Who who) const
+{
+    if (who == Myself) {
+        return m_channel->groupSelfContact();
+    } else {
+        Tp::Contacts contacts = m_channel->groupContacts();
+        Tp::ContactPtr contact;
+        Q_FOREACH(const Tp::ContactPtr & c, contacts) {
+            if (c != m_channel->groupSelfContact()) {
+                contact = c;
+            }
+        }
+        if (!contact) {
+            kWarning() << "No remote contact available, returning NULL";
+        }
+        return contact;
+    }
 }
 
 void CallChannelHandlerPrivate::onChannelInvalidated(Tp::DBusProxy *proxy,

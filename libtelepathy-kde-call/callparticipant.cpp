@@ -42,7 +42,7 @@ CallParticipant::~CallParticipant()
 
 Tp::ContactPtr CallParticipant::contact() const
 {
-    return Tp::ContactPtr(); //TODO
+    return d->handlerPriv->contactOfParticipant(d->who);
 }
 
 bool CallParticipant::isMyself() const

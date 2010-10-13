@@ -65,6 +65,7 @@ public:
 
     inline Tp::StreamedMediaChannelPtr channel() const { return m_channel; }
     inline QList<CallParticipant*> participants() const { return m_participants.values(); }
+    Tp::ContactPtr contactOfParticipant(Who who) const;
 
 private Q_SLOTS:
     void onChannelInvalidated(Tp::DBusProxy *proxy,

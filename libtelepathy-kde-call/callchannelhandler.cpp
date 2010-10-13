@@ -189,6 +189,7 @@ bool CallChannelHandlerPrivate::onRequestResource(const QGlib::ObjectPtr & strea
         {
             Q_EMIT q->error(i18n("Could not create some of the required elements. "
                                  "Please check your GStreamer installation."));
+            src->setState(QGst::StateNull); //cleanly dispose the src element
             return false;
         }
 
@@ -239,6 +240,12 @@ bool CallChannelHandlerPrivate::onRequestResource(const QGlib::ObjectPtr & strea
         {
             Q_EMIT q->error(i18n("Could not create some of the required elements. "
                                  "Please check your GStreamer installation."));
+
+            //destroy the audio output element, since we could not create a bin to connect it to
+            if (audio) {
+                m_audioOutputDevice->setState(QGst::StateNull);
+                m_audioOutputDevice.clear();
+            }
             return false;
         }
 

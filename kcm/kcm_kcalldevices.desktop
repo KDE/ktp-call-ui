@@ -1,23 +1,7 @@
 [Desktop Entry]
 Name=Devices
-Name[bg]=Устройства
-Name[da]=Enheder
-Name[de]=Geräte
-Name[en_GB]=Devices
-Name[eo]=Aparatoj
-Name[es]=Dispositivos
-Name[km]=ឧបករណ៍
-Name[mai]=डिवाइस
-Name[pa]=ਜੰਤਰ
-Name[pt]=Dispositivos
-Name[pt_BR]=Dispositivos
-Name[ro]=Dispozitive
-Name[ru]=Устройства
-Name[sv]=Enheter
-Name[tr]=Aygıtlar
 Name[uk]=Пристрої
 Name[x-test]=xxDevicesxx
-Name[zh_CN]=设备
 Icon=audio-card
 Exec=kcmshell4 kcm_kcalldevices
 Type=Service

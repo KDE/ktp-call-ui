@@ -1,5 +1,7 @@
 [Desktop Entry]
 Name=Devices
+Name[pt]=Dispositivos
+Name[sv]=Enheter
 Name[uk]=Пристрої
 Name[x-test]=xxDevicesxx
 Icon=audio-card

@@ -154,6 +154,53 @@ void CallChannelHandlerPrivate::onStreamCreated(const QGlib::ObjectPtr & stream)
                            &CallChannelHandlerPrivate::onSrcPadAdded, QGlib::Signal::PassSender);
     QGlib::Signal::connect(stream, "free-resource", this,
                            &CallChannelHandlerPrivate::onFreeResource, QGlib::Signal::PassSender);
+
+    bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
+    kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";
+
+    QGst::ElementPtr src = audio ? DeviceElementFactory::makeAudioCaptureElement()
+                                 : DeviceElementFactory::makeVideoCaptureElement();
+    if (!src) {
+        Q_EMIT q->error(audio ? i18n("The audio input device could not be initialized")
+                              : i18n("The video input device could not be initialized"));
+        return;
+    }
+
+    if (!(audio ? createAudioBin(m_participantData[Myself])
+                : createVideoBin(m_participantData[Myself], true)))
+    {
+        Q_EMIT q->error(i18n("Could not create some of the required elements. "
+                             "Please check your GStreamer installation."));
+        src->setState(QGst::StateNull); //cleanly dispose the src element
+        return;
+    }
+
+    (audio ? m_audioInputDevice : m_videoInputDevice) = src;
+
+    QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
+                               : m_participantData[Myself]->videoBin;
+
+    m_pipeline->add(src);
+    m_pipeline->add(bin);
+    src->link(bin);
+
+    //set everything to playing state
+    bin->setState(QGst::StatePlaying);
+    src->setState(QGst::StatePlaying);
+
+    bin->getStaticPad("src")->link(stream->property("sink-pad").get<QGst::PadPtr>());
+
+    //create the participant if not already there
+    if (!m_participants.contains(Myself)) {
+        m_participants[Myself] = new CallParticipant(m_participantData[Myself], q);
+        Q_EMIT q->participantJoined(m_participants[Myself]);
+    }
+
+    if (audio) {
+        Q_EMIT m_participants[Myself]->audioStreamAdded(m_participants[Myself]);
+    } else {
+        Q_EMIT m_participants[Myself]->videoStreamAdded(m_participants[Myself]);
+    }
 }
 
 GList *CallChannelHandlerPrivate::onStreamGetCodecConfig()
@@ -175,52 +222,11 @@ bool CallChannelHandlerPrivate::onRequestResource(const QGlib::ObjectPtr & strea
     switch(direction) {
     case Tp::MediaStreamDirectionSend:
     {
-        kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";
-
-        QGst::ElementPtr src = audio ? DeviceElementFactory::makeAudioCaptureElement()
-                                     : DeviceElementFactory::makeVideoCaptureElement();
-        if (!src) {
-            Q_EMIT q->error(audio ? i18n("The audio input device could not be initialized")
-                                  : i18n("The video input device could not be initialized"));
-            return false;
-        }
-
-        if (!(audio ? createAudioBin(m_participantData[Myself])
-                    : createVideoBin(m_participantData[Myself], true)))
-        {
-            Q_EMIT q->error(i18n("Could not create some of the required elements. "
-                                 "Please check your GStreamer installation."));
-            src->setState(QGst::StateNull); //cleanly dispose the src element
-            return false;
-        }
-
-        (audio ? m_audioInputDevice : m_videoInputDevice) = src;
-
         QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
                                    : m_participantData[Myself]->videoBin;
-
-        m_pipeline->add(src);
-        m_pipeline->add(bin);
-        src->link(bin);
-
-        //set everything to playing state
-        bin->setState(QGst::StatePlaying);
-        src->setState(QGst::StatePlaying);
-
-        bin->getStaticPad("src")->link(stream->property("sink-pad").get<QGst::PadPtr>());
-
-        //create the participant if not already there
-        if (!m_participants.contains(Myself)) {
-            m_participants[Myself] = new CallParticipant(m_participantData[Myself], q);
-            Q_EMIT q->participantJoined(m_participants[Myself]);
+        if (!bin) {
+            return false;
         }
-
-        if (audio) {
-            Q_EMIT m_participants[Myself]->audioStreamAdded(m_participants[Myself]);
-        } else {
-            Q_EMIT m_participants[Myself]->videoStreamAdded(m_participants[Myself]);
-        }
-
         break;
     }
     case Tp::MediaStreamDirectionReceive:

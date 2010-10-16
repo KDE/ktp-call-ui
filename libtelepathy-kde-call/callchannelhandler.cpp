@@ -457,7 +457,6 @@ bool CallChannelHandlerPrivate::createVideoBin(QExplicitlySharedDataPointer<Part
             bin->addPad(QGst::GhostPad::create(videomaxrate->getStaticPad("sink"), "sink"));
             videomaxrate->link(videoBalance);
         } else {
-            kDebug() << "NOT using postproc_tmpnoise";
             bin->addPad(QGst::GhostPad::create(videoBalance->getStaticPad("sink"), "sink"));
         }
         videoBalance->link(colorspace2);
@@ -467,6 +466,7 @@ bool CallChannelHandlerPrivate::createVideoBin(QExplicitlySharedDataPointer<Part
             capsfilter->link(postproc);
             postproc->link(tee);
         } else {
+            kDebug() << "NOT using postproc_tmpnoise";
             capsfilter->link(tee);
         }
 

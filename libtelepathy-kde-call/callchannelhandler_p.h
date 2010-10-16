@@ -87,7 +87,7 @@ private:
     void onFreeResource(const QGlib::ObjectPtr & stream, uint direction);
 
     bool createAudioBin(QExplicitlySharedDataPointer<ParticipantData> & data);
-    bool createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool withSink);
+    bool createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool isVideoSrc);
 
     // *** data ***
 

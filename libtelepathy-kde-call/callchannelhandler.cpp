@@ -153,6 +153,8 @@ void CallChannelHandlerPrivate::onStreamCreated(const QGlib::ObjectPtr & stream)
                            &CallChannelHandlerPrivate::onSrcPadAdded, QGlib::Signal::PassSender);
     QGlib::Signal::connect(stream, "free-resource", this,
                            &CallChannelHandlerPrivate::onFreeResource, QGlib::Signal::PassSender);
+    QGlib::Signal::connect(stream, "closed", this,
+                           &CallChannelHandlerPrivate::onStreamClosed, QGlib::Signal::PassSender);
 
     bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
     kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";
@@ -350,6 +352,23 @@ void CallChannelHandlerPrivate::onFreeResource(const QGlib::ObjectPtr & stream, 
     }
 }
 
+void CallChannelHandlerPrivate::onStreamClosed(const QGlib::ObjectPtr & stream)
+{
+    kDebug();
+
+    bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
+    QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
+                               : m_participantData[Myself]->videoBin;
+
+    /* For some reason telepathy-farsight does not emit the free-resource signal for the
+     * input resources, so we have to simulate this emission here. For future compatibility
+     * (in case this gets fixed in tp-farsight), we check if the bin is null or not before
+     * simulating the emission. If it is null, it means the signal was emitted earlier.
+     */
+    if (bin) {
+        onFreeResource(stream, Tp::MediaStreamDirectionSend);
+    }
+}
 
 bool CallChannelHandlerPrivate::createAudioBin(QExplicitlySharedDataPointer<ParticipantData> & data)
 {

@@ -85,6 +85,7 @@ private:
     void onSrcPadAdded(const QGlib::ObjectPtr & stream, QGst::PadPtr & src);
     bool onRequestResource(const QGlib::ObjectPtr & stream, uint direction);
     void onFreeResource(const QGlib::ObjectPtr & stream, uint direction);
+    void onStreamClosed(const QGlib::ObjectPtr & stream);
 
     bool createAudioBin(QExplicitlySharedDataPointer<ParticipantData> & data);
     bool createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool isVideoSrc);

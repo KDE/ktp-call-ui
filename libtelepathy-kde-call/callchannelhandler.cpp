@@ -38,7 +38,6 @@ CallChannelHandler::CallChannelHandler(const Tp::StreamedMediaChannelPtr & chann
     : QObject(parent), d(new CallChannelHandlerPrivate(this))
 {
     d->init(channel);
-    qRegisterMetaType<CallParticipant*>();
 }
 
 CallChannelHandler::~CallChannelHandler()
@@ -267,6 +266,18 @@ bool CallChannelHandlerPrivate::onRequestResource(const QGlib::ObjectPtr & strea
             m_participantData[RemoteContact]->videoBin->setState(QGst::StatePlaying);
         }
 
+        //create the participant if not already there
+        if (!m_participants.contains(RemoteContact)) {
+            m_participants[RemoteContact] = new CallParticipant(m_participantData[RemoteContact], q);
+            Q_EMIT q->participantJoined(m_participants[RemoteContact]);
+        }
+
+        if (audio) {
+            Q_EMIT m_participants[RemoteContact]->audioStreamAdded(m_participants[RemoteContact]);
+        } else {
+            Q_EMIT m_participants[RemoteContact]->videoStreamAdded(m_participants[RemoteContact]);
+        }
+
         break;
     }
     default:
@@ -286,19 +297,6 @@ void CallChannelHandlerPrivate::onSrcPadAdded(const QGlib::ObjectPtr & stream, Q
     kDebug() << (audio ? "Audio" : "Video") << "src pad added";
 
     pad->link(bin->getStaticPad("sink"));
-
-    //create the participant if not already there
-    if (!m_participants.contains(RemoteContact)) {
-        m_participants[RemoteContact] = new CallParticipant(m_participantData[RemoteContact]);
-        m_participants[RemoteContact]->moveToThread(q->thread());
-        m_participants[RemoteContact]->setParent(q);
-        QMetaObject::invokeMethod(q, "participantJoined", Qt::QueuedConnection,
-                                  Q_ARG(CallParticipant*, m_participants[RemoteContact]));
-    }
-
-    const char *streamAddedSignal = audio ? "audioStreamAdded" : "videoStreamAdded";
-    QMetaObject::invokeMethod(m_participants[RemoteContact], streamAddedSignal, Qt::QueuedConnection,
-                              Q_ARG(CallParticipant*, m_participants[RemoteContact]));
 }
 
 void CallChannelHandlerPrivate::onFreeResource(const QGlib::ObjectPtr & stream, uint direction)

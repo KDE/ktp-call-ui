@@ -264,7 +264,7 @@ void CallWindow::onParticipantJoined(CallParticipant *participant)
     connect(participant, SIGNAL(videoStreamRemoved(CallParticipant*)),
             this, SLOT(onParticipantVideoStreamRemoved(CallParticipant*)));
 
-    if (participant->isMyself()) {
+    if (!participant->isMyself()) {
         setState(Connected);
     }
 }

@@ -1,3 +1,14 @@
+# - Try to find farsight2
+#
+# Based on FindGStreamer.cmake
+# Copyright (c) 2006, Tim Beaulen <tbscope@gmail.com>
+# Copyright (c) 2009, George Kiagiadakis <kiagiadakis.george@gmail.com>
+# Copyright (c) 2010, Collabora Ltd. <info@collabora.co.uk>
+#   @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 IF (FARSIGHT2_INCLUDE_DIR AND FARSIGHT2_LIBRARIES)
    # in cache already
    SET(Farsight2_FIND_QUIETLY TRUE)

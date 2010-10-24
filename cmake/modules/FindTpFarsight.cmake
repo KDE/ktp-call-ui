@@ -1,3 +1,12 @@
+# - Try to find telepathy-farsight
+#
+# Based on FindGStreamer.cmake
+# Copyright (c) 2006, Tim Beaulen <tbscope@gmail.com>
+# Copyright (c) 2009, George Kiagiadakis <kiagiadakis.george@gmail.com>
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 IF (TPFARSIGHT_INCLUDE_DIR AND TPFARSIGHT_LIBRARIES)
    # in cache already
    SET(TpFarsight_FIND_QUIETLY TRUE)

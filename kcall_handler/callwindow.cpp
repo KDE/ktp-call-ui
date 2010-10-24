@@ -20,7 +20,6 @@
 #include "ui_callwindow.h"
 #include "dtmfhandler.h"
 #include "kcallhandlersettings.h"
-#include "../libkcallprivate/groupmembersmodel.h"
 #include "../libtelepathy-kde-call/callchannelhandler.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
@@ -90,11 +89,6 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
         d->ui.dtmfWidget->setEnabled(true);
         handler->connectDtmfWidget(d->ui.dtmfWidget);
     }
-
-    //populate the participants dock
-    GroupMembersModel *model = new GroupMembersModel(Tp::ChannelPtr::staticCast(d->channel), this);
-    d->ui.participantsDock->setEnabled(true);
-    d->ui.participantsListView->setModel(model);
 
     setState(Connecting);
 }

@@ -27,7 +27,7 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData aboutData("kcall_handler", "kcall", ki18n("KCall"), "0.8",
+    KAboutData aboutData("telepathy-kde-call-ui", "kcall", ki18n("KCall"), "0.8",
                           ki18n("VoIP client for KDE"), KAboutData::License_GPL,
                           ki18n("(C) 2009, George Kiagiadakis"));
     aboutData.setProgramIconName("internet-telephony");
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
                                                        << Tp::Connection::FeatureSelfContact)
                                    );
     Tp::SharedPtr<CallHandler> callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
-    registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "kcall_handler");
+    registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "telepathy-kde-call-ui");
 
     return app.exec();
 }

@@ -18,6 +18,7 @@
 */
 #include "callwindow.h"
 #include "ui_callwindow.h"
+#include "statusarea.h"
 #include "dtmfhandler.h"
 #include "kcallhandlersettings.h"
 #include "../libtelepathy-kde-call/callchannelhandler.h"
@@ -29,7 +30,6 @@
 #include <KLocalizedString>
 #include <KToggleAction>
 #include <KActionCollection>
-#include <KStatusBar>
 #include <TelepathyQt4/StreamedMediaChannel>
 #include <TelepathyQt4/Connection>
 
@@ -39,17 +39,14 @@ struct CallWindow::Private
 {
     Tp::StreamedMediaChannelPtr channel;
     CallChannelHandler *channelHandler;
+    StatusArea *statusArea;
+
     KAction *hangupAction;
     KAction *sendVideoAction;
     bool sendingVideo;
-    QTime callDuration;
-    QTimer callDurationTimer;
     QDockWidget *videoDock;
-    QLabel *statusLabel;
     Ui::CallWindow ui;
     CallLog *callLog;
-    QPointer<QWidget> audioStatusIcon;
-    QPointer<QWidget> videoStatusIcon;
     bool callEnded;
 };
 
@@ -78,8 +75,6 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
 
     d->callLog = new CallLog(d->ui.logView, this);
     connect(d->callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
-
-    connect(&d->callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 
     //enable dtmf
     if ( d->channel->interfaces().contains(TELEPATHY_INTERFACE_CHANNEL_INTERFACE_DTMF) ) {
@@ -127,15 +122,11 @@ void CallWindow::setupUi()
     d->ui.setupUi(this);
     setupActions();
 
+    d->statusArea = new StatusArea(statusBar());
+
     d->ui.participantsDock->hide();
     d->ui.logDock->hide();
     disableUi();
-
-    d->callDuration.setHMS(0, 0, 0);
-    statusBar()->insertPermanentItem(d->callDuration.toString(), 1);
-
-    d->statusLabel = new QLabel;
-    statusBar()->addWidget(d->statusLabel);
 
     setupGUI(QSize(330, 330), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
@@ -157,16 +148,16 @@ void CallWindow::setState(State state)
 {
     switch (state) {
     case Connecting:
-        setStatus(i18nc("@info:status", "Connecting..."));
+        d->statusArea->setStatusMessage(i18nc("@info:status", "Connecting..."));
         break;
     case Connected:
-        setStatus(i18nc("@info:status", "Talking..."));
-        d->callDurationTimer.start(1000);
+        d->statusArea->setStatusMessage(i18nc("@info:status", "Talking..."));
+        d->statusArea->startDurationTimer();
         break;
     case Disconnected:
-        setStatus(i18nc("@info:status", "Disconnected."));
+        d->statusArea->setStatusMessage(i18nc("@info:status", "Disconnected."));
         disableUi();
-        d->callDurationTimer.stop();
+        d->statusArea->stopDurationTimer();
         d->callEnded = true;
         if ( KCallHandlerSettings::closeOnDisconnect() && !d->callLog->errorHasBeenLogged() ) {
             QTimer::singleShot(KCallHandlerSettings::closeOnDisconnectTimeout() * 1000,
@@ -176,55 +167,6 @@ void CallWindow::setState(State state)
     default:
         Q_ASSERT(false);
     }
-}
-
-void CallWindow::setStatus(const QString & msg)
-{
-    d->statusLabel->setText(msg);
-}
-
-void CallWindow::onCallDurationTimerTimeout()
-{
-    d->callDuration = d->callDuration.addSecs(1);
-    statusBar()->changeItem(d->callDuration.toString(), 1);
-}
-
-void CallWindow::onAudioStreamAdded()
-{
-    if ( !d->audioStatusIcon ) {
-        QLabel *label = new QLabel;
-        label->setPixmap(KIcon("voicecall").pixmap(16));
-        d->audioStatusIcon = label;
-        statusBar()->insertPermanentWidget(1, d->audioStatusIcon);
-    } else {
-        statusBar()->insertPermanentWidget(1, d->audioStatusIcon);
-        d->audioStatusIcon->show();
-    }
-}
-
-void CallWindow::onAudioStreamRemoved()
-{
-    Q_ASSERT(d->audioStatusIcon);
-    statusBar()->removeWidget(d->audioStatusIcon);
-}
-
-void CallWindow::onVideoStreamAdded()
-{
-    if ( !d->videoStatusIcon ) {
-        QLabel *label = new QLabel;
-        label->setPixmap(KIcon("camera-web").pixmap(16));
-        d->videoStatusIcon = label;
-        statusBar()->insertPermanentWidget(1, d->videoStatusIcon);
-    } else {
-        statusBar()->insertPermanentWidget(1, d->videoStatusIcon);
-        d->videoStatusIcon->show();
-    }
-}
-
-void CallWindow::onVideoStreamRemoved()
-{
-    Q_ASSERT(d->videoStatusIcon);
-    statusBar()->removeWidget(d->videoStatusIcon);
 }
 
 void CallWindow::onSendVideoStateChanged(bool enabled)
@@ -278,7 +220,7 @@ void CallWindow::onParticipantLeft(CallParticipant *participant)
 void CallWindow::onParticipantAudioStreamAdded(CallParticipant *participant)
 {
     if (participant->isMyself()) {
-        onAudioStreamAdded();
+        d->statusArea->showAudioStatusIcon(true);
         d->ui.microphoneGroupBox->setEnabled(true);
         d->ui.inputVolumeWidget->setVolumeControl(participant);
     } else {
@@ -290,7 +232,7 @@ void CallWindow::onParticipantAudioStreamAdded(CallParticipant *participant)
 void CallWindow::onParticipantAudioStreamRemoved(CallParticipant *participant)
 {
     if (participant->isMyself()) {
-        onAudioStreamRemoved();
+        d->statusArea->showAudioStatusIcon(false);
         d->ui.microphoneGroupBox->setEnabled(false);
         d->ui.inputVolumeWidget->setVolumeControl(NULL);
     } else {
@@ -305,7 +247,7 @@ void CallWindow::onParticipantVideoStreamAdded(CallParticipant *participant)
     setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
 
     if (participant->isMyself()) {
-        onVideoStreamAdded();
+        d->statusArea->showVideoStatusIcon(true);
 
         d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, true);
         d->ui.videoControlsTab->setEnabled(true);
@@ -337,7 +279,7 @@ void CallWindow::onParticipantVideoStreamRemoved(CallParticipant *participant)
     setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
 
     if (participant->isMyself()) {
-        onVideoStreamRemoved();
+        d->statusArea->showVideoStatusIcon(false);
 
         d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
         d->ui.videoControlsTab->setEnabled(false);

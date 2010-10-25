@@ -9,6 +9,7 @@ set(telepathy-kde-call-ui_SRCS
     dtmfwidget.cpp
     volumewidget.cpp
     videobalancewidget.cpp
+    statusarea.cpp
 )
 
 kde4_add_ui_files(telepathy-kde-call-ui_SRCS callwindow.ui dtmfwidget.ui)

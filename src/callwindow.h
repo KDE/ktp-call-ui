@@ -40,13 +40,7 @@ private:
 
 private slots:
     void setState(State state);
-    void setStatus(const QString & msg);
 
-    void onCallDurationTimerTimeout();
-    void onAudioStreamAdded();
-    void onAudioStreamRemoved();
-    void onVideoStreamAdded();
-    void onVideoStreamRemoved();
     void onSendVideoStateChanged(bool enabled);
     void toggleSendVideo();
 

@@ -20,9 +20,9 @@ target_link_libraries(telepathy-kde-call-ui ${KDE4_KDEUI_LIBS} ${TELEPATHY_QT4_L
 install(TARGETS telepathy-kde-call-ui ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/telepathy-kde-call-ui)
 
-configure_file(org.freedesktop.Telepathy.Client.telepathy-kde-call-ui.service.in
-                org.freedesktop.Telepathy.Client.telepathy-kde-call-ui.service)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.Client.telepathy-kde-call-ui.service
+configure_file(org.freedesktop.Telepathy.Client.telepathy_kde_call_ui.service.in
+                org.freedesktop.Telepathy.Client.telepathy_kde_call_ui.service)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.Client.telepathy_kde_call_ui.service
         DESTINATION ${DBUS_SERVICES_INSTALL_DIR})
 
 # FIXME any better macro for ${XDG_DATA_DIRS} ?

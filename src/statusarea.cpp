@@ -17,6 +17,7 @@
 */
 #include "statusarea.h"
 #include <KIcon>
+#include <KDebug>
 
 StatusArea::StatusArea(KStatusBar *statusBar)
     : QObject(statusBar), m_statusBar(statusBar)
@@ -40,9 +41,14 @@ void StatusArea::stopDurationTimer()
     m_callDurationTimer.stop();
 }
 
-void StatusArea::setStatusMessage(const QString& message)
+void StatusArea::setMessage(MessageType type, const QString& message)
 {
-    m_statusLabel->setText(message);
+    if (type == Status) {
+        m_statusLabel->setText(message);
+    } else {
+        kDebug() << "ERROR message:" << message;
+        //TODO handle error messages
+    }
 }
 
 void StatusArea::onCallDurationTimerTimeout()

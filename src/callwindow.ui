@@ -6,125 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>389</height>
+    <width>563</width>
+    <height>386</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="KTabWidget" name="tabWidget">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="volumeTab">
-         <attribute name="title">
-          <string>Volume</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <widget class="QGroupBox" name="speakersGroupBox">
-            <property name="title">
-             <string>Speakers</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="VolumeWidget" name="outputVolumeWidget" native="true"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="microphoneGroupBox">
-            <property name="title">
-             <string>Microphone</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <item>
-              <widget class="VolumeWidget" name="inputVolumeWidget" native="true"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="videoControlsTab">
-         <attribute name="title">
-          <string>Video controls</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <item>
-           <widget class="QGroupBox" name="groupBox">
-            <property name="title">
-             <string>Video input</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <item>
-              <widget class="VideoBalanceWidget" name="videoInputBalanceWidget" native="true"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="DtmfWidget" name="dtmfWidget">
-         <attribute name="title">
-          <string>Dialpad</string>
-         </attribute>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
+   <layout class="QHBoxLayout" name="horizontalLayout"/>
   </widget>
-  <widget class="QDockWidget" name="logDock">
+  <widget class="QDockWidget" name="dtmfDock">
    <property name="windowTitle">
-    <string>Call log</string>
+    <string>Dialpad</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>8</number>
+    <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPlainTextEdit" name="logView">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="participantsDock">
-   <property name="windowTitle">
-    <string>Participants</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <widget class="QListView" name="participantsListView"/>
+      <widget class="DtmfWidget" name="dtmfWidget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -132,27 +31,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KTabWidget</class>
-   <extends>QTabWidget</extends>
-   <header>ktabwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>DtmfWidget</class>
    <extends>QWidget</extends>
    <header>dtmfwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>VolumeWidget</class>
-   <extends>QWidget</extends>
-   <header>volumewidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>VideoBalanceWidget</class>
-   <extends>QWidget</extends>
-   <header>videobalancewidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

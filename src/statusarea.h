@@ -29,12 +29,14 @@ class StatusArea : public QObject
 {
     Q_OBJECT
 public:
+    enum MessageType { Status, Error };
+
     StatusArea(KStatusBar *statusBar);
 
 public Q_SLOTS:
     void startDurationTimer();
     void stopDurationTimer();
-    void setStatusMessage(const QString & message);
+    void setMessage(MessageType type, const QString & message);
     void showAudioStatusIcon(bool show);
     void showVideoStatusIcon(bool show);
 

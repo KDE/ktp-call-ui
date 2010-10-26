@@ -20,11 +20,9 @@
 #include "ui_callwindow.h"
 #include "statusarea.h"
 #include "dtmfhandler.h"
-#include "kcallhandlersettings.h"
 #include "../libtelepathy-kde-call/callchannelhandler.h"
 #include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
-#include <QtGui/QLabel>
 #include <QtGui/QDockWidget>
 #include <KDebug>
 #include <KLocalizedString>
@@ -33,20 +31,14 @@
 #include <TelepathyQt4/StreamedMediaChannel>
 #include <TelepathyQt4/Connection>
 
-enum TabIndices { VolumeTabIndex, VideoControlsTabIndex, DialpadTabIndex };
-
 struct CallWindow::Private
 {
-    Tp::StreamedMediaChannelPtr channel;
+    Private() : callEnded(false) {}
+
     CallChannelHandler *channelHandler;
     StatusArea *statusArea;
-
-    KAction *hangupAction;
-    KAction *sendVideoAction;
-    bool sendingVideo;
-    QDockWidget *videoDock;
+    KToggleAction *muteAction;
     Ui::CallWindow ui;
-    CallLog *callLog;
     bool callEnded;
 };
 
@@ -56,34 +48,31 @@ struct CallWindow::Private
 CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
     : KXmlGuiWindow(), d(new Private)
 {
-    //setup the channel
-    d->channel = channel;
-    d->channel->acceptCall();
-    d->callEnded = false;
-
-    //create the gstreamer handler
-    d->channelHandler = new CallChannelHandler(d->channel, this);
+    //create the channel handler
+    d->channelHandler = new CallChannelHandler(channel, this);
     connect(d->channelHandler, SIGNAL(participantJoined(CallParticipant*)),
             this, SLOT(onParticipantJoined(CallParticipant*)));
     connect(d->channelHandler, SIGNAL(participantLeft(CallParticipant*)),
             this, SLOT(onParticipantLeft(CallParticipant*)));
-    connect(d->channelHandler, SIGNAL(error(QString)), this, SLOT(logErrorMessage(QString)));
+    connect(d->channelHandler, SIGNAL(error(QString)), this, SLOT(onHandlerError(QString)));
     connect(d->channelHandler, SIGNAL(callEnded(QString)), this, SLOT(onCallEnded(QString)));
 
     //create ui
-    setupUi(); //must be called after creating the state handler
-
-    d->callLog = new CallLog(d->ui.logView, this);
-    connect(d->callLog, SIGNAL(notifyUser()), d->ui.logDock, SLOT(show()));
+    d->ui.setupUi(this);
+    d->statusArea = new StatusArea(statusBar());
+    setupActions(); //must be called after creating the channel handler
+    setupGUI(QSize(430, 300), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
+    setAutoSaveSettings(QLatin1String("CallWindow"), false);
 
     //enable dtmf
-    if ( d->channel->interfaces().contains(TELEPATHY_INTERFACE_CHANNEL_INTERFACE_DTMF) ) {
+    if (channel->interfaces().contains(TELEPATHY_INTERFACE_CHANNEL_INTERFACE_DTMF)) {
         kDebug() << "Creating DTMF handler";
-        DtmfHandler *handler = new DtmfHandler(d->channel, this);
-        d->ui.tabWidget->setTabEnabled(DialpadTabIndex, true);
-        d->ui.dtmfWidget->setEnabled(true);
+        DtmfHandler *handler = new DtmfHandler(channel, this);
         handler->connectDtmfWidget(d->ui.dtmfWidget);
+    } else {
+        d->ui.dtmfWidget->setEnabled(false);
     }
+    d->ui.dtmfDock->hide();
 
     setState(Connecting);
 }
@@ -96,97 +85,54 @@ CallWindow::~CallWindow()
 
 void CallWindow::setupActions()
 {
-    d->hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
-    connect(d->hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangup()));
-    actionCollection()->addAction("hangup", d->hangupAction);
+    QAction *showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
+    showMyVideoAction->setIcon(KIcon("camera-web"));
+    actionCollection()->addAction("showMyVideo", showMyVideoAction);
 
-    d->sendVideoAction = new KAction(this);
-    d->sendVideoAction->setIcon(KIcon("webcamsend"));
-    connect(d->sendVideoAction, SIGNAL(triggered()), this, SLOT(toggleSendVideo()));
-    actionCollection()->addAction("sendVideo", d->sendVideoAction);
-    d->sendingVideo = true;
-    onSendVideoStateChanged(false); //to initialize the text of the action
+    QAction *showDtmfAction = d->ui.dtmfDock->toggleViewAction();
+    showDtmfAction->setText(i18nc("@action", "Show dialpad"));
+    showDtmfAction->setIcon(KIcon("phone"));
+    actionCollection()->addAction("showDtmf", showDtmfAction);
 
-    QAction *showParticipants = d->ui.participantsDock->toggleViewAction();
-    showParticipants->setText(i18nc("@action:inmenu", "Show participants"));
-    showParticipants->setIcon(KIcon("system-users"));
-    actionCollection()->addAction("showParticipants", showParticipants);
+    QAction *sendVideoAction = new KToggleAction(i18nc("@action", "Send video"), this);
+    sendVideoAction->setIcon(KIcon("webcamsend"));
+    sendVideoAction->setEnabled(false); //TODO implement this feature
+    actionCollection()->addAction("sendVideo", sendVideoAction);
 
-    QAction *showLog = d->ui.logDock->toggleViewAction();
-    showLog->setText(i18nc("@action:inmenu", "Show log"));
-    actionCollection()->addAction("showLog", showLog);
-}
+    d->muteAction = new KToggleAction(KIcon("audio-volume-medium"), i18nc("@action", "Mute"), this);
+    d->muteAction->setCheckedState(KGuiItem(i18nc("@action", "Mute"), KIcon("audio-volume-muted")));
+    d->muteAction->setEnabled(false); //will be enabled later
+    actionCollection()->addAction("mute", d->muteAction);
 
-void CallWindow::setupUi()
-{
-    d->ui.setupUi(this);
-    setupActions();
+    QAction *holdAction = new KToggleAction(i18nc("@action", "Hold"), this);
+    holdAction->setIcon(KIcon("media-playback-pause"));
+    holdAction->setEnabled(false); //TODO implement this feature
+    actionCollection()->addAction("hold", holdAction);
 
-    d->statusArea = new StatusArea(statusBar());
-
-    d->ui.participantsDock->hide();
-    d->ui.logDock->hide();
-    disableUi();
-
-    setupGUI(QSize(330, 330), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
-    setAutoSaveSettings(QLatin1String("CallWindow"), false);
-}
-
-void CallWindow::disableUi()
-{
-    d->ui.participantsDock->setEnabled(false);
-    //d->ui.tabWidget->setTabEnabled(VolumeTabIndex, false);
-    d->ui.microphoneGroupBox->setEnabled(false);
-    d->ui.speakersGroupBox->setEnabled(false);
-    d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
-    d->ui.videoControlsTab->setEnabled(false);
-    d->ui.tabWidget->setTabEnabled(DialpadTabIndex, false);
-    d->ui.dtmfWidget->setEnabled(false);
+    QAction *hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
+    connect(hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangup()));
+    actionCollection()->addAction("hangup", hangupAction);
 }
 
 void CallWindow::setState(State state)
 {
     switch (state) {
     case Connecting:
-        d->statusArea->setStatusMessage(i18nc("@info:status", "Connecting..."));
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Connecting..."));
         break;
     case Connected:
-        d->statusArea->setStatusMessage(i18nc("@info:status", "Talking..."));
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
         d->statusArea->startDurationTimer();
         break;
     case Disconnected:
-        d->statusArea->setStatusMessage(i18nc("@info:status", "Disconnected."));
-        disableUi();
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Disconnected."));
         d->statusArea->stopDurationTimer();
         d->callEnded = true;
-        if ( KCallHandlerSettings::closeOnDisconnect() && !d->callLog->errorHasBeenLogged() ) {
-            QTimer::singleShot(KCallHandlerSettings::closeOnDisconnectTimeout() * 1000,
-                               this, SLOT(close()));
-        }
+        QTimer::singleShot(5000, this, SLOT(close()));
         break;
     default:
         Q_ASSERT(false);
     }
-}
-
-void CallWindow::onSendVideoStateChanged(bool enabled)
-{
-    if ( enabled == d->sendingVideo ) {
-        return;
-    }
-
-    if ( enabled ) {
-        d->sendVideoAction->setText(i18nc("@action", "Stop sending video"));
-    } else {
-        d->sendVideoAction->setText(i18nc("@action", "Send video"));
-    }
-
-    d->sendingVideo = enabled;
-}
-
-void CallWindow::toggleSendVideo()
-{
-    //d->stateHandler->setSendVideo(!d->sendingVideo);
 }
 
 void CallWindow::onParticipantJoined(CallParticipant *participant)
@@ -205,27 +151,13 @@ void CallWindow::onParticipantJoined(CallParticipant *participant)
     }
 }
 
-void CallWindow::onParticipantLeft(CallParticipant *participant)
-{
-    disconnect(participant, SIGNAL(audioStreamAdded(CallParticipant*)),
-               this, SLOT(onParticipantAudioStreamAdded(CallParticipant*)));
-    disconnect(participant, SIGNAL(audioStreamRemoved(CallParticipant*)),
-               this, SLOT(onParticipantAudioStreamRemoved(CallParticipant*)));
-    disconnect(participant, SIGNAL(videoStreamAdded(CallParticipant*)),
-               this, SLOT(onParticipantVideoStreamAdded(CallParticipant*)));
-    disconnect(participant, SIGNAL(videoStreamRemoved(CallParticipant*)),
-               this, SLOT(onParticipantVideoStreamRemoved(CallParticipant*)));
-}
-
 void CallWindow::onParticipantAudioStreamAdded(CallParticipant *participant)
 {
     if (participant->isMyself()) {
         d->statusArea->showAudioStatusIcon(true);
-        d->ui.microphoneGroupBox->setEnabled(true);
-        d->ui.inputVolumeWidget->setVolumeControl(participant);
-    } else {
-        d->ui.speakersGroupBox->setEnabled(true);
-        d->ui.outputVolumeWidget->setVolumeControl(participant);
+        d->muteAction->setEnabled(true);
+        d->muteAction->setChecked(participant->isMuted());
+        connect(d->muteAction, SIGNAL(toggled(bool)), participant, SLOT(setMuted(bool)));
     }
 }
 
@@ -233,85 +165,28 @@ void CallWindow::onParticipantAudioStreamRemoved(CallParticipant *participant)
 {
     if (participant->isMyself()) {
         d->statusArea->showAudioStatusIcon(false);
-        d->ui.microphoneGroupBox->setEnabled(false);
-        d->ui.inputVolumeWidget->setVolumeControl(NULL);
-    } else {
-        d->ui.speakersGroupBox->setEnabled(false);
-        d->ui.outputVolumeWidget->setVolumeControl(NULL);
+        d->muteAction->setEnabled(false);
+        d->muteAction->disconnect(participant);
     }
 }
 
 void CallWindow::onParticipantVideoStreamAdded(CallParticipant *participant)
 {
-    QWidget *videoWidget = participant->videoWidget();
-    setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
-
     if (participant->isMyself()) {
         d->statusArea->showVideoStatusIcon(true);
-
-        d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, true);
-        d->ui.videoControlsTab->setEnabled(true);
-        d->ui.videoInputBalanceWidget->setVideoBalanceControl(participant);
-
-        videoWidget->setMinimumSize(160, 120);
-        videoWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        d->ui.verticalLayout->insertWidget(0, videoWidget);
-
-        // force update of the size hint
-        d->ui.verticalLayout->update();
-        d->ui.verticalLayout->activate();
-    } else {
-        videoWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-        d->videoDock = new QDockWidget(this);
-        d->videoDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-        d->videoDock->setWidget(videoWidget);
-        addDockWidget(Qt::LeftDockWidgetArea, d->videoDock);
-
-        QCoreApplication::processEvents(); // force update of the size hint
     }
-
-    resize(sizeHint());
-    setUpdatesEnabled(true);
 }
 
 void CallWindow::onParticipantVideoStreamRemoved(CallParticipant *participant)
 {
-    setUpdatesEnabled(false); // reduce flickering. remember to enable it at the end again.
-
     if (participant->isMyself()) {
         d->statusArea->showVideoStatusIcon(false);
-
-        d->ui.tabWidget->setTabEnabled(VideoControlsTabIndex, false);
-        d->ui.videoControlsTab->setEnabled(false);
-        d->ui.videoInputBalanceWidget->setVideoBalanceControl(NULL);
-
-        QWidget *videoWidget = dynamic_cast<QWidget*>(d->ui.verticalLayout->takeAt(0));
-        videoWidget->hide();
-        videoWidget->deleteLater();
-
-        // force update of the size hint
-        d->ui.verticalLayout->update();
-        d->ui.verticalLayout->activate();
-
-        // no idea why resize needs to be done twice, but it works...
-        // apparently the first time it only resizes horizontally and the second time it resizes vertically.
-        resize(sizeHint());
-        resize(sizeHint());
-    } else {
-        removeDockWidget(d->videoDock);
-        d->videoDock->deleteLater();
-        d->videoDock = NULL;
-
-        QCoreApplication::processEvents(); // force update of the size hint
-        resize(sizeHint());
     }
-
-    setUpdatesEnabled(true);
 }
 
-void CallWindow::logErrorMessage(const QString & error)
+void CallWindow::onHandlerError(const QString & error)
 {
-    d->callLog->logMessage(CallLog::Error, error);
+    d->statusArea->setMessage(StatusArea::Error, error);
 }
 
 void CallWindow::onCallEnded(const QString & message)

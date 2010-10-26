@@ -84,6 +84,8 @@ void CallHandler::onChannelReady(Tp::PendingOperation *operation)
     }
 
     Tp::StreamedMediaChannelPtr channel = Tp::StreamedMediaChannelPtr::dynamicCast(pr->object());
+    channel->acceptCall();
+
     CallWindow *cw = new CallWindow(channel);
     cw->show();
 }

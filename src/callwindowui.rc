@@ -10,18 +10,29 @@
     <Menu name="call" >
       <text>Call</text>
       <Action name="hangup" />
-      <Action name="sendVideo" />
+      <Action name="hold" />
     </Menu>
     <Menu name="view">
-      <Action name="showParticipants" />
-      <Action name="showLog" />
+      <Action name="showMyVideo" />
+      <Action name="showDtmf" />
+    </Menu>
+    <Menu name="media" >
+      <text>Media</text>
+      <Action name="sendVideo" />
+      <Action name="mute" />
     </Menu>
   </MenuBar>
 
-  <ToolBar name="mainToolBar" >
+  <ToolBar name="mainToolBar" position="bottom" >
     <text>Main Toolbar</text>
-    <Action name="hangup" />
+    <Action name="showMyVideo" />
+    <Action name="showDtmf" />
+    <Separator />
     <Action name="sendVideo" />
+    <Action name="mute" />
+    <Separator />
+    <Action name="hold" />
+    <Action name="hangup" />
   </ToolBar>
 
 </gui>

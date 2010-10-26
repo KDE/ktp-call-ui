@@ -151,7 +151,7 @@ void MainWindow::makeDirectCall(bool useVideo)
         request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".InitialVideo", true);
     }
     account->ensureChannel(request, QDateTime::currentDateTime(),
-                           "org.freedesktop.Telepathy.Client.kcall_handler");
+                           "org.freedesktop.Telepathy.Client.telepathy_kde_call_ui");
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

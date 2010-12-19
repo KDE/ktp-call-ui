@@ -23,6 +23,7 @@
 #include <QGst/Bus>
 #include <QGst/GhostPad>
 #include <QGst/Message>
+#include <QGst/Fraction>
 #include <KDebug>
 #include <KLocalizedString>
 #include <KStandardDirs>
@@ -153,6 +154,53 @@ void CallChannelHandlerPrivate::onStreamCreated(const QGlib::ObjectPtr & stream)
                            &CallChannelHandlerPrivate::onSrcPadAdded, QGlib::Signal::PassSender);
     QGlib::Signal::connect(stream, "free-resource", this,
                            &CallChannelHandlerPrivate::onFreeResource, QGlib::Signal::PassSender);
+
+    bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
+    kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";
+
+    QGst::ElementPtr src = audio ? DeviceElementFactory::makeAudioCaptureElement()
+                                 : DeviceElementFactory::makeVideoCaptureElement();
+    if (!src) {
+        Q_EMIT q->error(audio ? i18n("The audio input device could not be initialized")
+                              : i18n("The video input device could not be initialized"));
+        return;
+    }
+
+    if (!(audio ? createAudioBin(m_participantData[Myself])
+                : createVideoBin(m_participantData[Myself], true)))
+    {
+        Q_EMIT q->error(i18n("Could not create some of the required elements. "
+                             "Please check your GStreamer installation."));
+        src->setState(QGst::StateNull); //cleanly dispose the src element
+        return;
+    }
+
+    (audio ? m_audioInputDevice : m_videoInputDevice) = src;
+
+    QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
+                               : m_participantData[Myself]->videoBin;
+
+    m_pipeline->add(src);
+    m_pipeline->add(bin);
+    src->link(bin);
+
+    //set everything to playing state
+    bin->setState(QGst::StatePlaying);
+    src->setState(QGst::StatePlaying);
+
+    bin->getStaticPad("src")->link(stream->property("sink-pad").get<QGst::PadPtr>());
+
+    //create the participant if not already there
+    if (!m_participants.contains(Myself)) {
+        m_participants[Myself] = new CallParticipant(m_participantData[Myself], q);
+        Q_EMIT q->participantJoined(m_participants[Myself]);
+    }
+
+    if (audio) {
+        Q_EMIT m_participants[Myself]->audioStreamAdded(m_participants[Myself]);
+    } else {
+        Q_EMIT m_participants[Myself]->videoStreamAdded(m_participants[Myself]);
+    }
 }
 
 GList *CallChannelHandlerPrivate::onStreamGetCodecConfig()
@@ -174,52 +222,11 @@ bool CallChannelHandlerPrivate::onRequestResource(const QGlib::ObjectPtr & strea
     switch(direction) {
     case Tp::MediaStreamDirectionSend:
     {
-        kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";
-
-        QGst::ElementPtr src = audio ? DeviceElementFactory::makeAudioCaptureElement()
-                                     : DeviceElementFactory::makeVideoCaptureElement();
-        if (!src) {
-            Q_EMIT q->error(audio ? i18n("The audio input device could not be initialized")
-                                  : i18n("The video input device could not be initialized"));
-            return false;
-        }
-
-        if (!(audio ? createAudioBin(m_participantData[Myself])
-                    : createVideoBin(m_participantData[Myself], true)))
-        {
-            Q_EMIT q->error(i18n("Could not create some of the required elements. "
-                                 "Please check your GStreamer installation."));
-            src->setState(QGst::StateNull); //cleanly dispose the src element
-            return false;
-        }
-
-        (audio ? m_audioInputDevice : m_videoInputDevice) = src;
-
         QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
                                    : m_participantData[Myself]->videoBin;
-
-        m_pipeline->add(src);
-        m_pipeline->add(bin);
-
-        src->link(bin);
-        bin->getStaticPad("src")->link(stream->property("sink-pad").get<QGst::PadPtr>());
-
-        //set everything to playing state
-        bin->setState(QGst::StatePlaying);
-        src->setState(QGst::StatePlaying);
-
-        //create the participant if not already there
-        if (!m_participants.contains(Myself)) {
-            m_participants[Myself] = new CallParticipant(m_participantData[Myself], q);
-            Q_EMIT q->participantJoined(m_participants[Myself]);
+        if (!bin) {
+            return false;
         }
-
-        if (audio) {
-            Q_EMIT m_participants[Myself]->audioStreamAdded(m_participants[Myself]);
-        } else {
-            Q_EMIT m_participants[Myself]->videoStreamAdded(m_participants[Myself]);
-        }
-
         break;
     }
     case Tp::MediaStreamDirectionReceive:
@@ -375,20 +382,108 @@ bool CallChannelHandlerPrivate::createAudioBin(QExplicitlySharedDataPointer<Part
     return true;
 }
 
-bool CallChannelHandlerPrivate::createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool withSink)
+bool CallChannelHandlerPrivate::createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool isVideoSrc)
 {
     QGst::BinPtr bin = QGst::Bin::create();
     QGst::ElementPtr videoBalance = QGst::ElementFactory::make("videobalance");
-    QGst::ElementPtr tee = QGst::ElementFactory::make("tee");
-    QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
     QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
     QGst::ElementPtr videoscale = QGst::ElementFactory::make("videoscale");
     QGst::ElementPtr videosink = QGst::ElementFactory::make("qwidgetvideosink"); //FIXME not always the best sink
 
-    if (!bin || !videoBalance || !tee || !queue || !colorspace || !videoscale || !videosink) {
+    if (!bin || !videoBalance || !colorspace || !videoscale || !videosink) {
         kDebug() << "Could not make some of the video bin elements";
         return false;
     }
+
+    videosink->setProperty("force-aspect-ratio", true); //FIXME should be externally configurable
+
+    bin->add(videoBalance);
+    bin->add(colorspace);
+    bin->add(videoscale);
+    bin->add(videosink);
+
+    /* if we are creating the bin for the video source, we create the following pipeline:
+     * (srcPad) ! videomaxrate (optional) ! videobalance ! ffmpegcolorspace ! videoscale ! capsfilter !
+     * postproc_tmpnoise (optional) ! tee ! -> queue ! ffmpegcolorspace ! videoscale ! qwidgetvideosink
+     *                                      -> queue ! (sinkPad)
+     * else we just create a simple:
+     * (srcPad) ! videobalance ! ffmpegcolorspace ! videoscale ! qwidgetvideosink
+     *
+     * videomaxrate is optional because it is in gst-plugins-bad and similarly, postproc_tmpnoise
+     * is optional because it is in gst-plugins-ffmpeg.
+     */
+    if (isVideoSrc) {
+        QGst::ElementPtr videomaxrate = QGst::ElementFactory::make("videomaxrate");
+        QGst::ElementPtr colorspace2 = QGst::ElementFactory::make("ffmpegcolorspace");
+        QGst::ElementPtr videoscale2 = QGst::ElementFactory::make("videoscale");
+        QGst::ElementPtr capsfilter = QGst::ElementFactory::make("capsfilter");
+        QGst::ElementPtr postproc = QGst::ElementFactory::make("postproc_tmpnoise");
+        QGst::ElementPtr tee = QGst::ElementFactory::make("tee");
+        QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
+        QGst::ElementPtr queue2 = QGst::ElementFactory::make("queue");
+
+        if (!colorspace2 || !videoscale2 || !capsfilter || !tee || !queue || !queue2) {
+            kDebug() << "Could not make some of the video bin elements";
+            return false;
+        }
+
+        QGst::Structure capsStruct("video/x-raw-yuv");
+        capsStruct.setValue("width", 320);
+        capsStruct.setValue("height", 240);
+
+        /* videomaxrate is optional, since it is not always available */
+        if (videomaxrate) {
+            bin->add(videomaxrate);
+        } else {
+            kDebug() << "NOT using videomaxrate";
+            capsStruct.setValue("framerate", QGst::Fraction(15,1));
+        }
+
+        QGst::CapsPtr caps = QGst::Caps::createEmpty();
+        caps->appendStructure(capsStruct);
+        capsfilter->setProperty("caps", caps);
+
+        bin->add(colorspace2);
+        bin->add(videoscale2);
+        bin->add(capsfilter);
+        if (postproc) {
+            bin->add(postproc);
+        }
+        bin->add(tee);
+        bin->add(queue);
+        bin->add(queue2);
+
+        if (videomaxrate) {
+            bin->addPad(QGst::GhostPad::create(videomaxrate->getStaticPad("sink"), "sink"));
+            videomaxrate->link(videoBalance);
+        } else {
+            bin->addPad(QGst::GhostPad::create(videoBalance->getStaticPad("sink"), "sink"));
+        }
+        videoBalance->link(colorspace2);
+        colorspace2->link(videoscale2);
+        videoscale2->link(capsfilter);
+        if (postproc) {
+            capsfilter->link(postproc);
+            postproc->link(tee);
+        } else {
+            kDebug() << "NOT using postproc_tmpnoise";
+            capsfilter->link(tee);
+        }
+
+        //video preview branch
+        tee->getRequestPad("src%d")->link(queue->getStaticPad("sink"));
+        queue->link(colorspace);
+
+        //src pad for fsconference branch
+        tee->getRequestPad("src%d")->link(queue2->getStaticPad("sink"));
+        bin->addPad(QGst::GhostPad::create(queue2->getStaticPad("src"), "src"));
+    } else {
+        bin->addPad(QGst::GhostPad::create(videoBalance->getStaticPad("sink"), "sink"));
+        videoBalance->link(colorspace);
+    }
+
+    colorspace->link(videoscale);
+    videoscale->link(videosink);
 
     if (!(data->colorBalanceControl = videoBalance.dynamicCast<QGst::ColorBalance>())) {
         kDebug() << "Could not cast videobalance element to GstColorBalance";
@@ -396,32 +491,8 @@ bool CallChannelHandlerPrivate::createVideoBin(QExplicitlySharedDataPointer<Part
     }
     data->videoBin = bin;
 
-    videosink->setProperty("force-aspect-ratio", true); //FIXME should be externally configurable
-
-    bin->add(videoBalance);
-    bin->add(tee);
-    bin->add(queue);
-    bin->add(colorspace);
-    bin->add(videoscale);
-    bin->add(videosink);
-
-    bin->addPad(QGst::GhostPad::create(videoBalance->getStaticPad("sink"), "sink"));
-    videoBalance->link(tee);
-    tee->getRequestPad("src%d")->link(queue->getStaticPad("sink"));
-    queue->link(colorspace);
-    colorspace->link(videoscale);
-    videoscale->link(videosink);
-
     data->videoWidget = new QGst::Ui::VideoWidget;
     data->videoWidget.data()->setVideoSink(videosink);
-
-    if (withSink) {
-        QGst::ElementPtr queue2 = QGst::ElementFactory::make("queue");
-        bin->add(queue2);
-        tee->getRequestPad("src%d")->link(queue2->getStaticPad("sink"));
-
-        bin->addPad(QGst::GhostPad::create(queue2->getStaticPad("src"), "src"));
-    }
 
     return true;
 }

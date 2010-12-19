@@ -317,6 +317,7 @@ void CallWindow::onParticipantVideoStreamAdded(CallParticipant *participant)
         d->ui.videoControlsTab->setEnabled(true);
         d->ui.videoInputBalanceWidget->setVideoBalanceControl(participant);
 
+        videoWidget->setMinimumSize(160, 120);
         videoWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         d->ui.verticalLayout->insertWidget(0, videoWidget);
 

@@ -38,7 +38,6 @@ CallChannelHandler::CallChannelHandler(const Tp::StreamedMediaChannelPtr & chann
     : QObject(parent), d(new CallChannelHandlerPrivate(this))
 {
     d->init(channel);
-    qRegisterMetaType<CallParticipant*>();
 }
 
 CallChannelHandler::~CallChannelHandler()
@@ -154,6 +153,8 @@ void CallChannelHandlerPrivate::onStreamCreated(const QGlib::ObjectPtr & stream)
                            &CallChannelHandlerPrivate::onSrcPadAdded, QGlib::Signal::PassSender);
     QGlib::Signal::connect(stream, "free-resource", this,
                            &CallChannelHandlerPrivate::onFreeResource, QGlib::Signal::PassSender);
+    QGlib::Signal::connect(stream, "closed", this,
+                           &CallChannelHandlerPrivate::onStreamClosed, QGlib::Signal::PassSender);
 
     bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
     kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";
@@ -267,6 +268,18 @@ bool CallChannelHandlerPrivate::onRequestResource(const QGlib::ObjectPtr & strea
             m_participantData[RemoteContact]->videoBin->setState(QGst::StatePlaying);
         }
 
+        //create the participant if not already there
+        if (!m_participants.contains(RemoteContact)) {
+            m_participants[RemoteContact] = new CallParticipant(m_participantData[RemoteContact], q);
+            Q_EMIT q->participantJoined(m_participants[RemoteContact]);
+        }
+
+        if (audio) {
+            Q_EMIT m_participants[RemoteContact]->audioStreamAdded(m_participants[RemoteContact]);
+        } else {
+            Q_EMIT m_participants[RemoteContact]->videoStreamAdded(m_participants[RemoteContact]);
+        }
+
         break;
     }
     default:
@@ -286,19 +299,6 @@ void CallChannelHandlerPrivate::onSrcPadAdded(const QGlib::ObjectPtr & stream, Q
     kDebug() << (audio ? "Audio" : "Video") << "src pad added";
 
     pad->link(bin->getStaticPad("sink"));
-
-    //create the participant if not already there
-    if (!m_participants.contains(RemoteContact)) {
-        m_participants[RemoteContact] = new CallParticipant(m_participantData[RemoteContact]);
-        m_participants[RemoteContact]->moveToThread(q->thread());
-        m_participants[RemoteContact]->setParent(q);
-        QMetaObject::invokeMethod(q, "participantJoined", Qt::QueuedConnection,
-                                  Q_ARG(CallParticipant*, m_participants[RemoteContact]));
-    }
-
-    const char *streamAddedSignal = audio ? "audioStreamAdded" : "videoStreamAdded";
-    QMetaObject::invokeMethod(m_participants[RemoteContact], streamAddedSignal, Qt::QueuedConnection,
-                              Q_ARG(CallParticipant*, m_participants[RemoteContact]));
 }
 
 void CallChannelHandlerPrivate::onFreeResource(const QGlib::ObjectPtr & stream, uint direction)
@@ -352,6 +352,23 @@ void CallChannelHandlerPrivate::onFreeResource(const QGlib::ObjectPtr & stream, 
     }
 }
 
+void CallChannelHandlerPrivate::onStreamClosed(const QGlib::ObjectPtr & stream)
+{
+    kDebug();
+
+    bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
+    QGst::BinPtr & bin = audio ? m_participantData[Myself]->audioBin
+                               : m_participantData[Myself]->videoBin;
+
+    /* For some reason telepathy-farsight does not emit the free-resource signal for the
+     * input resources, so we have to simulate this emission here. For future compatibility
+     * (in case this gets fixed in tp-farsight), we check if the bin is null or not before
+     * simulating the emission. If it is null, it means the signal was emitted earlier.
+     */
+    if (bin) {
+        onFreeResource(stream, Tp::MediaStreamDirectionSend);
+    }
+}
 
 bool CallChannelHandlerPrivate::createAudioBin(QExplicitlySharedDataPointer<ParticipantData> & data)
 {

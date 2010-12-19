@@ -141,7 +141,8 @@ void ContactListController::callContact(bool useInitialVideo)
     if ( useInitialVideo ) {
         request.insert(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA ".InitialVideo", true);
     }
-    account->ensureChannel(request, QDateTime::currentDateTime(), "org.freedesktop.Telepathy.Client.kcall_handler");
+    account->ensureChannel(request, QDateTime::currentDateTime(),
+                           "org.freedesktop.Telepathy.Client.telepathy_kde_call_ui");
 }
 
 void ContactListController::setStatus(int statusIndex)

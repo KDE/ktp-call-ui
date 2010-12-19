@@ -32,7 +32,7 @@ public:
 
     void init(const Tp::StreamedMediaChannelPtr & channel);
 
-    inline QHash<Tp::ContactPtr, CallParticipant*> participants() const { return m_participants; }
+    inline QList<CallParticipant*> participants() const { return m_participants.values(); }
 
 private Q_SLOTS:
     void onSessionCreated(QGst::ElementPtr conference);
@@ -57,7 +57,10 @@ private Q_SLOTS:
 private:
     CallChannelHandler *q;
     Tp::StreamedMediaChannelPtr m_channel;
-    QHash<Tp::ContactPtr, CallParticipant*> m_participants;
+
+    //TODO when we start using the Call interface, remember to fix this to support more participants
+    enum Who { Myself, RemoteContact };
+    QMap<Who, CallParticipant*> m_participants;
 
     QTfChannel *m_qtfchannel;
 

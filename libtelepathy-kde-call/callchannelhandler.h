@@ -30,10 +30,14 @@ public:
 
     QList<CallParticipant*> participants() const;
 
+public Q_SLOTS:
+    void hangup(const QString & message = QString());
+
 Q_SIGNALS:
     void participantJoined(CallParticipant *participant);
     void participantLeft(CallParticipant *participant);
     void error(const QString & message);
+    void callEnded(const QString & reason);
 
 private:
     friend class CallChannelHandlerPrivate;

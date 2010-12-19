@@ -32,9 +32,14 @@ public:
 
     void init(const Tp::StreamedMediaChannelPtr & channel);
 
+    inline Tp::StreamedMediaChannelPtr channel() const { return m_channel; }
     inline QList<CallParticipant*> participants() const { return m_participants.values(); }
 
 private Q_SLOTS:
+    void onChannelInvalidated(Tp::DBusProxy *proxy,
+                              const QString & errorName,
+                              const QString & errorMessage);
+
     void onSessionCreated(QGst::ElementPtr conference);
     void onQTfChannelClosed();
 

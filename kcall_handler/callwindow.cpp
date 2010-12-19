@@ -264,13 +264,6 @@ void CallWindow::onParticipantJoined(CallParticipant *participant)
     connect(participant, SIGNAL(videoStreamRemoved(CallParticipant*)),
             this, SLOT(onParticipantVideoStreamRemoved(CallParticipant*)));
 
-    if (participant->hasAudioStream()) {
-        onParticipantAudioStreamAdded(participant);
-    }
-    if (participant->hasVideoStream()) {
-        onParticipantVideoStreamAdded(participant);
-    }
-
     if (participant->isMyself()) {
         setState(Connected);
     }
@@ -286,13 +279,6 @@ void CallWindow::onParticipantLeft(CallParticipant *participant)
                this, SLOT(onParticipantVideoStreamAdded(CallParticipant*)));
     disconnect(participant, SIGNAL(videoStreamRemoved(CallParticipant*)),
                this, SLOT(onParticipantVideoStreamRemoved(CallParticipant*)));
-
-    if (participant->hasAudioStream()) {
-        onParticipantAudioStreamRemoved(participant);
-    }
-    if (participant->hasVideoStream()) {
-        onParticipantVideoStreamRemoved(participant);
-    }
 }
 
 void CallWindow::onParticipantAudioStreamAdded(CallParticipant *participant)

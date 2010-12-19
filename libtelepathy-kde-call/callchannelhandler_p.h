@@ -20,61 +20,107 @@
 
 #include "callchannelhandler.h"
 #include <QGst/Pipeline>
+#include <QGst/StreamVolume>
+#include <QGst/ColorBalance>
+#include <QGst/Ui/VideoWidget>
 #include <TelepathyQt4/Contact>
 #include <TelepathyQt4/StreamedMediaChannel>
-class QTfChannel;
+class ParticipantData;
+
+
+//BEGIN Ugly forward declarations
+
+/* These declarations are copied here instead of including the proper headers,
+ * because the proper headers also include too many unrelated stuff and we have
+ * to depend on many useless (at build time) external libraries (such as dbus-glib,
+ * libxml2, gstreamer) for no good reason.
+ */
+
+typedef unsigned long GType;
+typedef int gboolean;
+typedef char gchar;
+typedef struct _GList GList;
+typedef struct _TfChannel TfChannel;
+
+extern "C" {
+GType fs_codec_list_get_type (void);
+GList *fs_codec_list_from_keyfile (const gchar *filename, GError **error);
+gboolean tf_channel_bus_message(TfChannel *channel, GstMessage *message);
+}
+
+namespace Tp {
+Q_DECL_IMPORT TfChannel *createFarsightChannel(const StreamedMediaChannelPtr &channel);
+}
+//END Ugly forward declarations
+
 
 class CallChannelHandlerPrivate : public QObject
 {
     Q_OBJECT
 public:
-    inline CallChannelHandlerPrivate(CallChannelHandler *qq) : QObject(), q(qq) {}
+    enum Who { Myself = 0, RemoteContact = 1 };
 
+    inline CallChannelHandlerPrivate(CallChannelHandler *qq) : QObject(), q(qq) {}
     void init(const Tp::StreamedMediaChannelPtr & channel);
 
     inline Tp::StreamedMediaChannelPtr channel() const { return m_channel; }
     inline QList<CallParticipant*> participants() const { return m_participants.values(); }
+    Tp::ContactPtr contactOfParticipant(Who who) const;
 
 private Q_SLOTS:
     void onChannelInvalidated(Tp::DBusProxy *proxy,
                               const QString & errorName,
                               const QString & errorMessage);
 
-    void onSessionCreated(QGst::ElementPtr conference);
-    void onQTfChannelClosed();
-
-    void openAudioInputDevice(bool *success);
-    void audioSinkPadAdded(QGst::PadPtr sinkPad);
-    void closeAudioInputDevice();
-
-    void openVideoInputDevice(bool *success);
-    void videoSinkPadAdded(QGst::PadPtr sinkPad);
-    void closeVideoInputDevice();
-
-    void openAudioOutputDevice(bool *success);
-    void audioSrcPadAdded(QGst::PadPtr srcPad);
-    void audioSrcPadRemoved(QGst::PadPtr srcPad);
-
-    void openVideoOutputDevice(bool *success);
-    void videoSrcPadAdded(QGst::PadPtr srcPad);
-    void videoSrcPadRemoved(QGst::PadPtr srcPad);
-
 private:
+    void onBusMessage(const QGst::MessagePtr & message);
+
+    // -- from TfChannel signals
+    void onTfChannelClosed();
+    void onSessionCreated(QGst::ElementPtr & conference);
+    void onStreamCreated(const QGlib::ObjectPtr & stream);
+    GList *onStreamGetCodecConfig();
+
+    // -- from TfStream signals
+    void onSrcPadAdded(const QGlib::ObjectPtr & stream, QGst::PadPtr & src);
+    bool onRequestResource(const QGlib::ObjectPtr & stream, uint direction);
+    void onFreeResource(const QGlib::ObjectPtr & stream, uint direction);
+
+    bool createAudioBin(QExplicitlySharedDataPointer<ParticipantData> & data);
+    bool createVideoBin(QExplicitlySharedDataPointer<ParticipantData> & data, bool withSink);
+
+    // *** data ***
+
     CallChannelHandler *q;
     Tp::StreamedMediaChannelPtr m_channel;
 
-    //TODO when we start using the Call interface, remember to fix this to support more participants
-    enum Who { Myself, RemoteContact };
     QMap<Who, CallParticipant*> m_participants;
-
-    QTfChannel *m_qtfchannel;
+    QExplicitlySharedDataPointer<ParticipantData> m_participantData[2];
 
     QGst::PipelinePtr m_pipeline;
     QGst::ElementPtr m_audioInputDevice;
     QGst::ElementPtr m_videoInputDevice;
     QGst::ElementPtr m_audioOutputDevice;
-    QGst::ElementPtr m_audioOutputAdder;
-    QHash<QByteArray, QGst::PadPtr> m_audioAdderPadsMap;
+
+    QGlib::ObjectPtr m_tfChannel;
+    QGst::ElementPtr m_conference;
+};
+
+class ParticipantData : public QSharedData
+{
+public:
+    inline ParticipantData() //just for being able to construct the array above without initialization
+        : handlerPriv(NULL), who(CallChannelHandlerPrivate::Myself) {}
+    inline ParticipantData(CallChannelHandlerPrivate *h, CallChannelHandlerPrivate::Who w)
+        : handlerPriv(h), who(w) {}
+
+    QGst::BinPtr audioBin;
+    QGst::BinPtr videoBin;
+    QGst::StreamVolumePtr volumeControl;
+    QGst::ColorBalancePtr colorBalanceControl;
+    QWeakPointer<QGst::Ui::VideoWidget> videoWidget;
+    CallChannelHandlerPrivate *handlerPriv;
+    CallChannelHandlerPrivate::Who who;
 };
 
 #endif

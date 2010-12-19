@@ -7,6 +7,7 @@ find_package(TelepathyQt4 REQUIRED)
 find_package(TelepathyQt4Farsight REQUIRED)
 find_package(QtGstreamer REQUIRED)
 find_package(TpFarsight REQUIRED)
+find_package(Farsight2 REQUIRED)
 
 include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR})

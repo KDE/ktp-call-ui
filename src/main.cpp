@@ -49,12 +49,12 @@ int main(int argc, char **argv)
 
     Tp::ClientRegistrarPtr registrar =
         Tp::ClientRegistrar::create(Tp::AccountFactory::create(QDBusConnection::sessionBus()),
-                                    Tp::ConnectionFactory::create(QDBusConnection::sessionBus()),
-                                    Tp::ChannelFactory::create(QDBusConnection::sessionBus()),
-                                    Tp::ContactFactory::create(
+                                    Tp::ConnectionFactory::create(QDBusConnection::sessionBus(),
                                         Tp::Features() << Tp::Connection::FeatureCore
                                                        << Tp::Connection::FeatureSelfContact
-                                        )
+                                     ),
+                                    Tp::ChannelFactory::create(QDBusConnection::sessionBus()),
+                                    Tp::ContactFactory::create()
                                     );
 
     Tp::SharedPtr<CallHandler> callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());

@@ -55,17 +55,18 @@ QVariant AccountItem::data(int role) const
         }
         case KCall::PresenceRole:
         {
-            if ( m_account->currentPresence().type() == Tp::ConnectionPresenceTypeUnset ) {
+            Tp::Presence presence = m_account->currentPresence();
+            if ( presence.type() == Tp::ConnectionPresenceTypeUnset ) {
                 switch(m_account->connectionStatus()) {
                     case Tp::ConnectionStatusConnected:
-                        m_account->currentPresence().available("available");
+                        presence = Tp::Presence::available();
                         break;
                     default:
-                        m_account->currentPresence().offline("offline");
+                        presence = Tp::Presence::offline();
                         break;
                 }
             }
-            return QVariant::fromValue(m_account->currentPresence());
+            return QVariant::fromValue(presence);
         }
         case KCall::ItemTypeRole:
             return QByteArray("account");

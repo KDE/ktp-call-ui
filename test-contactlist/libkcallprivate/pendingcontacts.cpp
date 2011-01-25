@@ -49,7 +49,6 @@ void PendingContacts::onConnectionReady(Tp::PendingOperation *op)
     } else {
         Tp::PendingReady *pr = qobject_cast<Tp::PendingReady*>(op);
         Q_ASSERT(pr);
-//         Tp::Connection *connection = qobject_cast<Tp::Connection*>(pr->object());
         Tp::ConnectionPtr connection = Tp::ConnectionPtr::dynamicCast(pr->object());
 
         Q_ASSERT(connection);

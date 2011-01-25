@@ -22,15 +22,18 @@
 #include <KDebug>
 #include <KStatusNotifierItem>
 #include <TelepathyQt4/Constants>
+#include <TelepathyQt4/ChannelClassSpecList>
 
-static inline Tp::ChannelClassList channelClassList()
+static inline Tp::ChannelClassSpecList channelClassSpecList()
 {
-    QMap<QString, QDBusVariant> class1;
-    class1[TELEPATHY_INTERFACE_CHANNEL ".ChannelType"] =
-                                    QDBusVariant(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
-    class1[TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"] = QDBusVariant(Tp::HandleTypeContact);
-
-    return Tp::ChannelClassList() << Tp::ChannelClass(class1);
+    return Tp::ChannelClassSpecList() << Tp::ChannelClassSpec::streamedMediaCall()
+                                      << Tp::ChannelClassSpec::streamedMediaAudioCall()
+                                      << Tp::ChannelClassSpec::streamedMediaVideoCall()
+                                      << Tp::ChannelClassSpec::streamedMediaVideoCallWithAudio()
+                                      << Tp::ChannelClassSpec::unnamedStreamedMediaCall()
+                                      << Tp::ChannelClassSpec::unnamedStreamedMediaAudioCall()
+                                      << Tp::ChannelClassSpec::unnamedStreamedMediaVideoCall()
+                                      << Tp::ChannelClassSpec::unnamedStreamedMediaVideoCallWithAudio();
 }
 
 struct SystrayIcon::Private
@@ -42,7 +45,7 @@ struct SystrayIcon::Private
 };
 
 SystrayIcon::SystrayIcon()
-    : AbstractClientApprover(channelClassList()), d(new Private)
+    : AbstractClientApprover(channelClassSpecList()), d(new Private)
 {
     d->notificationItem = new KStatusNotifierItem(this);
     d->notificationItem->setTitle(i18n("KCall"));

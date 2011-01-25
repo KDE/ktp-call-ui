@@ -31,7 +31,7 @@ public:
 
 private slots:
     void onAccountReady(Tp::PendingOperation *op);
-    void onAccountHaveConnectionChanged(bool);
+    void onAccountConnectionChanged(const Tp::ConnectionPtr & connection);
     void onContactsReady(Tp::PendingOperation*);
     //make emitDataChange available as a slot
     inline void emitDataChange() { TreeModelItem::emitDataChange(); }

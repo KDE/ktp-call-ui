@@ -183,7 +183,7 @@ QGst::ElementPtr DeviceElementFactory::tryOverrideForKey(const char *keyName)
 
     if (configGroup.hasKey(keyName)) {
         QString binDescription = configGroup.readEntry(keyName);
-        element = QGst::Bin::fromDescription(binDescription.toUtf8());
+        element = QGst::Bin::fromDescription(binDescription);
 
         if (!element) {
             kDebug() << "Could not construct bin" << binDescription;

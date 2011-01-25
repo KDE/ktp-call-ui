@@ -18,20 +18,20 @@
 #include "callwindow.h"
 #include <KDebug>
 #include <TelepathyQt4/StreamedMediaChannel>
+#include <TelepathyQt4/ChannelClassSpecList>
 
-static inline Tp::ChannelClassList channelClassList()
+static inline Tp::ChannelClassSpecList channelClassSpecList()
 {
-    QMap<QString, QDBusVariant> class1;
-    class1[TELEPATHY_INTERFACE_CHANNEL ".ChannelType"] =
-                                    QDBusVariant(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAMED_MEDIA);
-    class1[TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"] = QDBusVariant(Tp::HandleTypeContact);
-
-    return Tp::ChannelClassList() << Tp::ChannelClass(class1);
+    return Tp::ChannelClassSpecList() << Tp::ChannelClassSpec::streamedMediaCall()
+                                      << Tp::ChannelClassSpec::streamedMediaAudioCall()
+                                      << Tp::ChannelClassSpec::streamedMediaVideoCall()
+                                      << Tp::ChannelClassSpec::streamedMediaVideoCallWithAudio();
 }
 
 CallHandler::CallHandler()
-    : Tp::AbstractClientHandler(channelClassList(), false)
+    : Tp::AbstractClientHandler(channelClassSpecList())
 {
+    kDebug ();
 }
 
 CallHandler::~CallHandler()
@@ -49,8 +49,9 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
                                  const QList<Tp::ChannelPtr> & channels,
                                  const QList<Tp::ChannelRequestPtr> & requestsSatisfied,
                                  const QDateTime & userActionTime,
-                                 const QVariantMap & handlerInfo)
+                                 const Tp::AbstractClientHandler::HandlerInfo & handlerInfo)
 {
+    kDebug ();
     Q_UNUSED(account);
     Q_UNUSED(connection);
     Q_UNUSED(requestsSatisfied);
@@ -64,7 +65,6 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
             continue;
         }
 
-        kDebug() << "handling new channel";
         connect(smchannel->becomeReady(Tp::Features()
                                         << Tp::StreamedMediaChannel::FeatureCore
                                         << Tp::StreamedMediaChannel::FeatureStreams),
@@ -83,7 +83,7 @@ void CallHandler::onChannelReady(Tp::PendingOperation *operation)
         return;
     }
 
-    Tp::StreamedMediaChannelPtr channel(qobject_cast<Tp::StreamedMediaChannel*>(pr->object()));
+    Tp::StreamedMediaChannelPtr channel = Tp::StreamedMediaChannelPtr::dynamicCast(pr->object());
     CallWindow *cw = new CallWindow(channel);
     cw->show();
 }

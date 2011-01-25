@@ -19,12 +19,13 @@
 #include <KIcon>
 #include <KDebug>
 #include <TelepathyQt4/Constants>
+#include <TelepathyQt4/Presence>
 
 ContactItem::ContactItem(const Tp::ContactPtr & contact, TreeModelItem *parent)
     : QObject(), TreeModelItem(parent), m_contact(contact)
 {
     connect(m_contact.data(), SIGNAL(aliasChanged(QString)), SLOT(emitDataChange()));
-    connect(m_contact.data(), SIGNAL(simplePresenceChanged(QString, uint, QString)),
+    connect(m_contact.data(), SIGNAL(presenceChanged(Tp::Presence)),
             SLOT(emitDataChange()));
 }
 
@@ -34,7 +35,7 @@ QVariant ContactItem::data(int role) const
     case Qt::DisplayRole:
         return m_contact->alias();
     case Qt::DecorationRole:
-        return KIcon(iconForPresence(m_contact->presenceType()));
+        return KIcon(iconForPresence(m_contact->presence().type()));
     case KCall::ItemTypeRole:
         return QByteArray("contact");
     case KCall::ObjectPtrRole:

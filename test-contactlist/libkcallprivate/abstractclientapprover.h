@@ -32,7 +32,6 @@ class KCALLPRIVATE_EXPORT ApproverRequest : public QObject
     Q_OBJECT
 public:
     ApproverRequest(const Tp::MethodInvocationContextPtr<> & context,
-                    const QList<Tp::ChannelPtr> & channels,
                     const Tp::ChannelDispatchOperationPtr & dispatchOperation);
     virtual ~ApproverRequest();
 
@@ -71,7 +70,7 @@ public:
     /** Constructs a new Approver that can handle the channel types listed in @a classList.
      * For more information on what @a classList should contain, refer to the telepathy spec.
      */
-    AbstractClientApprover(const Tp::ChannelClassList & classList);
+    AbstractClientApprover(const Tp::ChannelClassSpecList & classList);
 
 protected slots:
     /** This method is called when a new approval request arrives. In the implementation
@@ -87,7 +86,6 @@ protected slots:
 
 protected:
     virtual void addDispatchOperation(const Tp::MethodInvocationContextPtr<> & context,
-                                      const QList<Tp::ChannelPtr> & channels,
                                       const Tp::ChannelDispatchOperationPtr & dispatchOperation);
 
 private slots:

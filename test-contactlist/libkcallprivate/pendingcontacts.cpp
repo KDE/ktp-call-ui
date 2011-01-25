@@ -22,9 +22,9 @@
 #include <TelepathyQt4/PendingContacts>
 
 PendingContacts::PendingContacts(Tp::AccountPtr account, QObject *parent)
-    : Tp::PendingOperation(parent), m_account(account)
+    : Tp::PendingOperation(account), m_account(account)
 {
-    Q_ASSERT(account->haveConnection());
+    Q_ASSERT(!account->connection().isNull());
 
     Tp::ConnectionPtr connection = account->connection();
     connect(connection->becomeReady(Tp::Connection::FeatureRoster),
@@ -49,13 +49,14 @@ void PendingContacts::onConnectionReady(Tp::PendingOperation *op)
     } else {
         Tp::PendingReady *pr = qobject_cast<Tp::PendingReady*>(op);
         Q_ASSERT(pr);
-        Tp::Connection *connection = qobject_cast<Tp::Connection*>(pr->object());
+        Tp::ConnectionPtr connection = Tp::ConnectionPtr::dynamicCast(pr->object());
+
         Q_ASSERT(connection);
 
         m_contacts = connection->contactManager()->allKnownContacts();
         kDebug() << "received" << m_contacts.size() << "contacts";
 
-        QSet<Tp::Contact::Feature> features;
+        QSet<Tp::Feature> features;
         features << Tp::Contact::FeatureAlias << Tp::Contact::FeatureSimplePresence;
         connect(connection->contactManager()->upgradeContacts(m_contacts.toList(), features),
                 SIGNAL(finished(Tp::PendingOperation*)),

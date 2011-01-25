@@ -20,14 +20,14 @@
 struct DtmfHandler::Private
 {
     Tp::StreamedMediaChannelPtr channel;
-    Tp::Client::ChannelInterfaceDTMFInterface *dtmfInterface;
+//     Tp::Client::ChannelInterfaceDTMFInterface *dtmfInterface;
 };
 
 DtmfHandler::DtmfHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent)
     : QObject(parent), d(new Private)
 {
     d->channel = channel;
-    d->dtmfInterface = channel->DTMFInterface();
+//     d->dtmfInterface = channel->DTMFInterface();
 }
 
 DtmfHandler::~DtmfHandler()
@@ -45,20 +45,22 @@ void DtmfHandler::connectDtmfWidget(DtmfWidget *dtmfWidget)
 
 void DtmfHandler::onStartSendDtmfEvent(Tp::DTMFEvent event)
 {
-    foreach(const Tp::MediaStreamPtr & stream, d->channel->streams()) {
+    foreach(const Tp::StreamedMediaStreamPtr & stream, d->channel->streams()) {
         if ( stream->type() == Tp::MediaStreamTypeAudio ) {
             //TODO handle return value and signal on error
-            d->dtmfInterface->StartTone(stream->id(), event);
+            stream->startDTMFTone(event);
+//             d->dtmfInterface->StartTone(stream->id(), event);
         }
     }
 }
 
 void DtmfHandler::onStopSendDtmfEvent()
 {
-    foreach(const Tp::MediaStreamPtr & stream, d->channel->streams()) {
+    foreach(const Tp::StreamedMediaStreamPtr & stream, d->channel->streams()) {
         if ( stream->type() == Tp::MediaStreamTypeAudio ) {
             //TODO handle return value and signal on error
-            d->dtmfInterface->StopTone(stream->id());
+            stream->stopDTMFTone();
+//             d->dtmfInterface->StopTone(stream->id());
         }
     }
 }

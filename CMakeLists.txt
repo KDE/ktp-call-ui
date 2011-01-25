@@ -5,7 +5,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/mod
 find_package(KDE4 REQUIRED)
 find_package(TelepathyQt4 REQUIRED)
 find_package(TelepathyQt4Farsight REQUIRED)
-find_package(QtGstreamer REQUIRED)
+find_package(QtGStreamer REQUIRED)
 find_package(TpFarsight REQUIRED)
 find_package(Farsight2 REQUIRED)
 

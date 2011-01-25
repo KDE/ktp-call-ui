@@ -19,6 +19,7 @@
 #include <QtCore/QHash>
 #include <KDebug>
 #include <TelepathyQt4/AccountManager>
+#include <TelepathyQt4/AccountSet>
 #include <TelepathyQt4/PendingReady>
 
 struct AccountManager::Private
@@ -31,11 +32,12 @@ struct AccountManager::Private
 
     //Q_PRIVATE_SLOTs
     void onAccountManagerReady(Tp::PendingOperation *op);
-    void onAccountCreated(const QString & path);
+    void onAccountCreated(const Tp::AccountPtr & account);
     void onAccountReady(Tp::PendingOperation *op);
-    void onAccountRemoved(const QString & path);
-    void onAccountValidityChanged(const QString & path, bool isValid);
-    void onAccountConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason);
+    void onAccountRemoved();
+    void onAccountRemoved(const Tp::AccountPtr & account);
+    void onAccountValidityChanged(bool isValid);
+    void onAccountConnectionStatusChanged(Tp::ConnectionStatus);
 
     Tp::AccountManagerPtr m_accountManager;
     TreeModel *m_treeModel;
@@ -103,21 +105,22 @@ void AccountManager::Private::onAccountManagerReady(Tp::PendingOperation *op)
         return; //TODO handle this error
     }
 
-    foreach(const QString & path, m_accountManager->validAccountPaths()) {
-        onAccountCreated(path);
+    foreach(const Tp::AccountPtr & account, m_accountManager->validAccounts()->accounts()) {
+        onAccountCreated(account);
+    }
+    foreach(const Tp::AccountPtr & account, m_accountManager->allAccounts()) {
+        connect(account.data(), SIGNAL(removed()),
+            q, SLOT(onAccountRemoved()));
+        connect(account.data(), SIGNAL(validityChanged(bool)),
+            q, SLOT(onAccountValidityChanged(bool)));
     }
 
-    connect(m_accountManager.data(), SIGNAL(accountCreated(QString)),
-            q, SLOT(onAccountCreated(QString)));
-    connect(m_accountManager.data(), SIGNAL(accountRemoved(QString)),
-            q, SLOT(onAccountRemoved(QString)));
-    connect(m_accountManager.data(), SIGNAL(accountValidityChanged(QString, bool)),
-            q, SLOT(onAccountValidityChanged(QString, bool)));
+    connect(m_accountManager.data(), SIGNAL(newAccount(Tp::AccountPtr)),
+            q, SLOT(onAccountCreated(Tp::AccountPtr)));
 }
 
-void AccountManager::Private::onAccountCreated(const QString & path)
+void AccountManager::Private::onAccountCreated(const Tp::AccountPtr & account)
 {
-    Tp::AccountPtr account = m_accountManager->accountForPath(path);
     Q_ASSERT(!account.isNull());
 
     account->ref(); //increment reference temporarily to avoid destroying the object in this block
@@ -129,9 +132,7 @@ void AccountManager::Private::onAccountReady(Tp::PendingOperation *op)
 {
     Tp::PendingReady *pendingReady = qobject_cast<Tp::PendingReady*>(op);
     Q_ASSERT(pendingReady);
-    Tp::Account *accountPtr = qobject_cast<Tp::Account*>(pendingReady->object());
-    Q_ASSERT(accountPtr);
-    Tp::AccountPtr account(accountPtr);
+    Tp::AccountPtr account = Tp::AccountPtr::dynamicCast(pendingReady->object());
     account->deref(); //remove extra reference added in onAccountCreated()
 
     if ( op->isError() ) {
@@ -149,44 +150,50 @@ void AccountManager::Private::onAccountReady(Tp::PendingOperation *op)
     updateOnlineStatus();
 
     connect(account.data(),
-            SIGNAL(connectionStatusChanged(Tp::ConnectionStatus,Tp::ConnectionStatusReason)), q,
-            SLOT(onAccountConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)));
+            SIGNAL(connectionStatusChanged(Tp::ConnectionStatus)), q,
+            SLOT(onAccountConnectionStatusChanged(Tp::ConnectionStatus)));
 }
 
-void AccountManager::Private::onAccountRemoved(const QString & path)
+void AccountManager::Private::onAccountRemoved()
 {
-    AccountItem *item = m_accountItemsMap.take(path);
+    Tp::AccountPtr account(qobject_cast<Tp::Account*>(q->sender()));
+    onAccountRemoved (account);
+}
+
+void AccountManager::Private::onAccountRemoved(const Tp::AccountPtr & account)
+{
+    AccountItem *item = m_accountItemsMap.take(account->objectPath());
     if ( !item ) {
         return; //an invalid account was removed, which was not in our list anyway
     }
 
     //update the global "online" status
-    int nRemoved = m_accountConnectionStatusMap.remove(path);
+    int nRemoved = m_accountConnectionStatusMap.remove(account->objectPath());
     Q_ASSERT(nRemoved == 1);
     updateOnlineStatus();
 
     m_treeModel->root()->removeChild(m_treeModel->root()->rowOfChild(item)); //NOTE item is deleted here
 }
 
-void AccountManager::Private::onAccountValidityChanged(const QString & path, bool isValid)
+void AccountManager::Private::onAccountValidityChanged(bool isValid)
 {
+    Tp::AccountPtr account(qobject_cast<Tp::Account*>(q->sender()));
     //this is to keep invalid accounts out of our list
     if ( isValid ) {
-        onAccountCreated(path);
+        onAccountCreated(account);
     } else {
-        onAccountRemoved(path);
+        onAccountRemoved(account);
     }
 }
 
-void AccountManager::Private::onAccountConnectionStatusChanged(Tp::ConnectionStatus status,
-                                                               Tp::ConnectionStatusReason reason)
+void AccountManager::Private::onAccountConnectionStatusChanged(Tp::ConnectionStatus status)
 {
     Tp::Account *account = qobject_cast<Tp::Account*>(q->sender());
     Q_ASSERT(account);
     m_accountConnectionStatusMap[account->objectPath()] = status;
     updateOnlineStatus();
 
-    Q_UNUSED(reason); //TODO handle the reason and show error message if necessary
+    //Q_UNUSED(reason); //TODO handle the reason and show error message if necessary
 }
 
 

@@ -69,12 +69,11 @@ private:
     struct Private;
     Private *const d;
     Q_PRIVATE_SLOT(d, void onAccountManagerReady(Tp::PendingOperation *op))
-    Q_PRIVATE_SLOT(d, void onAccountCreated(const QString & path))
+    Q_PRIVATE_SLOT(d, void onAccountCreated(const Tp::AccountPtr & account))
     Q_PRIVATE_SLOT(d, void onAccountReady(Tp::PendingOperation *op))
-    Q_PRIVATE_SLOT(d, void onAccountRemoved(const QString & path))
-    Q_PRIVATE_SLOT(d, void onAccountValidityChanged(const QString & path, bool isValid))
-    Q_PRIVATE_SLOT(d, void onAccountConnectionStatusChanged(Tp::ConnectionStatus,
-                                                            Tp::ConnectionStatusReason))
+    Q_PRIVATE_SLOT(d, void onAccountRemoved())
+    Q_PRIVATE_SLOT(d, void onAccountValidityChanged(bool isValid))
+    Q_PRIVATE_SLOT(d, void onAccountConnectionStatusChanged(Tp::ConnectionStatus))
 };
 
 #endif

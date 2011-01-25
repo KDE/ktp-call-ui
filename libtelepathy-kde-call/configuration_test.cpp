@@ -17,6 +17,7 @@
 */
 #include "deviceelementfactory_p.h"
 #include <QtCore/QCoreApplication>
+#include <QGst/Init>
 #include <QGst/Element>
 #include <KDebug>
 

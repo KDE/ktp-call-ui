@@ -142,6 +142,7 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readAudioDevices(Phonon::Obje
 
 QList<Phonon::DeviceAccessList> PhononIntegration::readVideoDevices(Phonon::Category category)
 {
+    Q_UNUSED (category);
     return QList<Phonon::DeviceAccessList>(); //TODO implement me
 }
 

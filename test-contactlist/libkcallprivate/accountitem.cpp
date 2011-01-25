@@ -44,32 +44,28 @@ QVariant AccountItem::data(int role) const
         case Qt::DisplayRole:
             if ( m_account->connectionStatus() == Tp::ConnectionStatusConnecting ) {
                 return i18nc("protocol - display name (Connecting)", "%1 - %2 (Connecting)",
-                             m_account->protocol(), m_account->displayName());
+                             m_account->protocolName(), m_account->displayName());
             } else {
                 return i18nc("protocol - display name", "%1 - %2",
-                             m_account->protocol(), m_account->displayName());
+                             m_account->protocolName(), m_account->displayName());
             }
         case Qt::DecorationRole:
         {
-            uint presenceType = data(KCall::PresenceRole).value<Tp::SimplePresence>().type;
-            return KIcon(iconForPresence(presenceType));
+            return KIcon(iconForPresence(m_account->currentPresence().type()));
         }
         case KCall::PresenceRole:
         {
-            Tp::SimplePresence presence = m_account->currentPresence();
-            if ( presence.type == Tp::ConnectionPresenceTypeUnset ) {
+            if ( m_account->currentPresence().type() == Tp::ConnectionPresenceTypeUnset ) {
                 switch(m_account->connectionStatus()) {
                     case Tp::ConnectionStatusConnected:
-                        presence.type = Tp::ConnectionPresenceTypeAvailable;
-                        presence.status = "available";
+                        m_account->currentPresence().available("available");
                         break;
                     default:
-                        presence.type = Tp::ConnectionPresenceTypeOffline;
-                        presence.status = "offline";
+                        m_account->currentPresence().offline("offline");
                         break;
                 }
             }
-            return QVariant::fromValue(presence);
+            return QVariant::fromValue(m_account->currentPresence());
         }
         case KCall::ItemTypeRole:
             return QByteArray("account");
@@ -88,19 +84,19 @@ void AccountItem::onAccountReady(Tp::PendingOperation *op)
         return; //TODO and then what?
     }
 
-    connect(m_account.data(), SIGNAL(haveConnectionChanged(bool)),
-            SLOT(onAccountHaveConnectionChanged(bool)) );
+    connect(m_account.data(), SIGNAL(connectionChanged(Tp::ConnectionPtr)),
+            SLOT(onAccountConnectionChanged(Tp::ConnectionPtr)) );
     connect(m_account.data(), SIGNAL(stateChanged(bool)), SLOT(emitDataChange()));
     connect(m_account.data(), SIGNAL(displayNameChanged(const QString &)), SLOT(emitDataChange()));
     connect(m_account.data(), SIGNAL(nicknameChanged(const QString &)), SLOT(emitDataChange()));
-    connect(m_account.data(), SIGNAL(currentPresenceChanged(const Tp::SimplePresence &)),
+    connect(m_account.data(), SIGNAL(currentPresenceChanged(const Tp::Presence &)),
             SLOT(emitDataChange()));
-    connect(m_account.data(), SIGNAL(haveConnectionChanged(bool)), SLOT(emitDataChange()));
+    connect(m_account.data(), SIGNAL(connectionChanged(Tp::ConnectionPtr)), SLOT(emitDataChange()));
     connect(m_account.data(),
-            SIGNAL(connectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)),
+            SIGNAL(connectionStatusChanged(Tp::ConnectionStatus)),
             SLOT(emitDataChange()));
 
-    if ( m_account->haveConnection() ) {
+    if ( m_account->connection() ) {
         connect(new PendingContacts(m_account, this),
                 SIGNAL(finished(Tp::PendingOperation*)),
                 SLOT(onContactsReady(Tp::PendingOperation*)) );
@@ -109,9 +105,9 @@ void AccountItem::onAccountReady(Tp::PendingOperation *op)
     emitDataChange();
 }
 
-void AccountItem::onAccountHaveConnectionChanged(bool hasConnection)
+void AccountItem::onAccountConnectionChanged(const Tp::ConnectionPtr & connection)
 {
-    if ( !hasConnection ) {
+    if ( !connection) {
         if ( childrenCount() > 0 ) {
             removeChildren(0, childrenCount()-1);
         }

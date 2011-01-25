@@ -18,7 +18,8 @@
 */
 #include "callchannelhandler_p.h"
 #include "deviceelementfactory_p.h"
-#include <QGlib/Signal>
+#include <QGlib/Connect> 
+#include <QGst/Init>
 #include <QGst/ElementFactory>
 #include <QGst/Bus>
 #include <QGst/GhostPad>
@@ -29,9 +30,9 @@
 #include <KStandardDirs>
 #include <TelepathyQt4/Connection>
 
-QGLIB_REGISTER_TYPE(GList*)
-QGLIB_REGISTER_TYPE_IMPLEMENTATION(GList*, fs_codec_list_get_type())
-QGLIB_REGISTER_VALUEIMPL_FOR_BOXED_TYPE(GList*)
+namespace QGlib {
+    template <> struct GetTypeImpl<GList*> { inline operator Type() { return fs_codec_list_get_type(); } };
+}
 
 
 CallChannelHandler::CallChannelHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent)
@@ -52,8 +53,9 @@ QList<CallParticipant*> CallChannelHandler::participants() const
 
 void CallChannelHandler::hangup(const QString & message)
 {
+    Q_UNUSED(message);
     //no reason to handle the return value. invalidated() will be emited...
-    d->channel()->hangupCall(Tp::StreamedMediaChannel::StateChangeReasonUserRequested, QString(), message);
+    d->channel()->hangupCall();
 }
 
 void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel)
@@ -72,7 +74,6 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
         QGst::init();
         gstInitDone = true;
     }
-
     m_pipeline = QGst::Pipeline::create();
     m_pipeline->setState(QGst::StatePlaying);
 
@@ -81,16 +82,16 @@ void CallChannelHandlerPrivate::init(const Tp::StreamedMediaChannelPtr & channel
     m_tfChannel = QGlib::ObjectPtr::wrap(reinterpret_cast<GObject*>(tfChannel), false);
 
     /* Set up the telepathy farsight channel */
-    QGlib::Signal::connect(m_tfChannel, "closed",
-                           this, &CallChannelHandlerPrivate::onTfChannelClosed);
-    QGlib::Signal::connect(m_tfChannel, "session-created",
-                           this, &CallChannelHandlerPrivate::onSessionCreated);
-    QGlib::Signal::connect(m_tfChannel, "stream-created",
-                           this, &CallChannelHandlerPrivate::onStreamCreated);
-    QGlib::Signal::connect(m_tfChannel, "stream-get-codec-config",
-                           this, &CallChannelHandlerPrivate::onStreamGetCodecConfig);
-    QGlib::Signal::connect(m_pipeline->bus(), "message",
-                           this, &CallChannelHandlerPrivate::onBusMessage);
+    QGlib::connect(m_tfChannel, "closed",
+                   this, &CallChannelHandlerPrivate::onTfChannelClosed);
+    QGlib::connect(m_tfChannel, "session-created",
+                   this, &CallChannelHandlerPrivate::onSessionCreated);
+    QGlib::connect(m_tfChannel, "stream-created",
+                   this, &CallChannelHandlerPrivate::onStreamCreated);
+    QGlib::connect(m_tfChannel, "stream-get-codec-config",
+                   this, &CallChannelHandlerPrivate::onStreamGetCodecConfig);
+    QGlib::connect(m_pipeline->bus(), "message",
+                   this, &CallChannelHandlerPrivate::onBusMessage);
 }
 
 Tp::ContactPtr CallChannelHandlerPrivate::contactOfParticipant(Who who) const
@@ -147,14 +148,14 @@ void CallChannelHandlerPrivate::onBusMessage(const QGst::MessagePtr & message)
 
 void CallChannelHandlerPrivate::onStreamCreated(const QGlib::ObjectPtr & stream)
 {
-    QGlib::Signal::connect(stream, "request-resource", this,
-                           &CallChannelHandlerPrivate::onRequestResource, QGlib::Signal::PassSender);
-    QGlib::Signal::connect(stream, "src-pad-added", this,
-                           &CallChannelHandlerPrivate::onSrcPadAdded, QGlib::Signal::PassSender);
-    QGlib::Signal::connect(stream, "free-resource", this,
-                           &CallChannelHandlerPrivate::onFreeResource, QGlib::Signal::PassSender);
-    QGlib::Signal::connect(stream, "closed", this,
-                           &CallChannelHandlerPrivate::onStreamClosed, QGlib::Signal::PassSender);
+    QGlib::connect(stream, "request-resource", this,
+                           &CallChannelHandlerPrivate::onRequestResource, QGlib::PassSender);
+    QGlib::connect(stream, "src-pad-added", this,
+                    &CallChannelHandlerPrivate::onSrcPadAdded, QGlib::PassSender);
+    QGlib::connect(stream, "free-resource", this,
+                    &CallChannelHandlerPrivate::onFreeResource, QGlib::PassSender);
+    QGlib::connect(stream, "closed", this,
+                    &CallChannelHandlerPrivate::onStreamClosed, QGlib::PassSender);
 
     bool audio = stream->property("media-type").get<uint>() == Tp::MediaStreamTypeAudio;
     kDebug() << "Opening" << (audio ? "audio" : "video") << "input device";

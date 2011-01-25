@@ -28,12 +28,10 @@ struct ApproverRequest::Private
 };
 
 ApproverRequest::ApproverRequest(const Tp::MethodInvocationContextPtr<> & context,
-                                 const QList<Tp::ChannelPtr> & channels,
                                  const Tp::ChannelDispatchOperationPtr & dispatchOperation)
     : QObject(), d(new Private)
 {
     d->context = context;
-    d->channels = channels;
     d->dispatchOperation = dispatchOperation;
 
     connect(dispatchOperation->becomeReady(), SIGNAL(finished(Tp::PendingOperation*)),
@@ -53,7 +51,7 @@ Tp::MethodInvocationContextPtr<> ApproverRequest::context() const
 
 QList<Tp::ChannelPtr> ApproverRequest::channels() const
 {
-    return d->channels;
+    return d->dispatchOperation->channels();
 }
 
 Tp::ChannelDispatchOperationPtr ApproverRequest::dispatchOperation() const
@@ -111,16 +109,15 @@ void ApproverRequest::onClaimFinished(Tp::PendingOperation *op)
     emit finished(this);
 }
 
-AbstractClientApprover::AbstractClientApprover(const Tp::ChannelClassList & classList)
+AbstractClientApprover::AbstractClientApprover(const Tp::ChannelClassSpecList & classList)
     : QObject(), Tp::AbstractClientApprover(classList)
 {
 }
 
 void AbstractClientApprover::addDispatchOperation(const Tp::MethodInvocationContextPtr<> & context,
-                                        const QList<Tp::ChannelPtr> & channels,
                                         const Tp::ChannelDispatchOperationPtr & dispatchOperation)
 {
-    ApproverRequest *r = new ApproverRequest(context, channels, dispatchOperation);
+    ApproverRequest *r = new ApproverRequest(context, dispatchOperation);
     connect(r, SIGNAL(ready(ApproverRequest*)), SLOT(onRequestReady(ApproverRequest*)));
 }
 

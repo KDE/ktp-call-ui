@@ -25,11 +25,7 @@ static inline Tp::ChannelClassSpecList channelClassSpecList()
     return Tp::ChannelClassSpecList() << Tp::ChannelClassSpec::streamedMediaCall()
                                       << Tp::ChannelClassSpec::streamedMediaAudioCall()
                                       << Tp::ChannelClassSpec::streamedMediaVideoCall()
-                                      << Tp::ChannelClassSpec::streamedMediaVideoCallWithAudio()
-                                      << Tp::ChannelClassSpec::unnamedStreamedMediaCall()
-                                      << Tp::ChannelClassSpec::unnamedStreamedMediaAudioCall()
-                                      << Tp::ChannelClassSpec::unnamedStreamedMediaVideoCall()
-                                      << Tp::ChannelClassSpec::unnamedStreamedMediaVideoCallWithAudio();
+                                      << Tp::ChannelClassSpec::streamedMediaVideoCallWithAudio();
 }
 
 CallHandler::CallHandler()

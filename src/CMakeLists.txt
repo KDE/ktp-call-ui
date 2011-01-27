@@ -26,4 +26,4 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.Client.telep
         DESTINATION ${DBUS_SERVICES_INSTALL_DIR})
 
 # FIXME any better macro for ${XDG_DATA_DIRS} ?
-install(FILES telepathy-kde-call-ui.client DESTINATION ${CMAKE_INSTALL_PREFIX}/share/telepathy/clients/)
+install(FILES telepathy_kde_call_ui.client DESTINATION ${CMAKE_INSTALL_PREFIX}/share/telepathy/clients/)

@@ -12,6 +12,7 @@ find_package(Farsight2 REQUIRED)
 include_directories(${KDE4_INCLUDES} ${TELEPATHY_QT4_INCLUDE_DIR})
 add_definitions(${KDE4_DEFINITIONS})
 
+add_subdirectory(libqtf)
 add_subdirectory(libtelepathy-kde-call)
 add_subdirectory(src)
 add_subdirectory(test-contactlist)

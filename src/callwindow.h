@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
-    Copyright (C) 2010 Collabora Ltd. <info@collabora.co.uk>
+    Copyright (C) 2010-2011 Collabora Ltd. <info@collabora.co.uk>
       @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
     This program is free software: you can redistribute it and/or modify
@@ -19,32 +19,27 @@
 #ifndef CALLWINDOW_H
 #define CALLWINDOW_H
 
-#include <TelepathyQt4/StreamedMediaChannel>
+#include <TelepathyQt4Yell/CallChannel>
 #include <KXmlGuiWindow>
-class CallParticipant;
+class CallContentHandler;
 
 class CallWindow : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
-    CallWindow(const Tp::StreamedMediaChannelPtr & channel);
+    CallWindow(const Tpy::CallChannelPtr & channel);
     virtual ~CallWindow();
 
 private:
     void setupActions();
 
-    enum State { Connecting, Connected, Disconnected };
-
-private slots:
-    void setState(State state);
-
-    void onParticipantJoined(CallParticipant *participant);
-    void onParticipantAudioStreamAdded(CallParticipant *participant);
-    void onParticipantAudioStreamRemoved(CallParticipant *participant);
-    void onParticipantVideoStreamAdded(CallParticipant *participant);
-    void onParticipantVideoStreamRemoved(CallParticipant *participant);
-    void onHandlerError(const QString & error);
-    void onCallEnded(const QString & message);
+private Q_SLOTS:
+    void setState(Tpy::CallState state);
+    void onCallEnded();
+    void onAudioContentAdded(CallContentHandler *contentHandler);
+    void onAudioContentRemoved(CallContentHandler *contentHandler);
+    void onVideoContentAdded(CallContentHandler *contentHandler);
+    void onVideoContentRemoved(CallContentHandler *contentHandler);
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

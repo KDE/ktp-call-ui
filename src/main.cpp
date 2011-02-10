@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2011 Collabora Ltd.
+      @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,6 +26,9 @@
 #include <TelepathyQt4/Types>
 #include <TelepathyQt4/Debug>
 #include <TelepathyQt4/ClientRegistrar>
+#include <TelepathyQt4Yell/CallChannel>
+#include <TelepathyQt4Yell/ChannelClassSpec>
+#include <TelepathyQt4Yell/ChannelFactory>
 
 int main(int argc, char **argv)
 {
@@ -47,15 +52,34 @@ int main(int argc, char **argv)
     Tp::enableDebug(true);
     Tp::enableWarnings(true);
 
+    Tp::AccountFactoryPtr accountFactory = Tp::AccountFactory::create(
+        QDBusConnection::sessionBus(),
+        Tp::Features() << Tp::Account::FeatureCore
+    );
+
+    Tp::ConnectionFactoryPtr connectionFactory = Tp::ConnectionFactory::create(
+        QDBusConnection::sessionBus(),
+        Tp::Features() << Tp::Connection::FeatureCore
+                       << Tp::Connection::FeatureSelfContact
+    );
+
+    Tp::ChannelFactoryPtr channelFactory = Tpy::ChannelFactory::create(
+        QDBusConnection::sessionBus()
+    );
+    channelFactory->addCommonFeatures(Tp::Channel::FeatureCore);
+    channelFactory->addFeaturesFor(Tpy::ChannelClassSpec::mediaCall(),
+        Tp::Features() << Tpy::CallChannel::FeatureContents
+                       << Tpy::CallChannel::FeatureLocalHoldState
+    );
+
+    Tp::ContactFactoryPtr contactFactory = Tp::ContactFactory::create(
+        Tp::Features() << Tp::Contact::FeatureAlias
+                       << Tp::Contact::FeatureAvatarData
+    );
+
     Tp::ClientRegistrarPtr registrar =
-        Tp::ClientRegistrar::create(Tp::AccountFactory::create(QDBusConnection::sessionBus()),
-                                    Tp::ConnectionFactory::create(QDBusConnection::sessionBus(),
-                                        Tp::Features() << Tp::Connection::FeatureCore
-                                                       << Tp::Connection::FeatureSelfContact
-                                     ),
-                                    Tp::ChannelFactory::create(QDBusConnection::sessionBus()),
-                                    Tp::ContactFactory::create()
-                                    );
+        Tp::ClientRegistrar::create(accountFactory, connectionFactory,
+                                    channelFactory, contactFactory);
 
     Tp::SharedPtr<CallHandler> callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
     registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "KDE.CallUi");

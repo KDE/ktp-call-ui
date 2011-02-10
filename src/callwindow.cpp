@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
-    Copyright (C) 2010 Collabora Ltd. <info@collabora.co.uk>
+    Copyright (C) 2010-2011 Collabora Ltd. <info@collabora.co.uk>
       @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
     This program is free software: you can redistribute it and/or modify
@@ -21,20 +21,18 @@
 #include "statusarea.h"
 #include "dtmfhandler.h"
 #include "../libtelepathy-kde-call/callchannelhandler.h"
-#include <QtCore/QMetaObject>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QDockWidget>
 #include <KDebug>
 #include <KLocalizedString>
 #include <KToggleAction>
 #include <KActionCollection>
-#include <TelepathyQt4/StreamedMediaChannel>
-#include <TelepathyQt4/Connection>
 
 struct CallWindow::Private
 {
     Private() : callEnded(false) {}
 
+    Tpy::CallChannelPtr callChannel;
     CallChannelHandler *channelHandler;
     StatusArea *statusArea;
     KToggleAction *muteAction;
@@ -45,17 +43,16 @@ struct CallWindow::Private
 /*! This constructor is used to handle an incoming call, in which case
  * the specified \a channel must be ready and the call must have been accepted.
  */
-CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
+CallWindow::CallWindow(const Tpy::CallChannelPtr & callChannel)
     : KXmlGuiWindow(), d(new Private)
 {
+    d->callChannel = callChannel;
+    connect(callChannel.data(), SIGNAL(stateChanged(Tpy::CallState)),
+            this, SLOT(setState(Tpy::CallState)));
+
     //create the channel handler
-    d->channelHandler = new CallChannelHandler(channel, this);
-    connect(d->channelHandler, SIGNAL(participantJoined(CallParticipant*)),
-            this, SLOT(onParticipantJoined(CallParticipant*)));
-    connect(d->channelHandler, SIGNAL(participantLeft(CallParticipant*)),
-            this, SLOT(onParticipantLeft(CallParticipant*)));
-    connect(d->channelHandler, SIGNAL(error(QString)), this, SLOT(onHandlerError(QString)));
-    connect(d->channelHandler, SIGNAL(callEnded(QString)), this, SLOT(onCallEnded(QString)));
+    d->channelHandler = new CallChannelHandler(callChannel, this);
+    connect(d->channelHandler, SIGNAL(callEnded()), this, SLOT(onCallEnded()));
 
     //create ui
     d->ui.setupUi(this);
@@ -65,16 +62,16 @@ CallWindow::CallWindow(const Tp::StreamedMediaChannelPtr & channel)
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
 
     //enable dtmf
-    if (channel->interfaces().contains(TELEPATHY_INTERFACE_CHANNEL_INTERFACE_DTMF)) {
+    if (callChannel->interfaces().contains(TP_QT4_IFACE_CHANNEL_INTERFACE_DTMF)) {
         kDebug() << "Creating DTMF handler";
-        DtmfHandler *handler = new DtmfHandler(channel, this);
+        DtmfHandler *handler = new DtmfHandler(callChannel, this);
         handler->connectDtmfWidget(d->ui.dtmfWidget);
     } else {
         d->ui.dtmfWidget->setEnabled(false);
     }
     d->ui.dtmfDock->hide();
 
-    setState(Connecting);
+    setState(callChannel->state());
 }
 
 CallWindow::~CallWindow()
@@ -110,96 +107,71 @@ void CallWindow::setupActions()
     actionCollection()->addAction("hold", holdAction);
 
     QAction *hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
-    connect(hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangup()));
+    //FIXME connect(hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangup()));
     actionCollection()->addAction("hangup", hangupAction);
 }
 
-void CallWindow::setState(State state)
+void CallWindow::setState(Tpy::CallState state)
 {
+    //TODO take into account the CallFlags
     switch (state) {
-    case Connecting:
+    case Tpy::CallStatePendingInitiator:
+    case Tpy::CallStatePendingReceiver:
         d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Connecting..."));
         break;
-    case Connected:
+    case Tpy::CallStateAccepted:
         d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
         d->statusArea->startDurationTimer();
         break;
-    case Disconnected:
+    case Tpy::CallStateEnded:
         d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Disconnected."));
         d->statusArea->stopDurationTimer();
-        d->callEnded = true;
-        QTimer::singleShot(5000, this, SLOT(close()));
         break;
     default:
         Q_ASSERT(false);
     }
 }
 
-void CallWindow::onParticipantJoined(CallParticipant *participant)
+void CallWindow::onCallEnded()
 {
-    connect(participant, SIGNAL(audioStreamAdded(CallParticipant*)),
-            this, SLOT(onParticipantAudioStreamAdded(CallParticipant*)));
-    connect(participant, SIGNAL(audioStreamRemoved(CallParticipant*)),
-            this, SLOT(onParticipantAudioStreamRemoved(CallParticipant*)));
-    connect(participant, SIGNAL(videoStreamAdded(CallParticipant*)),
-            this, SLOT(onParticipantVideoStreamAdded(CallParticipant*)));
-    connect(participant, SIGNAL(videoStreamRemoved(CallParticipant*)),
-            this, SLOT(onParticipantVideoStreamRemoved(CallParticipant*)));
-
-    if (!participant->isMyself()) {
-        setState(Connected);
-    }
+    d->callEnded = true;
+    QTimer::singleShot(5000, this, SLOT(close()));
 }
 
-void CallWindow::onParticipantAudioStreamAdded(CallParticipant *participant)
+void CallWindow::onAudioContentAdded(CallContentHandler *contentHandler)
 {
-    if (participant->isMyself()) {
-        d->statusArea->showAudioStatusIcon(true);
-        d->muteAction->setEnabled(true);
-        d->muteAction->setChecked(participant->isMuted());
-        connect(d->muteAction, SIGNAL(toggled(bool)), participant, SLOT(setMuted(bool)));
-    }
+    d->statusArea->showAudioStatusIcon(true);
+    d->muteAction->setEnabled(true);
+    d->muteAction->setChecked(contentHandler->sourceController()->sourceEnabled());
+    connect(d->muteAction, SIGNAL(toggled(bool)),
+            contentHandler->sourceController(), SLOT(setSourceEnabled(bool)));
 }
 
-void CallWindow::onParticipantAudioStreamRemoved(CallParticipant *participant)
+void CallWindow::onAudioContentRemoved(CallContentHandler *contentHandler)
 {
-    if (participant->isMyself()) {
-        d->statusArea->showAudioStatusIcon(false);
-        d->muteAction->setEnabled(false);
-        d->muteAction->disconnect(participant);
-    }
+    Q_UNUSED(contentHandler);
+    d->statusArea->showAudioStatusIcon(false);
+    d->muteAction->setEnabled(false);
 }
 
-void CallWindow::onParticipantVideoStreamAdded(CallParticipant *participant)
+void CallWindow::onVideoContentAdded(CallContentHandler *contentHandler)
 {
-    if (participant->isMyself()) {
-        d->statusArea->showVideoStatusIcon(true);
-    }
+    Q_UNUSED(contentHandler);
+    d->statusArea->showVideoStatusIcon(true);
 }
 
-void CallWindow::onParticipantVideoStreamRemoved(CallParticipant *participant)
+void CallWindow::onVideoContentRemoved(CallContentHandler *contentHandler)
 {
-    if (participant->isMyself()) {
-        d->statusArea->showVideoStatusIcon(false);
-    }
-}
-
-void CallWindow::onHandlerError(const QString & error)
-{
-    d->statusArea->setMessage(StatusArea::Error, error);
-}
-
-void CallWindow::onCallEnded(const QString & message)
-{
-    kDebug() << message;
-    setState(Disconnected);
+    Q_UNUSED(contentHandler);
+    d->statusArea->showVideoStatusIcon(false);
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)
 {
-    if ( !d->callEnded ) {
+    if (!d->callEnded) {
         kDebug() << "Ignoring close event";
-        d->channelHandler->hangup();
+        d->callChannel->hangup(Tpy::CallStateChangeReasonUserRequested,
+                               TP_QT4_ERROR_CANCELLED, QString());
         event->ignore();
     } else {
         KXmlGuiWindow::closeEvent(event);

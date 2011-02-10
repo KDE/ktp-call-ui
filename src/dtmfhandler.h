@@ -17,19 +17,19 @@
 #ifndef DTMFHANDLER_H
 #define DTMFHANDLER_H
 
-#include <TelepathyQt4/StreamedMediaChannel>
+#include <TelepathyQt4Yell/CallChannel>
 class DtmfWidget;
 
 class DtmfHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit DtmfHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
+    explicit DtmfHandler(const Tpy::CallChannelPtr & channel, QObject *parent = 0);
     virtual ~DtmfHandler();
 
     void connectDtmfWidget(DtmfWidget *dtmfWidget);
 
-private slots:
+private Q_SLOTS:
     void onStartSendDtmfEvent(Tp::DTMFEvent event);
     void onStopSendDtmfEvent();
 

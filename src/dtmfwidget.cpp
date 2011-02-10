@@ -77,7 +77,7 @@ DtmfWidget::~DtmfWidget()
 
 void DtmfWidget::onButtonPressed(int code)
 {
-    emit startSendDtmfEvent(static_cast<Tp::DTMFEvent>(code));
+    Q_EMIT startSendDtmfEvent(static_cast<Tp::DTMFEvent>(code));
 }
 
 #include "dtmfwidget.moc"

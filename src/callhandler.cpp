@@ -17,21 +17,20 @@
 #include "callhandler.h"
 #include "callwindow.h"
 #include <KDebug>
-#include <TelepathyQt4/StreamedMediaChannel>
-#include <TelepathyQt4/ChannelClassSpecList>
+#include <TelepathyQt4Yell/CallChannel>
+#include <TelepathyQt4Yell/ChannelClassSpec>
 
 static inline Tp::ChannelClassSpecList channelClassSpecList()
 {
-    return Tp::ChannelClassSpecList() << Tp::ChannelClassSpec::streamedMediaCall()
-                                      << Tp::ChannelClassSpec::streamedMediaAudioCall()
-                                      << Tp::ChannelClassSpec::streamedMediaVideoCall()
-                                      << Tp::ChannelClassSpec::streamedMediaVideoCallWithAudio();
+    return Tp::ChannelClassSpecList() << Tpy::ChannelClassSpec::audioCall()
+                                      << Tpy::ChannelClassSpec::videoCall()
+                                      << Tpy::ChannelClassSpec::videoCallWithAudio();
 }
 
 CallHandler::CallHandler()
     : Tp::AbstractClientHandler(channelClassSpecList())
 {
-    kDebug ();
+    kDebug();
 }
 
 CallHandler::~CallHandler()
@@ -51,43 +50,27 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
                                  const QDateTime & userActionTime,
                                  const Tp::AbstractClientHandler::HandlerInfo & handlerInfo)
 {
-    kDebug ();
+    kDebug();
     Q_UNUSED(account);
     Q_UNUSED(connection);
     Q_UNUSED(requestsSatisfied);
     Q_UNUSED(userActionTime);
     Q_UNUSED(handlerInfo);
 
-    foreach(const Tp::ChannelPtr & channel, channels) {
-        Tp::StreamedMediaChannelPtr smchannel = Tp::StreamedMediaChannelPtr::dynamicCast(channel);
-        if ( !smchannel ) {
-            kDebug() << "Channel is not a streamed media channel. Ignoring";
+    Q_FOREACH(const Tp::ChannelPtr & channel, channels) {
+        Tpy::CallChannelPtr callChannel = Tpy::CallChannelPtr::dynamicCast(channel);
+        if (!callChannel) {
+            kDebug() << "Channel is not a Call channel. Ignoring";
             continue;
         }
 
-        connect(smchannel->becomeReady(Tp::Features()
-                                        << Tp::StreamedMediaChannel::FeatureCore
-                                        << Tp::StreamedMediaChannel::FeatureStreams),
-                SIGNAL(finished(Tp::PendingOperation*)),
-                SLOT(onChannelReady(Tp::PendingOperation*)));
+        callChannel->accept();
+
+        CallWindow *cw = new CallWindow(callChannel);
+        cw->show();
     }
 
     context->setFinished();
-}
-
-void CallHandler::onChannelReady(Tp::PendingOperation *operation)
-{
-    Tp::PendingReady *pr = qobject_cast<Tp::PendingReady*>(operation);
-    if (pr->isError()) {
-        kError() << "Channel failed to become ready";
-        return;
-    }
-
-    Tp::StreamedMediaChannelPtr channel = Tp::StreamedMediaChannelPtr::dynamicCast(pr->object());
-    channel->acceptCall();
-
-    CallWindow *cw = new CallWindow(channel);
-    cw->show();
 }
 
 #include "callhandler.moc"

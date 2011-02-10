@@ -19,15 +19,15 @@
 
 struct DtmfHandler::Private
 {
-    Tp::StreamedMediaChannelPtr channel;
-//     Tp::Client::ChannelInterfaceDTMFInterface *dtmfInterface;
+    Tpy::CallChannelPtr channel;
+    Tp::Client::ChannelInterfaceDTMFInterface *dtmfInterface;
 };
 
-DtmfHandler::DtmfHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent)
+DtmfHandler::DtmfHandler(const Tpy::CallChannelPtr & channel, QObject *parent)
     : QObject(parent), d(new Private)
 {
     d->channel = channel;
-//     d->dtmfInterface = channel->DTMFInterface();
+    d->dtmfInterface = channel->optionalInterface<Tp::Client::ChannelInterfaceDTMFInterface>();
 }
 
 DtmfHandler::~DtmfHandler()
@@ -45,24 +45,24 @@ void DtmfHandler::connectDtmfWidget(DtmfWidget *dtmfWidget)
 
 void DtmfHandler::onStartSendDtmfEvent(Tp::DTMFEvent event)
 {
-    foreach(const Tp::StreamedMediaStreamPtr & stream, d->channel->streams()) {
-        if ( stream->type() == Tp::MediaStreamTypeAudio ) {
-            //TODO handle return value and signal on error
-            stream->startDTMFTone(event);
+//     foreach(const Tp::StreamedMediaStreamPtr & stream, d->channel->streams()) {
+//         if ( stream->type() == Tp::MediaStreamTypeAudio ) {
+//             //TODO handle return value and signal on error
+//             stream->startDTMFTone(event);
 //             d->dtmfInterface->StartTone(stream->id(), event);
-        }
-    }
+//         }
+//     }
 }
 
 void DtmfHandler::onStopSendDtmfEvent()
 {
-    foreach(const Tp::StreamedMediaStreamPtr & stream, d->channel->streams()) {
-        if ( stream->type() == Tp::MediaStreamTypeAudio ) {
-            //TODO handle return value and signal on error
-            stream->stopDTMFTone();
+//     foreach(const Tp::StreamedMediaStreamPtr & stream, d->channel->streams()) {
+//         if ( stream->type() == Tp::MediaStreamTypeAudio ) {
+//             //TODO handle return value and signal on error
+//             stream->stopDTMFTone();
 //             d->dtmfInterface->StopTone(stream->id());
-        }
-    }
+//         }
+//     }
 }
 
 #include "dtmfhandler.moc"

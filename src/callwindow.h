@@ -40,6 +40,7 @@ private Q_SLOTS:
     void onAudioContentRemoved(CallContentHandler *contentHandler);
     void onVideoContentAdded(CallContentHandler *contentHandler);
     void onVideoContentRemoved(CallContentHandler *contentHandler);
+    void hangup();
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

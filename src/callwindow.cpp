@@ -107,7 +107,7 @@ void CallWindow::setupActions()
     actionCollection()->addAction("hold", holdAction);
 
     QAction *hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
-    //FIXME connect(hangupAction, SIGNAL(triggered()), d->channelHandler, SLOT(hangup()));
+    connect(hangupAction, SIGNAL(triggered()), this, SLOT(hangup()));
     actionCollection()->addAction("hangup", hangupAction);
 }
 
@@ -166,12 +166,18 @@ void CallWindow::onVideoContentRemoved(CallContentHandler *contentHandler)
     d->statusArea->showVideoStatusIcon(false);
 }
 
+void CallWindow::hangup()
+{
+    kDebug();
+    d->callChannel->hangup(Tpy::CallStateChangeReasonUserRequested,
+                           TP_QT4_ERROR_CANCELLED, QString());
+}
+
 void CallWindow::closeEvent(QCloseEvent *event)
 {
     if (!d->callEnded) {
         kDebug() << "Ignoring close event";
-        d->callChannel->hangup(Tpy::CallStateChangeReasonUserRequested,
-                               TP_QT4_ERROR_CANCELLED, QString());
+        hangup();
         event->ignore();
     } else {
         KXmlGuiWindow::closeEvent(event);

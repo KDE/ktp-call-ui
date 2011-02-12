@@ -90,6 +90,7 @@ private:
     QTf::ContentPtr m_tfContent;
     QGst::PipelinePtr m_pipeline;
     QGst::PadPtr m_sourceControllerPad;
+    QGst::ElementPtr m_queue;
 };
 
 #endif // CALLCONTENTHANDLER_P_H

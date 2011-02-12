@@ -20,6 +20,7 @@
 #include "sinkcontrollers_p.h"
 #include <QGlib/Connect>
 #include <QGst/Pad>
+#include <QGst/ElementFactory>
 #include <KDebug>
 
 //BEGIN PendingCallContentHandler
@@ -72,6 +73,9 @@ void PendingCallContentHandler::onContentAdded(const Tpy::CallContentPtr & callC
 CallContentHandlerPrivate::~CallContentHandlerPrivate()
 {
     kDebug();
+    m_sourceControllerPad->unlink(m_queue->getStaticPad("sink"));
+    m_queue->getStaticPad("src")->unlink(m_tfContent->property("sink-pad").get<QGst::PadPtr>());
+    m_queue->setState(QGst::StateNull);
     m_sourceController->releaseSrcPad(m_sourceControllerPad);
     m_sinkManager->unlinkAllPads();
 }
@@ -104,8 +108,13 @@ void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
         Q_ASSERT(false);
     }
 
+    m_queue = QGst::ElementFactory::make("queue");
+    m_pipeline->add(m_queue);
+    m_queue->syncStateWithParent();
+
     m_sourceControllerPad = m_sourceController->requestSrcPad();
-    m_sourceControllerPad->link(m_tfContent->property("sink-pad").get<QGst::PadPtr>());
+    m_sourceControllerPad->link(m_queue->getStaticPad("sink"));
+    m_queue->getStaticPad("src")->link(m_tfContent->property("sink-pad").get<QGst::PadPtr>());
 
     connect(m_sinkManager, SIGNAL(controllerCreated(BaseSinkController*)),
             this, SLOT(onControllerCreated(BaseSinkController*)));

@@ -178,15 +178,16 @@ void BaseSourceControllerPrivate::createBin()
     m_fakesink->setProperty("async", false);
     m_fakesink->setProperty("silent", true);
     m_fakesink->setProperty("enable-last-buffer", false);
+    QGst::ElementPtr filter = makeFilterBin();
 
-    m_bin->add(m_silenceSource, m_inputSelector, m_tee, m_fakesink);
+    m_bin->add(m_silenceSource, m_inputSelector, filter, m_tee, m_fakesink);
 
     // silencesource ! input-selector
     QGst::PadPtr selectorSinkPad = m_inputSelector->getRequestPad("sink%d");
     m_silenceSource->getStaticPad("src")->link(selectorSinkPad);
 
-    // input-selector ! tee
-    m_inputSelector->link(m_tee);
+    // input-selector ! (filter bin) ! tee
+    QGst::Element::linkMany(m_inputSelector, filter, m_tee);
 
     // tee ! fakesink
     m_tee->getRequestPad("src%d")->link(m_fakesink->getStaticPad("sink"));
@@ -275,18 +276,24 @@ QGst::ElementPtr AudioSourceControllerPrivate::makeRealSource()
 
     QGst::BinPtr bin = QGst::Bin::create();
     QGst::ElementPtr volume = QGst::ElementFactory::make("volume");
-    QGst::ElementPtr audioConvert = QGst::ElementFactory::make("audioconvert");
-    QGst::ElementPtr audioResample = QGst::ElementFactory::make("audioresample");
     QGst::ElementPtr level = QGst::ElementFactory::make("level");
 
     m_volumeController->setElement(volume.dynamicCast<QGst::StreamVolume>());
 
-    bin->add(src, volume, audioConvert, audioResample, level);
-    QGst::Element::linkMany(src, volume, audioConvert, audioResample, level);
+    bin->add(src, volume, level);
+    QGst::Element::linkMany(src, volume, level);
 
     bin->addPad(QGst::GhostPad::create(level->getStaticPad("src"), "src"));
 
     return bin;
+}
+
+QGst::ElementPtr AudioSourceControllerPrivate::makeFilterBin()
+{
+    return QGst::Bin::fromDescription(
+        "audiorate ! "
+        "capsfilter caps=\"audio/x-raw-int,rate=[8000,16000];audio/x-raw-float,rate=[8000,16000]\""
+    );
 }
 
 void AudioSourceControllerPrivate::releaseRealSource()
@@ -320,81 +327,79 @@ QGst::ElementPtr VideoSourceControllerPrivate::makeSilenceSource()
 
 QGst::ElementPtr VideoSourceControllerPrivate::makeRealSource()
 {
-    /*
-     * (source) ! videomaxrate (optional) ! videobalance (optional)
-     * ! ffmpegcolorspace ! videoscale ! capsfilter ! postproc_tmpnoise (optional)
-     */
-
     QGst::ElementPtr src = DeviceElementFactory::makeVideoCaptureElement();
     if (!src) {
         kDebug() << "Could not initialize video capture device";
         return QGst::ElementPtr();
-    }
-
-    QGst::BinPtr bin = QGst::Bin::create();
-    QGst::ElementPtr videomaxrate = QGst::ElementFactory::make("videomaxrate");
-    QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
-    QGst::ElementPtr videoscale = QGst::ElementFactory::make("videoscale");
-    QGst::ElementPtr capsfilter = QGst::ElementFactory::make("capsfilter");
-    QGst::ElementPtr postproc = QGst::ElementFactory::make("postproc_tmpnoise");
-
-    QGst::ElementPtr realSrc;
-    QGst::BinPtr srcBin = src.dynamicCast<QGst::Bin>();
-    if (srcBin) {
-        realSrc = srcBin->childByIndex(0).dynamicCast<QGst::Element>();
     } else {
-        realSrc = src;
+        return src;
     }
 
-    QGst::ElementPtr videobalance;
+//TODO colorbalance support
+//     QGst::ElementPtr realSrc;
+//     QGst::BinPtr srcBin = src.dynamicCast<QGst::Bin>();
+//     if (srcBin) {
+//         realSrc = srcBin->childByIndex(0).dynamicCast<QGst::Element>();
+//     } else {
+//         realSrc = src;
+//     }
+//
+//     QGst::ElementPtr videobalance;
 //     m_colorBalance = realSrc.dynamicCast<QGst::ColorBalance>();
 //     if (!m_colorBalance) {
 //         kDebug() << "Source does not support color balance";
 //         videobalance = QGst::ElementFactory::make("videobalance");
 //         m_colorBalance = videobalance.dynamicCast<QGst::ColorBalance>();
 //     }
+}
 
-    //TODO have methods to select preferred resolution + query source
+QGst::ElementPtr VideoSourceControllerPrivate::makeFilterBin()
+{
+    QGst::BinPtr bin = QGst::Bin::create();
+
+    //videomaxrate drops frames to support the 15fps restriction
+    //in the capsfilter if the camera cannot produce 15fps
+    QGst::ElementPtr videomaxrate = QGst::ElementFactory::make("videomaxrate");
+
+    //ffmpegcolorspace converts to yuv for postproc_tmpnoise
+    //to work if the camera cannot produce yuv
+    QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
+
+    //videoscale supports the 320x240 restriction in the capsfilter
+    //if the camera cannot produce 320x240
+    QGst::ElementPtr videoscale = QGst::ElementFactory::make("videoscale");
+
+    //capsfilter restricts the output to 320x240 @ 15fps
+    QGst::ElementPtr capsfilter = QGst::ElementFactory::make("capsfilter");
+
+    //postproc_tmpnoise reduces video noise to improve quality
+    QGst::ElementPtr postproc = QGst::ElementFactory::make("postproc_tmpnoise");
+
     QGst::Structure capsStruct("video/x-raw-yuv");
     capsStruct.setValue("width", 320);
     capsStruct.setValue("height", 240);
-
-    /* videomaxrate is optional, since it is not always available */
-    if (videomaxrate) {
-        bin->add(videomaxrate);
-    } else {
-        kDebug() << "NOT using videomaxrate";
-        //TODO query source to get supported framerates
-        capsStruct.setValue("framerate", QGst::Fraction(15,1));
-    }
-
-    if (videobalance) {
-        kDebug() << "Using videobalance";
-        bin->add(videobalance);
-    }
+    capsStruct.setValue("framerate", QGst::FractionRange(QGst::Fraction(0,1), QGst::Fraction(15,1)));
 
     QGst::CapsPtr caps = QGst::Caps::createEmpty();
     caps->appendStructure(capsStruct);
     capsfilter->setProperty("caps", caps);
 
     bin->add(colorspace, videoscale, capsfilter);
-    if (postproc) {
-        bin->add(postproc);
+
+    /* videomaxrate and postproc_tmpnoise are optional */
+    if (videomaxrate) {
+        bin->add(videomaxrate);
+        videomaxrate->link(colorspace);
+        bin->addPad(QGst::GhostPad::create(videomaxrate->getStaticPad("sink"), "sink"));
+    } else {
+        kDebug() << "NOT using videomaxrate";
+        bin->addPad(QGst::GhostPad::create(colorspace->getStaticPad("sink"), "sink"));
     }
 
-    if (videomaxrate) {
-        if (videobalance) {
-            videomaxrate->link(videobalance);
-        } else {
-            videomaxrate->link(colorspace);
-        }
-    } else {
-        if (videobalance) {
-            videobalance->link(colorspace);
-        }
-    }
     QGst::Element::linkMany(colorspace, videoscale, capsfilter);
+
     if (postproc) {
+        bin->add(postproc);
         capsfilter->link(postproc);
         bin->addPad(QGst::GhostPad::create(postproc->getStaticPad("src"), "src"));
     } else {

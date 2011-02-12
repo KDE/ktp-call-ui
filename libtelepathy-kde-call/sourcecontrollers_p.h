@@ -31,6 +31,7 @@ protected:
 
     virtual QGst::ElementPtr makeSilenceSource() = 0;
     virtual QGst::ElementPtr makeRealSource() = 0;
+    virtual QGst::ElementPtr makeFilterBin() = 0;
     virtual void releaseRealSource() {}
 
     BaseSourceController *q_ptr;
@@ -79,6 +80,7 @@ public:
 protected:
     virtual QGst::ElementPtr makeSilenceSource();
     virtual QGst::ElementPtr makeRealSource();
+    virtual QGst::ElementPtr makeFilterBin();
     virtual void releaseRealSource();
 
 private:
@@ -95,6 +97,7 @@ public:
 protected:
     virtual QGst::ElementPtr makeSilenceSource();
     virtual QGst::ElementPtr makeRealSource();
+    virtual QGst::ElementPtr makeFilterBin();
 };
 
 #endif // SOURCECONTROLLERS_P_H

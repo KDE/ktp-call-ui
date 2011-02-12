@@ -292,63 +292,30 @@ AudioSinkManager::AudioSinkManager(const QGst::PipelinePtr & pipeline, QObject *
       m_pipeline(pipeline),
       m_sinkRefCount(0)
 {
-    m_sink = DeviceElementFactory::makeAudioOutputElement();
-    if (!m_sink) {
-        kWarning() << "Failed to create audio sink. Using fakesink. "
-                      "You will need to restart the call to get audio output.";
-        m_sink = QGst::ElementFactory::make("fakesink");
-        m_sink->setProperty("sync", false);
-        m_sink->setProperty("async", false);
-        m_sink->setProperty("silent", true);
-        m_sink->setProperty("enable-last-buffer", false);
-    }
-
-    m_adder = QGst::ElementFactory::make("liveadder");
-    if (!m_adder) {
-        kWarning() << "Failed to create liveadder. Using adder. This may cause trouble...";
-        m_adder = QGst::ElementFactory::make("adder");
-    }
-
-    m_pipeline->add(m_adder, m_sink);
-    m_adder->link(m_sink);
-    m_sink->setState(QGst::StateReady);
-    m_adder->setState(QGst::StateReady);
 }
 
 AudioSinkManager::~AudioSinkManager()
 {
     Q_ASSERT(m_sinkRefCount == 0);
-    m_adder->setState(QGst::StateNull);
-    m_sink->setState(QGst::StateNull);
-    m_adder->unlink(m_sink);
-    m_pipeline->remove(m_adder);
-    m_pipeline->remove(m_sink);
 }
 
 BaseSinkControllerPrivate *AudioSinkManager::createControllerPrivate(const QGst::PadPtr & srcPad)
 {
     AudioSinkControllerPrivate *priv = new AudioSinkControllerPrivate;
-    priv->m_bin = QGst::Bin::create();
-    QGst::ElementPtr volume = QGst::ElementFactory::make("volume");
-    QGst::ElementPtr audioConvert = QGst::ElementFactory::make("audioconvert");
-    QGst::ElementPtr audioResample = QGst::ElementFactory::make("audioresample");
-    QGst::ElementPtr level = QGst::ElementFactory::make("level");
-
-    priv->m_bin->add(volume, audioConvert, audioResample, level);
-    QGst::Element::linkMany(volume, audioConvert, audioResample, level);
-
-    QGst::PadPtr binSinkPad = QGst::GhostPad::create(volume->getStaticPad("sink"), "sink");
-    QGst::PadPtr binSrcPad = QGst::GhostPad::create(level->getStaticPad("src"), "src");
-    priv->m_bin->addPad(binSinkPad);
-    priv->m_bin->addPad(binSrcPad);
+    priv->m_bin = QGst::Bin::fromDescription(
+        "volume ! "
+        "audioconvert ! "
+        "audioresample ! "
+        "level"
+    );
 
     refSink();
     m_pipeline->add(priv->m_bin);
     priv->m_bin->syncStateWithParent();
 
     priv->m_adderRequestPad = m_adder->getRequestPad("sink%d");
-    binSinkPad->link(priv->m_adderRequestPad);
-    srcPad->link(binSinkPad);
+    priv->m_bin->getStaticPad("src")->link(priv->m_adderRequestPad);
+    srcPad->link(priv->m_bin->getStaticPad("sink"));
 
     return priv;
 }
@@ -379,6 +346,25 @@ void AudioSinkManager::refSink()
 {
     QMutexLocker l(&m_mutex);
     if (m_sinkRefCount++ == 0) {
+        m_sink = DeviceElementFactory::makeAudioOutputElement();
+        if (!m_sink) {
+            kWarning() << "Failed to create audio sink. Using fakesink. "
+                        "You will need to restart the call to get audio output.";
+            m_sink = QGst::ElementFactory::make("fakesink");
+            m_sink->setProperty("sync", false);
+            m_sink->setProperty("async", false);
+            m_sink->setProperty("silent", true);
+            m_sink->setProperty("enable-last-buffer", false);
+        }
+
+        m_adder = QGst::ElementFactory::make("liveadder");
+        if (!m_adder) {
+            kWarning() << "Failed to create liveadder. Using adder. This may cause trouble...";
+            m_adder = QGst::ElementFactory::make("adder");
+        }
+
+        m_pipeline->add(m_adder, m_sink);
+        m_adder->link(m_sink);
         m_sink->syncStateWithParent();
         m_adder->syncStateWithParent();
     }
@@ -388,8 +374,13 @@ void AudioSinkManager::unrefSink()
 {
     QMutexLocker l(&m_mutex);
     if (--m_sinkRefCount == 0) {
-        m_adder->setState(QGst::StateReady);
-        m_sink->setState(QGst::StateReady);
+        m_adder->unlink(m_sink);
+        m_adder->setState(QGst::StateNull);
+        m_sink->setState(QGst::StateNull);
+        m_pipeline->remove(m_adder);
+        m_pipeline->remove(m_sink);
+        m_adder.clear();
+        m_sink.clear();
     }
 }
 

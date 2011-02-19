@@ -17,6 +17,7 @@
 */
 #include "qtf.h"
 #include <QGlib/Quark>
+#include <TelepathyQt4Yell/Farstream/PendingTfChannel>
 #include <telepathy-farstream/telepathy-farstream.h>
 
 //BEGIN generated code
@@ -77,4 +78,35 @@ void init()
     Private::registerWrapperConstructors();
 }
 
+
+PendingChannel::PendingChannel(const Tpy::CallChannelPtr& callChannel)
+    : PendingOperation(callChannel)
+{
+    Tpy::FarstreamChannelFactoryPtr factory = Tpy::FarstreamChannelFactory::create();
+    Tpy::PendingTfChannel *p = factory->createTfChannel(callChannel);
+    connect(p, SIGNAL(finished(Tp::PendingOperation*)),
+            SLOT(onPendingTfChannelFinished(Tp::PendingOperation*)));
+}
+
+PendingChannel::~PendingChannel()
+{
+}
+
+ChannelPtr PendingChannel::channel() const
+{
+    return m_channel;
+}
+
+void PendingChannel::onPendingTfChannelFinished(Tp::PendingOperation *op)
+{
+    if (op->isError()) {
+        setFinishedWithError(op->errorName(), op->errorMessage());
+    } else {
+        m_channel = ChannelPtr::wrap(qobject_cast<Tpy::PendingTfChannel*>(op)->tfChannel(), false);
+        setFinished();
+    }
+}
+
 } //namespace QTf
+
+#include "qtf.moc"

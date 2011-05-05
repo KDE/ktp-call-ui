@@ -58,7 +58,7 @@ int main(int argc, char **argv)
                                     );
 
     Tp::SharedPtr<CallHandler> callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
-    registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "telepathy_kde_call_ui");
+    registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "KDE.CallUi");
 
     return app.exec();
 }

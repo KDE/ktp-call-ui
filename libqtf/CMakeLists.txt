@@ -1,6 +1,7 @@
 # This is *A LOT* of dependencies to find one by one,
 # since gnome people like to include as many headers as possible
 # in their public headers instead of doing forward declarations.
+find_package(PkgConfig REQUIRED)
 pkg_check_modules(TP_FARSTREAM REQUIRED telepathy-farstream)
 pkg_check_modules(TP_QT4_YELL_FARSTREAM REQUIRED TelepathyQt4YellFarstream)
 

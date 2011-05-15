@@ -23,7 +23,7 @@
 
 class CallChannelHandlerPrivate;
 
-/*! This class handles streaming in a telepathy Call channel.
+/** This class handles streaming in a telepathy Call channel.
  * To begin streaming, construct an instance of this class and use the
  * CallContentHandler objects that this class creates to control streaming
  * for the individual contents of the call.

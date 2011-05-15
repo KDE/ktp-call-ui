@@ -33,7 +33,7 @@ class BaseSourceController : public QObject
     Q_PROPERTY(bool sourceEnabled READ sourceEnabled WRITE setSourceEnabled
                                   NOTIFY sourceEnabledChanged)
 public:
-    /*! This returns a new 'src' pad from the source bin that can be
+    /** This returns a new 'src' pad from the source bin that can be
      * connected to any sink that needs to get the data of the source.
      * This is useful for connecting a video preview sink on video contents
      * or for connecting an encoder and recording the call.

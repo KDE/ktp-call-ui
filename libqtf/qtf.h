@@ -48,7 +48,7 @@ class Content;
 typedef QGlib::RefPointer<Content> ContentPtr;
 
 
-/*! Wrapper for TfChannel */
+/** Wrapper for TfChannel */
 class QTF_EXPORT Channel : public QGlib::Object
 {
     QTF_WRAPPER(Channel)
@@ -57,19 +57,19 @@ public:
 };
 
 
-/*! Wrapper for TfContent */
+/** Wrapper for TfContent */
 class QTF_EXPORT Content : public QGlib::Object
 {
     QTF_WRAPPER(Content)
 };
 
 
-/*! Initializes telepathy-farstream and registers the
+/** Initializes telepathy-farstream and registers the
  * QTf wrapper types with the QGlib type system */
 QTF_EXPORT void init();
 
 
-/*! Constructs a new QTf::Channel from a Tpy::CallChannel */
+/** Constructs a new QTf::Channel from a Tpy::CallChannel */
 class QTF_EXPORT PendingChannel : public Tp::PendingOperation
 {
     Q_OBJECT

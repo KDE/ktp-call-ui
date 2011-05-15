@@ -26,7 +26,7 @@ class CallContentHandlerPrivate;
 class PendingCallContentHandler;
 class CallChannelHandlerPrivate;
 
-/*! This class handles streaming in a telepathy Call channel Content.
+/** This class handles streaming in a telepathy Call channel Content.
  * Everything related to streaming is handled internally. You only need
  * to access the controller classes that this class exports to be able
  * to control properties of the internal gstreamer pipeline.
@@ -35,16 +35,16 @@ class CallContentHandler : public QObject
 {
     Q_OBJECT
 public:
-    /*! \returns the telepathy content associated with this handler */
+    /** \returns the telepathy content associated with this handler */
     Tpy::CallContentPtr callContent() const;
 
-    /*! \returns the controller for the input source that is used in this content.
+    /** \returns the controller for the input source that is used in this content.
      * In audio contents, this can be safely cast to AudioSourceController*
      * and in video contents, to VideoSourceController*.
      */
     BaseSourceController *sourceController() const;
 
-    /*! \returns the controllers for the output sinks. Typically, there
+    /** \returns the controllers for the output sinks. Typically, there
      * is one sink controller for each participant in this content.
      * In audio contents, every sink controller can be safely cast to
      * AudioSinkController* and in video contents, to VideoSinkController*.

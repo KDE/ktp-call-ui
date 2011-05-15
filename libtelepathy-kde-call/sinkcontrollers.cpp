@@ -164,8 +164,8 @@ void BaseSinkManager::handleNewSinkPadAsync(uint contactHandle)
     if (m_content) {
         kDebug() << "Content exists. Looking for contact...";
 
-        Q_FOREACH(const Tpy::CallStreamPtr & stream, m_content->streams()) {
-            Q_FOREACH(const Tp::ContactPtr & contact, stream->members()) {
+        Q_FOREACH (const Tpy::CallStreamPtr & stream, m_content->streams()) {
+            Q_FOREACH (const Tp::ContactPtr & contact, stream->members()) {
                 if (contact->handle()[0] == contactHandle) {
                     kDebug() << "Found contact" << contact;
 
@@ -203,7 +203,7 @@ void BaseSinkManager::onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tp
     QMutexLocker l(&m_mutex);
 
     if (!m_controllersWaitingForContact.isEmpty()) {
-        Q_FOREACH(const Tp::ContactPtr & contact, states.keys()) {
+        Q_FOREACH (const Tp::ContactPtr & contact, states.keys()) {
             if (m_controllersWaitingForContact.contains(contact->handle()[0])) {
                 kDebug() << "Found contact" << contact;
 

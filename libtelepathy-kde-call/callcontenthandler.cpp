@@ -42,7 +42,7 @@ PendingCallContentHandler::PendingCallContentHandler(const Tpy::CallChannelPtr &
 void PendingCallContentHandler::findCallContent()
 {
     Tpy::CallContents callContents = m_callChannel->contents();
-    Q_FOREACH(const Tpy::CallContentPtr & callContent, callContents) {
+    Q_FOREACH (const Tpy::CallContentPtr & callContent, callContents) {
         //FIXME telepathy-farstream should provide an object path here
         if (callContent->type() == m_tfContent->property("media-type").toInt()) {
             m_contentHandler->d->setCallContent(callContent);
@@ -93,17 +93,13 @@ void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
 
     switch(tfContent->property("media-type").toInt()) {
     case Tp::MediaStreamTypeAudio:
-      {
         m_sourceController = new AudioSourceController(pipeline, this);
         m_sinkManager = new AudioSinkManager(pipeline, this);
         break;
-      }
     case Tp::MediaStreamTypeVideo:
-      {
         m_sourceController = new VideoSourceController(pipeline, this);
         m_sinkManager = new VideoSinkManager(pipeline, this);
         break;
-      }
     default:
         Q_ASSERT(false);
     }

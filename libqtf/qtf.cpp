@@ -34,31 +34,31 @@ REGISTER_TYPE_IMPLEMENTATION(QTf::Channel,TF_TYPE_CHANNEL)
 REGISTER_TYPE_IMPLEMENTATION(QTf::Content,TF_TYPE_CONTENT)
 
 namespace QTf {
-  QGlib::RefCountedObject *Channel_new(void *instance)
-  {
-    QTf::Channel *cppClass = new QTf::Channel;
-    cppClass->m_object = instance;
-    return cppClass;
-  }
+    QGlib::RefCountedObject *Channel_new(void *instance)
+    {
+        QTf::Channel *cppClass = new QTf::Channel;
+        cppClass->m_object = instance;
+        return cppClass;
+    }
 } //namespace QTf
 
 namespace QTf {
-  QGlib::RefCountedObject *Content_new(void *instance)
-  {
-    QTf::Content *cppClass = new QTf::Content;
-    cppClass->m_object = instance;
-    return cppClass;
-  }
+    QGlib::RefCountedObject *Content_new(void *instance)
+    {
+        QTf::Content *cppClass = new QTf::Content;
+        cppClass->m_object = instance;
+        return cppClass;
+    }
 } //namespace QTf
 
 namespace QTf {
 namespace Private {
-  void registerWrapperConstructors()
-  {
-    QGlib::Quark q = QGlib::Quark::fromString("QGlib__wrapper_constructor");
-    QGlib::GetType<Channel>().setQuarkData(q, reinterpret_cast<void*>(&Channel_new));
-    QGlib::GetType<Content>().setQuarkData(q, reinterpret_cast<void*>(&Content_new));
-  }
+    void registerWrapperConstructors()
+    {
+        QGlib::Quark q = QGlib::Quark::fromString("QGlib__wrapper_constructor");
+        QGlib::GetType<Channel>().setQuarkData(q, reinterpret_cast<void*>(&Channel_new));
+        QGlib::GetType<Content>().setQuarkData(q, reinterpret_cast<void*>(&Content_new));
+    }
 } //namespace Private
 } //namespace QTf
 

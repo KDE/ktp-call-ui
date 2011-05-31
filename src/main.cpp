@@ -27,7 +27,7 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData aboutData("telepathy-kde-call-ui", "kcall", ki18n("KCall"), "0.8",
+    KAboutData aboutData("telepathy-kde-call-ui", 0, ki18n("KCall"), "0.8",
                           ki18n("VoIP client for KDE"), KAboutData::License_GPL,
                           ki18n("(C) 2009, George Kiagiadakis"));
     aboutData.setProgramIconName("internet-telephony");

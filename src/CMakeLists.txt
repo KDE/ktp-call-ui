@@ -25,5 +25,4 @@ configure_file(org.freedesktop.Telepathy.Client.KDE.CallUi.service.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.Client.KDE.CallUi.service
         DESTINATION ${DBUS_SERVICES_INSTALL_DIR})
 
-# FIXME any better macro for ${XDG_DATA_DIRS} ?
-install(FILES KDE.CallUi.client DESTINATION ${CMAKE_INSTALL_PREFIX}/share/telepathy/clients/)
+install(FILES KDE.CallUi.client DESTINATION ${SHARE_INSTALL_PREFIX}/telepathy/clients/)

@@ -17,7 +17,7 @@ kde4_add_executable(telepathy-kde-call-ui ${telepathy-kde-call-ui_SRCS})
 target_link_libraries(telepathy-kde-call-ui ${KDE4_KDEUI_LIBS} ${TELEPATHY_QT4_LIBRARIES}
                                     telepathy-kde-call)
 
-install(TARGETS telepathy-kde-call-ui ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS telepathy-kde-call-ui DESTINATION ${LIBEXEC_INSTALL_DIR})
 install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/telepathy-kde-call-ui)
 
 configure_file(org.freedesktop.Telepathy.Client.KDE.CallUi.service.in

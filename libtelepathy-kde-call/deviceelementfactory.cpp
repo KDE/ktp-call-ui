@@ -52,8 +52,8 @@ QGst::ElementPtr DeviceElementFactory::makeAudioCaptureElement()
     QList<Phonon::DeviceAccessList> phononDeviceLists
         = PhononIntegration::readDevices(Phonon::AudioCaptureDeviceType, Phonon::CommunicationCategory);
 
-    Q_FOREACH(const Phonon::DeviceAccessList & deviceList, phononDeviceLists) {
-        Q_FOREACH(const Phonon::DeviceAccess & device, deviceList) {
+    Q_FOREACH (const Phonon::DeviceAccessList & deviceList, phononDeviceLists) {
+        Q_FOREACH (const Phonon::DeviceAccess & device, deviceList) {
             if (device.first == "alsa") {
                 //skip x-phonon devices, we will use plughw which is always second in the list
                 if (!device.second.startsWith("x-phonon")) {
@@ -106,8 +106,8 @@ QGst::ElementPtr DeviceElementFactory::makeAudioOutputElement()
     QList<Phonon::DeviceAccessList> phononDeviceLists
         = PhononIntegration::readDevices(Phonon::AudioOutputDeviceType, Phonon::CommunicationCategory);
 
-    Q_FOREACH(const Phonon::DeviceAccessList & deviceList, phononDeviceLists) {
-        Q_FOREACH(const Phonon::DeviceAccess & device, deviceList) {
+    Q_FOREACH (const Phonon::DeviceAccessList & deviceList, phononDeviceLists) {
+        Q_FOREACH (const Phonon::DeviceAccess & device, deviceList) {
             if (device.first == "alsa") {
                 //use dmix instead of x-phonon, since we don't have phonon's alsa configuration file
                 QString deviceString = device.second;

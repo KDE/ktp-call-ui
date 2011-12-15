@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Collabora Ltd. <info@collabora.co.uk>
+    Copyright (C) 2011 Collabora Ltd. <info@collabora.co.uk>
       @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
     This library is free software; you can redistribute it and/or modify
@@ -18,26 +18,29 @@
 #ifndef CALLCHANNELHANDLER_H
 #define CALLCHANNELHANDLER_H
 
-#include "callparticipant.h"
+#include "callcontenthandler.h"
+#include <TelepathyQt4Yell/CallChannel>
+
 class CallChannelHandlerPrivate;
 
+/** This class handles streaming in a telepathy Call channel.
+ * To begin streaming, construct an instance of this class and use the
+ * CallContentHandler objects that this class creates to control streaming
+ * for the individual contents of the call.
+ */
 class CallChannelHandler : public QObject
 {
     Q_OBJECT
 public:
-    CallChannelHandler(const Tp::StreamedMediaChannelPtr & channel, QObject *parent = 0);
+    explicit CallChannelHandler(const Tpy::CallChannelPtr & channel, QObject *parent = 0);
     virtual ~CallChannelHandler();
 
-    QList<CallParticipant*> participants() const;
-
-public Q_SLOTS:
-    void hangup(const QString & message = QString());
+    QList<CallContentHandler*> contents() const;
 
 Q_SIGNALS:
-    void participantJoined(CallParticipant *participant);
-    void participantLeft(CallParticipant *participant);
-    void error(const QString & message);
-    void callEnded(const QString & reason);
+    void contentAdded(CallContentHandler *content);
+    void contentRemoved(CallContentHandler *content);
+    void callEnded();
 
 private:
     friend class CallChannelHandlerPrivate;

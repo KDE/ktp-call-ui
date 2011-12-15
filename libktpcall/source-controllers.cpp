@@ -70,49 +70,29 @@ void BaseSourceController::setSourceEnabled(bool enabled)
 
 BaseSourceControllerPrivate::BaseSourceControllerPrivate(const QGst::PipelinePtr & pipeline)
 {
+    m_inputCtrlBin = NULL;
     m_pipeline = pipeline;
 }
 
 BaseSourceControllerPrivate::~BaseSourceControllerPrivate()
 {
-    m_pads.clear();
-    if (m_bin) {
+    if (m_inputCtrlBin) {
         destroyBin();
     }
 }
 
 QGst::PadPtr BaseSourceControllerPrivate::requestSrcPad()
 {
-    static uint padNameCounter = 0;
-
-    if (!m_bin) {
+    if (!m_inputCtrlBin) {
         createBin();
     }
 
-    QString newPadName = QString("src%1").arg(padNameCounter);
-    padNameCounter++;
-
-    QGst::PadPtr teeSrcPad = m_tee->getRequestPad("src%d");
-    QGst::PadPtr ghostSrcPad = QGst::GhostPad::create(teeSrcPad, newPadName.toAscii());
-
-    ghostSrcPad->setActive(true);
-    m_bin->addPad(ghostSrcPad);
-    m_pads.insert(ghostSrcPad, teeSrcPad);
-
-    return ghostSrcPad;
+    return m_inputCtrlBin->requestSrcPad();
 }
 
 void BaseSourceControllerPrivate::releaseSrcPad(const QGst::PadPtr & pad)
 {
-    QGst::PadPtr teeSrcPad = m_pads.take(pad);
-    Q_ASSERT(!teeSrcPad.isNull());
-
-    m_bin->removePad(pad);
-    m_tee->releaseRequestPad(teeSrcPad);
-
-    if (m_pads.isEmpty()) {
-        destroyBin();
-    }
+    m_inputCtrlBin->releaseSrcPad(pad);
 }
 
 void BaseSourceControllerPrivate::connectToSource()
@@ -126,17 +106,7 @@ void BaseSourceControllerPrivate::connectToSource()
         if (!m_source) {
             return;
         }
-        m_bin->add(m_source);
-
-        //connect the source to the input-selector sink pad
-        m_selectorSinkPad = m_inputSelector->getRequestPad("sink%d");
-        m_source->getStaticPad("src")->link(m_selectorSinkPad);
-
-        //set the source to playing state
-        m_source->syncStateWithParent();
-
-        //swap sources
-        switchToRealSource();
+        m_inputCtrlBin->connectSource(m_source);
 
         Q_EMIT q->sourceEnabledChanged(true);
     }
@@ -148,18 +118,9 @@ void BaseSourceControllerPrivate::disconnectFromSource()
     Q_Q(BaseSourceController);
 
     if (!m_source.isNull()) {
-        //swap sources
-        switchToSilenceSource();
-
-        //disconnect the source from the input-selector sink pad
-        m_source->getStaticPad("src")->unlink(m_selectorSinkPad);
-        m_inputSelector->releaseRequestPad(m_selectorSinkPad);
-        m_selectorSinkPad.clear();
-
-        //destroy the source
         releaseRealSource(); //release any pointers that the subclass keeps
-        m_source->setState(QGst::StateNull);
-        m_bin->remove(m_source);
+
+        m_inputCtrlBin->disconnectSource();
         m_source.clear();
 
         Q_EMIT q->sourceEnabledChanged(false);
@@ -169,71 +130,23 @@ void BaseSourceControllerPrivate::disconnectFromSource()
 
 void BaseSourceControllerPrivate::createBin()
 {
-    m_bin = QGst::Bin::create();
-    m_silenceSource = makeSilenceSource();
-    m_inputSelector = QGst::ElementFactory::make("input-selector");
-    m_tee = QGst::ElementFactory::make("tee");
-    m_fakesink = QGst::ElementFactory::make("fakesink");
-    m_fakesink->setProperty("sync", false);
-    m_fakesink->setProperty("async", false);
-    m_fakesink->setProperty("silent", true);
-    m_fakesink->setProperty("enable-last-buffer", false);
-    QGst::ElementPtr filter = makeFilterBin();
-
-    m_bin->add(m_silenceSource, m_inputSelector, filter, m_tee, m_fakesink);
-
-    // silencesource ! input-selector
-    QGst::PadPtr selectorSinkPad = m_inputSelector->getRequestPad("sink%d");
-    m_silenceSource->getStaticPad("src")->link(selectorSinkPad);
-
-    // input-selector ! (filter bin) ! tee
-    QGst::Element::linkMany(m_inputSelector, filter, m_tee);
-
-    // tee ! fakesink
-    m_tee->getRequestPad("src%d")->link(m_fakesink->getStaticPad("sink"));
+    m_inputCtrlBin = new InputControlBin(makeSilenceSource(), makeFilterBin());
 
     // play
-    m_pipeline->add(m_bin);
-    m_bin->syncStateWithParent();
+    m_pipeline->add(m_inputCtrlBin->bin());
+    m_inputCtrlBin->bin()->syncStateWithParent();
 }
 
 void BaseSourceControllerPrivate::destroyBin()
 {
     disconnectFromSource();
 
-    m_bin->setState(QGst::StateNull);
-    m_pipeline->remove(m_bin);
+    m_inputCtrlBin->bin()->setState(QGst::StateNull);
+    m_pipeline->remove(m_inputCtrlBin->bin());
 
-    m_fakesink.clear();
-    m_tee.clear();
-    m_inputSelector.clear();
-    m_silenceSource.clear();
-    m_bin.clear();
+    delete m_inputCtrlBin;
 }
 
-void BaseSourceControllerPrivate::switchToRealSource()
-{
-    //wait for data to arrive on the source src pad
-    //required for synchronization with the streaming thread
-    QGst::PadPtr sourceSrcPad = m_source->getStaticPad("src");
-    sourceSrcPad->setBlocked(true);
-    sourceSrcPad->setBlocked(false);
-
-    //switch inputs
-    m_inputSelector->setProperty("active-pad", m_selectorSinkPad);
-}
-
-void BaseSourceControllerPrivate::switchToSilenceSource()
-{
-    //switch inputs
-    m_inputSelector->setProperty("active-pad", m_inputSelector->getStaticPad("sink0"));
-
-    //wait for data to arrive on the inputselector src pad
-    //required for synchronization with the streaming thread
-    QGst::PadPtr selectorSrcPad = m_inputSelector->getStaticPad("src");
-    selectorSrcPad->setBlocked(true);
-    selectorSrcPad->setBlocked(false);
-}
 
 //END BaseSourceControllerPrivate
 //BEGIN AudioSourceController

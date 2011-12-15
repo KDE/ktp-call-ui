@@ -19,6 +19,8 @@
 #define SOURCE_CONTROLLERS_P_H
 
 #include "source-controllers.h"
+#include "private/input-control-bin.h"
+
 #include <QGst/Pipeline>
 #include <QGst/Pad>
 
@@ -46,28 +48,10 @@ private:
     void createBin();
     void destroyBin();
 
-    void switchToRealSource();
-    void switchToSilenceSource();
-
 
     QGst::PipelinePtr m_pipeline;
-
-    //<ghost src pad, tee request src pad>
-    QHash<QGst::PadPtr, QGst::PadPtr> m_pads;
-    //the bin that keeps all the elements below grouped together
-    QGst::BinPtr m_bin;
-    //the tee that gives us the source pads for whomever connects on this bin
-    QGst::ElementPtr m_tee;
-    //a fake sink that is connected on the tee to avoid not-linked errors
-    QGst::ElementPtr m_fakesink;
-    //the input-selector that switches between m_source and m_silenceSource
-    QGst::ElementPtr m_inputSelector;
-    //a fake source that generates silence (audio) or black image (video)
-    QGst::ElementPtr m_silenceSource;
-    //the real source bin, as constructed from the subclass
     QGst::ElementPtr m_source;
-    //the input-selector pad where the source is connected
-    QGst::PadPtr m_selectorSinkPad;
+    InputControlBin *m_inputCtrlBin;
 };
 
 

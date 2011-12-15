@@ -10,6 +10,7 @@ set(libktpcall_SRCS
     volume-controller.cpp
     device-element-factory.cpp
     phonon-integration.cpp
+    private/input-control-bin.cpp
 )
 
 kde4_add_library(ktpcall STATIC ${libktpcall_SRCS})

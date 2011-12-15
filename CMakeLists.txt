@@ -24,4 +24,3 @@ add_definitions(
 add_subdirectory(libqtf)
 add_subdirectory(libtelepathy-kde-call)
 add_subdirectory(src)
-#add_subdirectory(test-contactlist)

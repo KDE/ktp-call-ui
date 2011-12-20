@@ -17,7 +17,7 @@
 #ifndef CALLHANDLER_H
 #define CALLHANDLER_H
 
-#include <TelepathyQt4/AbstractClientHandler>
+#include <TelepathyQt/AbstractClientHandler>
 
 class CallHandler : public QObject, public Tp::AbstractClientHandler
 {

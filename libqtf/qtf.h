@@ -25,7 +25,7 @@
 
 #include <QGlib/Object>
 #include <QGst/Message>
-#include <TelepathyQt4/PendingOperation>
+#include <TelepathyQt/PendingOperation>
 #include <TelepathyQt4Yell/CallChannel>
 
 typedef struct _TfChannel TfChannel;

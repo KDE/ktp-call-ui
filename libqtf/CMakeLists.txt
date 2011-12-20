@@ -26,5 +26,5 @@ kde4_add_library(qtf STATIC qtf.cpp)
 target_link_libraries(qtf
     ${QTGSTREAMER_LIBRARIES}
     ${TP_FARSTREAM_LDFLAGS}
-    ${TP_QT4_YELL_FARSTREAM_LDFLAGS}
+    ${TP_QT4_YELL_FARSTREAM_STATIC_LDFLAGS}
 )

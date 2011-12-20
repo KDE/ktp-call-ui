@@ -19,7 +19,7 @@
 #define SINKCONTROLLERS_P_H
 
 #include "sinkcontrollers.h"
-#include <TelepathyQt4/Types>
+#include <TelepathyQt/Types>
 #include <TelepathyQt4Yell/CallContent>
 #include <QGst/Pipeline>
 

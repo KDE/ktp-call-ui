@@ -62,7 +62,7 @@ CallWindow::CallWindow(const Tpy::CallChannelPtr & callChannel)
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
 
     //enable dtmf
-    if (callChannel->interfaces().contains(TP_QT4_IFACE_CHANNEL_INTERFACE_DTMF)) {
+    if (callChannel->interfaces().contains(TP_QT_IFACE_CHANNEL_INTERFACE_DTMF)) {
         kDebug() << "Creating DTMF handler";
         DtmfHandler *handler = new DtmfHandler(callChannel, this);
         handler->connectDtmfWidget(d->ui.dtmfWidget);
@@ -170,7 +170,7 @@ void CallWindow::hangup()
 {
     kDebug();
     d->callChannel->hangup(Tpy::CallStateChangeReasonUserRequested,
-                           TP_QT4_ERROR_CANCELLED, QString());
+                           TP_QT_ERROR_CANCELLED, QString());
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

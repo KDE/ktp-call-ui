@@ -23,9 +23,9 @@
 #include <KLocalizedString>
 #include <KUniqueApplication>
 
-#include <TelepathyQt4/Types>
-#include <TelepathyQt4/Debug>
-#include <TelepathyQt4/ClientRegistrar>
+#include <TelepathyQt/Types>
+#include <TelepathyQt/Debug>
+#include <TelepathyQt/ClientRegistrar>
 #include <TelepathyQt4Yell/CallChannel>
 #include <TelepathyQt4Yell/ChannelClassSpec>
 #include <TelepathyQt4Yell/ChannelFactory>

@@ -17,7 +17,7 @@
 */
 #include "sinkcontrollers_p.h"
 #include "deviceelementfactory_p.h"
-#include <TelepathyQt4/ReferencedHandles>
+#include <TelepathyQt/ReferencedHandles>
 #include <QGlib/Connect>
 #include <QGst/ElementFactory>
 #include <QGst/Pipeline>

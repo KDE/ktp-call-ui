@@ -19,7 +19,7 @@
 #define SINKCONTROLLERS_H
 
 #include "volumecontroller.h"
-#include <TelepathyQt4/Contact>
+#include <TelepathyQt/Contact>
 
 class BaseSinkControllerPrivate;
 class AudioSinkControllerPrivate;

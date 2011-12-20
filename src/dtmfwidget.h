@@ -18,7 +18,7 @@
 #define DTMFWIDGET_H
 
 #include <QtGui/QWidget>
-#include <TelepathyQt4/Constants>
+#include <TelepathyQt/Constants>
 
 class DtmfWidget : public QWidget
 {

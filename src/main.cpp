@@ -26,9 +26,9 @@
 #include <TelepathyQt/Types>
 #include <TelepathyQt/Debug>
 #include <TelepathyQt/ClientRegistrar>
-#include <TelepathyQt4Yell/CallChannel>
-#include <TelepathyQt4Yell/ChannelClassSpec>
-#include <TelepathyQt4Yell/ChannelFactory>
+#include <TelepathyQt/CallChannel>
+#include <TelepathyQt/ChannelClassSpec>
+#include <TelepathyQt/ChannelFactory>
 
 int main(int argc, char **argv)
 {
@@ -63,13 +63,13 @@ int main(int argc, char **argv)
                        << Tp::Connection::FeatureSelfContact
     );
 
-    Tp::ChannelFactoryPtr channelFactory = Tpy::ChannelFactory::create(
+    Tp::ChannelFactoryPtr channelFactory = Tp::ChannelFactory::create(
         QDBusConnection::sessionBus()
     );
     channelFactory->addCommonFeatures(Tp::Channel::FeatureCore);
-    channelFactory->addFeaturesFor(Tpy::ChannelClassSpec::mediaCall(),
-        Tp::Features() << Tpy::CallChannel::FeatureContents
-                       << Tpy::CallChannel::FeatureLocalHoldState
+    channelFactory->addFeaturesForCalls(
+        Tp::Features() << Tp::CallChannel::FeatureContents
+                       << Tp::CallChannel::FeatureCallState
     );
 
     Tp::ContactFactoryPtr contactFactory = Tp::ContactFactory::create(

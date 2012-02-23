@@ -17,14 +17,14 @@
 #include "callhandler.h"
 #include "callwindow.h"
 #include <KDebug>
-#include <TelepathyQt4Yell/CallChannel>
-#include <TelepathyQt4Yell/ChannelClassSpec>
+#include <TelepathyQt/CallChannel>
+#include <TelepathyQt/ChannelClassSpec>
 
 static inline Tp::ChannelClassSpecList channelClassSpecList()
 {
-    return Tp::ChannelClassSpecList() << Tpy::ChannelClassSpec::audioCall()
-                                      << Tpy::ChannelClassSpec::videoCall()
-                                      << Tpy::ChannelClassSpec::videoCallWithAudio();
+    return Tp::ChannelClassSpecList() << Tp::ChannelClassSpec::audioCall()
+                                      << Tp::ChannelClassSpec::videoCall()
+                                      << Tp::ChannelClassSpec::videoCallWithAudio();
 }
 
 CallHandler::CallHandler()
@@ -58,7 +58,7 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
     Q_UNUSED(handlerInfo);
 
     Q_FOREACH(const Tp::ChannelPtr & channel, channels) {
-        Tpy::CallChannelPtr callChannel = Tpy::CallChannelPtr::dynamicCast(channel);
+        Tp::CallChannelPtr callChannel = Tp::CallChannelPtr::qObjectCast(channel);
         if (!callChannel) {
             kDebug() << "Channel is not a Call channel. Ignoring";
             continue;

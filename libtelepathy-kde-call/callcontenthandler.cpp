@@ -25,7 +25,7 @@
 
 //BEGIN PendingCallContentHandler
 
-PendingCallContentHandler::PendingCallContentHandler(const Tpy::CallChannelPtr & callChannel,
+PendingCallContentHandler::PendingCallContentHandler(const Tp::CallChannelPtr & callChannel,
                                                      const QTf::ContentPtr & tfContent,
                                                      const QGst::PipelinePtr & pipeline,
                                                      QObject *parent)
@@ -41,8 +41,8 @@ PendingCallContentHandler::PendingCallContentHandler(const Tpy::CallChannelPtr &
 
 void PendingCallContentHandler::findCallContent()
 {
-    Tpy::CallContents callContents = m_callChannel->contents();
-    Q_FOREACH (const Tpy::CallContentPtr & callContent, callContents) {
+    Tp::CallContents callContents = m_callChannel->contents();
+    Q_FOREACH (const Tp::CallContentPtr & callContent, callContents) {
         //FIXME telepathy-farstream should provide an object path here
         if (callContent->type() == m_tfContent->property("media-type").toInt()) {
             m_contentHandler->d->setCallContent(callContent);
@@ -53,11 +53,11 @@ void PendingCallContentHandler::findCallContent()
     }
 
     kDebug() << "CallContent not found. Waiting for tp-qt4 to synchronize with d-bus.";
-    connect(m_callChannel.data(), SIGNAL(contentAdded(Tpy::CallContentPtr)),
-            SLOT(onContentAdded(Tpy::CallContentPtr)));
+    connect(m_callChannel.data(), SIGNAL(contentAdded(Tp::CallContentPtr)),
+            SLOT(onContentAdded(Tp::CallContentPtr)));
 }
 
-void PendingCallContentHandler::onContentAdded(const Tpy::CallContentPtr & callContent)
+void PendingCallContentHandler::onContentAdded(const Tp::CallContentPtr & callContent)
 {
     //FIXME telepathy-farstream should provide an object path here
     if (callContent->type() == m_tfContent->property("media-type").toInt()) {
@@ -118,7 +118,7 @@ void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
             this, SLOT(onControllerDestroyed(BaseSinkController*)));
 }
 
-void CallContentHandlerPrivate::setCallContent(const Tpy::CallContentPtr & callContent)
+void CallContentHandlerPrivate::setCallContent(const Tp::CallContentPtr & callContent)
 {
     kDebug();
     m_callContent = callContent;
@@ -176,7 +176,7 @@ CallContentHandler::~CallContentHandler()
     delete d;
 }
 
-Tpy::CallContentPtr CallContentHandler::callContent() const
+Tp::CallContentPtr CallContentHandler::callContent() const
 {
     return d->m_callContent;
 }

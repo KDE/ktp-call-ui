@@ -19,7 +19,7 @@
 #ifndef CALLWINDOW_H
 #define CALLWINDOW_H
 
-#include <TelepathyQt4Yell/CallChannel>
+#include <TelepathyQt/CallChannel>
 #include <KXmlGuiWindow>
 class CallContentHandler;
 
@@ -27,14 +27,14 @@ class CallWindow : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
-    CallWindow(const Tpy::CallChannelPtr & channel);
+    CallWindow(const Tp::CallChannelPtr & channel);
     virtual ~CallWindow();
 
 private:
     void setupActions();
 
 private Q_SLOTS:
-    void setState(Tpy::CallState state);
+    void setState(Tp::CallState state);
     void onCallEnded();
     void onAudioContentAdded(CallContentHandler *contentHandler);
     void onAudioContentRemoved(CallContentHandler *contentHandler);

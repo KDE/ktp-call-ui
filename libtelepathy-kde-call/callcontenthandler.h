@@ -20,7 +20,7 @@
 
 #include "sourcecontrollers.h"
 #include "sinkcontrollers.h"
-#include <TelepathyQt4Yell/CallContent>
+#include <TelepathyQt/CallContent>
 
 class CallContentHandlerPrivate;
 class PendingCallContentHandler;
@@ -36,7 +36,7 @@ class CallContentHandler : public QObject
     Q_OBJECT
 public:
     /** \returns the telepathy content associated with this handler */
-    Tpy::CallContentPtr callContent() const;
+    Tp::CallContentPtr callContent() const;
 
     /** \returns the controller for the input source that is used in this content.
      * In audio contents, this can be safely cast to AudioSourceController*

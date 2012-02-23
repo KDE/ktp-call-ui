@@ -26,7 +26,7 @@
 #include <QGlib/Object>
 #include <QGst/Message>
 #include <TelepathyQt/PendingOperation>
-#include <TelepathyQt4Yell/CallChannel>
+#include <TelepathyQt/CallChannel>
 
 typedef struct _TfChannel TfChannel;
 typedef struct _TfContent TfContent;
@@ -69,12 +69,12 @@ class QTF_EXPORT Content : public QGlib::Object
 QTF_EXPORT void init();
 
 
-/** Constructs a new QTf::Channel from a Tpy::CallChannel */
+/** Constructs a new QTf::Channel from a Tp::CallChannel */
 class QTF_EXPORT PendingChannel : public Tp::PendingOperation
 {
     Q_OBJECT
 public:
-    PendingChannel(const Tpy::CallChannelPtr & callChannel);
+    PendingChannel(const Tp::CallChannelPtr & callChannel);
     virtual ~PendingChannel();
 
     QTf::ChannelPtr channel() const;

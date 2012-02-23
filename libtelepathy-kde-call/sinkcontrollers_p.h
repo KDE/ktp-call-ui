@@ -20,7 +20,7 @@
 
 #include "sinkcontrollers.h"
 #include <TelepathyQt/Types>
-#include <TelepathyQt4Yell/CallContent>
+#include <TelepathyQt/CallContent>
 #include <QGst/Pipeline>
 
 class BaseSinkManager : public QObject
@@ -32,7 +32,7 @@ public:
 
     void unlinkAllPads();
 
-    void setCallContent(const Tpy::CallContentPtr & callContent);
+    void setCallContent(const Tp::CallContentPtr & callContent);
 
 protected:
     explicit BaseSinkManager(QObject *parent = 0);
@@ -48,8 +48,8 @@ protected:
 
 private Q_SLOTS:
     void handleNewSinkPadAsync(uint contactHandle);
-    void onStreamAdded(const Tpy::CallStreamPtr & stream);
-    void onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tpy::SendingState> & states);
+    void onStreamAdded(const Tp::CallStreamPtr & stream);
+    void onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tp::SendingState> & states);
     void onControllerAboutToBeDestroyed(QObject *controller);
 
 private:
@@ -61,7 +61,7 @@ Q_SIGNALS:
     void controllerDestroyed(BaseSinkController *controller);
 
 private:
-    Tpy::CallContentPtr m_content;
+    Tp::CallContentPtr m_content;
     QMutex m_mutex;
     QHash<uint, BaseSinkControllerPrivate*> m_controllersWaitingForContact;
     QHash<QGst::PadPtr, BaseSinkControllerPrivate*> m_controllers;

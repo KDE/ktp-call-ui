@@ -19,7 +19,7 @@
 #define CALLCHANNELHANDLER_H
 
 #include "callcontenthandler.h"
-#include <TelepathyQt4Yell/CallChannel>
+#include <TelepathyQt/CallChannel>
 
 class CallChannelHandlerPrivate;
 
@@ -32,7 +32,7 @@ class CallChannelHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit CallChannelHandler(const Tpy::CallChannelPtr & channel, QObject *parent = 0);
+    explicit CallChannelHandler(const Tp::CallChannelPtr & channel, QObject *parent = 0);
     virtual ~CallChannelHandler();
 
     QList<CallContentHandler*> contents() const;

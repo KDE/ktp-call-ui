@@ -30,7 +30,7 @@ class CallChannelHandlerPrivate : public QObject
 {
     Q_OBJECT
 public:
-    CallChannelHandlerPrivate(const Tpy::CallChannelPtr & channel, CallChannelHandler *qq);
+    CallChannelHandlerPrivate(const Tp::CallChannelPtr & channel, CallChannelHandler *qq);
 
 private Q_SLOTS:
     void init();
@@ -49,7 +49,7 @@ private:
 private:
     CallChannelHandler * const q;
 
-    Tpy::CallChannelPtr m_callChannel;
+    Tp::CallChannelPtr m_callChannel;
     QGst::PipelinePtr m_pipeline;
     QTf::ChannelPtr m_tfChannel;
 
@@ -57,7 +57,7 @@ public:
     QHash<QTf::ContentPtr, CallContentHandler*> m_contents;
 };
 
-CallChannelHandlerPrivate::CallChannelHandlerPrivate(const Tpy::CallChannelPtr & channel,
+CallChannelHandlerPrivate::CallChannelHandlerPrivate(const Tp::CallChannelPtr & channel,
                                                      CallChannelHandler *qq)
     : QObject(), q(qq), m_callChannel(channel)
 {
@@ -165,7 +165,7 @@ void CallChannelHandlerPrivate::onBusMessage(const QGst::MessagePtr & message)
 //END CallChannelHandlerPrivate
 //BEGIN CallChannelHandler
 
-CallChannelHandler::CallChannelHandler(const Tpy::CallChannelPtr & channel, QObject *parent)
+CallChannelHandler::CallChannelHandler(const Tp::CallChannelPtr & channel, QObject *parent)
     : QObject(parent), d(new CallChannelHandlerPrivate(channel, this))
 {
 }

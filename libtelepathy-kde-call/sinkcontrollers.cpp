@@ -164,8 +164,8 @@ void BaseSinkManager::handleNewSinkPadAsync(uint contactHandle)
     if (m_content) {
         kDebug() << "Content exists. Looking for contact...";
 
-        Q_FOREACH (const Tpy::CallStreamPtr & stream, m_content->streams()) {
-            Q_FOREACH (const Tp::ContactPtr & contact, stream->members()) {
+        Q_FOREACH (const Tp::CallStreamPtr & stream, m_content->streams()) {
+            Q_FOREACH (const Tp::ContactPtr & contact, stream->remoteMembers()) {
                 if (contact->handle()[0] == contactHandle) {
                     kDebug() << "Found contact" << contact;
 
@@ -185,20 +185,21 @@ void BaseSinkManager::handleNewSinkPadAsync(uint contactHandle)
     kDebug() << "Contact not found. Waiting for tp-qt4 to sync with dbus";
 }
 
-void BaseSinkManager::setCallContent(const Tpy::CallContentPtr & callContent)
+void BaseSinkManager::setCallContent(const Tp::CallContentPtr & callContent)
 {
     m_content = callContent;
-    connect(m_content.data(), SIGNAL(streamAdded(Tpy::CallStreamPtr)),
-            SLOT(onStreamAdded(Tpy::CallStreamPtr)));
+    connect(m_content.data(), SIGNAL(streamAdded(Tp::CallStreamPtr)),
+            SLOT(onStreamAdded(Tp::CallStreamPtr)));
 }
 
-void BaseSinkManager::onStreamAdded(const Tpy::CallStreamPtr & stream)
+void BaseSinkManager::onStreamAdded(const Tp::CallStreamPtr & stream)
 {
-    connect(stream.data(), SIGNAL(remoteSendingStateChanged(QHash<Tp::ContactPtr,Tpy::SendingState>)),
-            SLOT(onRemoteSendingStateChanged(QHash<Tp::ContactPtr,Tpy::SendingState>)));
+    connect(stream.data(),
+            SIGNAL(remoteSendingStateChanged(QHash<Tp::ContactPtr,Tp::SendingState>,Tp::CallStateReason)),
+            SLOT(onRemoteSendingStateChanged(QHash<Tp::ContactPtr,Tp::SendingState>)));
 }
 
-void BaseSinkManager::onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tpy::SendingState> & states)
+void BaseSinkManager::onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tp::SendingState> & states)
 {
     QMutexLocker l(&m_mutex);
 

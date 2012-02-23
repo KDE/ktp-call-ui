@@ -36,21 +36,21 @@ class PendingCallContentHandler : public QObject
 {
     Q_OBJECT
 public:
-    PendingCallContentHandler(const Tpy::CallChannelPtr & callChannel,
+    PendingCallContentHandler(const Tp::CallChannelPtr & callChannel,
                               const QTf::ContentPtr & tfContent,
                               const QGst::PipelinePtr & pipeline,
                               QObject *parent);
 
 private Q_SLOTS:
     void findCallContent();
-    void onContentAdded(const Tpy::CallContentPtr & callContent);
+    void onContentAdded(const Tp::CallContentPtr & callContent);
 
 Q_SIGNALS:
     void ready(const QTf::ContentPtr & tfContent, CallContentHandler *contentHandler);
 
 private:
     CallContentHandler *m_contentHandler;
-    Tpy::CallChannelPtr m_callChannel;
+    Tp::CallChannelPtr m_callChannel;
     QTf::ContentPtr m_tfContent;
 };
 
@@ -66,7 +66,7 @@ public:
     void init(const QTf::ContentPtr & tfContent, const QGst::PipelinePtr & pipeline);
 
     /* Called from PendingCallContentHandler when the CallContent is ready */
-    void setCallContent(const Tpy::CallContentPtr & callContent);
+    void setCallContent(const Tp::CallContentPtr & callContent);
 
 private:
     void onSrcPadAdded(uint contactHandle,
@@ -82,7 +82,7 @@ private Q_SLOTS:
 public: //accessed from the public class
     BaseSourceController *m_sourceController;
     QSet<BaseSinkController*> m_sinkControllers;
-    Tpy::CallContentPtr m_callContent;
+    Tp::CallContentPtr m_callContent;
 
 private:
     CallContentHandler * const q;

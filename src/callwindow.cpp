@@ -32,7 +32,7 @@ struct CallWindow::Private
 {
     Private() : callEnded(false) {}
 
-    Tpy::CallChannelPtr callChannel;
+    Tp::CallChannelPtr callChannel;
     CallChannelHandler *channelHandler;
     StatusArea *statusArea;
     KToggleAction *muteAction;
@@ -43,12 +43,12 @@ struct CallWindow::Private
 /*! This constructor is used to handle an incoming call, in which case
  * the specified \a channel must be ready and the call must have been accepted.
  */
-CallWindow::CallWindow(const Tpy::CallChannelPtr & callChannel)
+CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     : KXmlGuiWindow(), d(new Private)
 {
     d->callChannel = callChannel;
-    connect(callChannel.data(), SIGNAL(stateChanged(Tpy::CallState)),
-            this, SLOT(setState(Tpy::CallState)));
+    connect(callChannel.data(), SIGNAL(callStateChanged(Tp::CallState)),
+            this, SLOT(setState(Tp::CallState)));
 
     //create the channel handler
     d->channelHandler = new CallChannelHandler(callChannel, this);
@@ -71,7 +71,7 @@ CallWindow::CallWindow(const Tpy::CallChannelPtr & callChannel)
     }
     d->ui.dtmfDock->hide();
 
-    setState(callChannel->state());
+    setState(callChannel->callState());
 }
 
 CallWindow::~CallWindow()
@@ -111,19 +111,21 @@ void CallWindow::setupActions()
     actionCollection()->addAction("hangup", hangupAction);
 }
 
-void CallWindow::setState(Tpy::CallState state)
+void CallWindow::setState(Tp::CallState state)
 {
     //TODO take into account the CallFlags
     switch (state) {
-    case Tpy::CallStatePendingInitiator:
-    case Tpy::CallStatePendingReceiver:
+    case Tp::CallStatePendingInitiator:
+    case Tp::CallStateInitialising:
+    case Tp::CallStateInitialised:
+    case Tp::CallStateAccepted:
         d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Connecting..."));
         break;
-    case Tpy::CallStateAccepted:
+    case Tp::CallStateActive:
         d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
         d->statusArea->startDurationTimer();
         break;
-    case Tpy::CallStateEnded:
+    case Tp::CallStateEnded:
         d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Disconnected."));
         d->statusArea->stopDurationTimer();
         break;
@@ -169,8 +171,7 @@ void CallWindow::onVideoContentRemoved(CallContentHandler *contentHandler)
 void CallWindow::hangup()
 {
     kDebug();
-    d->callChannel->hangup(Tpy::CallStateChangeReasonUserRequested,
-                           TP_QT_ERROR_CANCELLED, QString());
+    d->callChannel->hangup();
 }
 
 void CallWindow::closeEvent(QCloseEvent *event)

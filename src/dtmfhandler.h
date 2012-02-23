@@ -17,14 +17,14 @@
 #ifndef DTMFHANDLER_H
 #define DTMFHANDLER_H
 
-#include <TelepathyQt4Yell/CallChannel>
+#include <TelepathyQt/CallChannel>
 class DtmfWidget;
 
 class DtmfHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit DtmfHandler(const Tpy::CallChannelPtr & channel, QObject *parent = 0);
+    explicit DtmfHandler(const Tp::CallChannelPtr & channel, QObject *parent = 0);
     virtual ~DtmfHandler();
 
     void connectDtmfWidget(DtmfWidget *dtmfWidget);

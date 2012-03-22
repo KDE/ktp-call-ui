@@ -2,18 +2,14 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(ktp-call-ui_SRCS
     main.cpp
-    callwindow.cpp
-    #calllog.cpp
-    callhandler.cpp
-    dtmfhandler.cpp
-    dtmfwidget.cpp
-    #volumewidget.cpp
-    #videobalancewidget.cpp
-    statusarea.cpp
+    call-window.cpp
+    call-handler.cpp
+    dtmf-handler.cpp
+    dtmf-widget.cpp
+    status-area.cpp
 )
 
-kde4_add_ui_files(ktp-call-ui_SRCS callwindow.ui dtmfwidget.ui)
-kde4_add_kcfg_files(ktp-call-ui_SRCS kcallhandlersettings.kcfgc)
+kde4_add_ui_files(ktp-call-ui_SRCS call-window.ui dtmf-widget.ui)
 kde4_add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
 target_link_libraries(ktp-call-ui
     ${KDE4_KDEUI_LIBS}

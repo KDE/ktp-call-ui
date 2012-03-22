@@ -15,7 +15,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "../sourcecontrollers.h"
+#include "../source-controllers.h"
 #include <QGst/Init>
 #include <QGst/Pipeline>
 #include <QGst/Pad>

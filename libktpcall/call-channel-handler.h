@@ -40,7 +40,6 @@ public:
 Q_SIGNALS:
     void contentAdded(CallContentHandler *content);
     void contentRemoved(CallContentHandler *content);
-    void callEnded();
 
 private:
     friend class CallChannelHandlerPrivate;

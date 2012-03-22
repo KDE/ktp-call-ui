@@ -37,9 +37,9 @@ private Q_SLOTS:
     void onPendingTfChannelFinished(Tp::PendingOperation *op);
     void onCallContentHandlerReady(const QTf::ContentPtr & tfContent,
                                    CallContentHandler *contentHandler);
+    void onCallStateChanged(Tp::CallState state);
 
 private:
-    void onTfChannelClosed();
     void onContentAdded(const QTf::ContentPtr & tfContent);
     void onContentRemoved(const QTf::ContentPtr & tfContent);
     void onFsConferenceAdded(const QGst::ElementPtr & conference);
@@ -61,6 +61,9 @@ CallChannelHandlerPrivate::CallChannelHandlerPrivate(const Tp::CallChannelPtr & 
                                                      CallChannelHandler *qq)
     : QObject(), q(qq), m_callChannel(channel)
 {
+    connect(m_callChannel.data(), SIGNAL(callStateChanged(Tp::CallState)),
+            SLOT(onCallStateChanged(Tp::CallState)));
+
     QTimer::singleShot(0, this, SLOT(init()));
 }
 
@@ -71,7 +74,9 @@ void CallChannelHandlerPrivate::init()
         QTf::init();
     } catch (const QGlib::Error & error) {
         kError() << error;
-        Q_EMIT q->callEnded();
+        m_callChannel->hangup(Tp::CallStateChangeReasonInternalError,
+                              TP_QT_ERROR_MEDIA_STREAMING_ERROR,
+                              error.message());
         return;
     }
 
@@ -84,7 +89,9 @@ void CallChannelHandlerPrivate::onPendingTfChannelFinished(Tp::PendingOperation 
 {
     if (op->isError()) {
         kError() << op->errorMessage();
-        Q_EMIT q->callEnded();
+        m_callChannel->hangup(Tp::CallStateChangeReasonInternalError,
+                              TP_QT_ERROR_MEDIA_STREAMING_ERROR,
+                              op->errorMessage());
         return;
     }
 
@@ -97,8 +104,6 @@ void CallChannelHandlerPrivate::onPendingTfChannelFinished(Tp::PendingOperation 
     m_pipeline->bus()->addSignalWatch();
     QGlib::connect(m_pipeline->bus(), "message", this, &CallChannelHandlerPrivate::onBusMessage);
 
-    QGlib::connect(m_tfChannel, "closed",
-                   this, &CallChannelHandlerPrivate::onTfChannelClosed);
     QGlib::connect(m_tfChannel, "content-added",
                    this, &CallChannelHandlerPrivate::onContentAdded);
     QGlib::connect(m_tfChannel, "content-removed",
@@ -109,13 +114,14 @@ void CallChannelHandlerPrivate::onPendingTfChannelFinished(Tp::PendingOperation 
                    this, &CallChannelHandlerPrivate::onFsConferenceRemoved);
 }
 
-void CallChannelHandlerPrivate::onTfChannelClosed()
+void CallChannelHandlerPrivate::onCallStateChanged(Tp::CallState state)
 {
-    kDebug() << "TfChannel closed";
-
-    m_pipeline->bus()->removeSignalWatch();
-    m_pipeline->setState(QGst::StateNull);
-    Q_EMIT q->callEnded();
+    if (state == Tp::CallStateEnded) {
+        if (m_pipeline) {
+            m_pipeline->bus()->removeSignalWatch();
+            m_pipeline->setState(QGst::StateNull);
+        }
+    }
 }
 
 void CallChannelHandlerPrivate::onContentAdded(const QTf::ContentPtr & tfContent)

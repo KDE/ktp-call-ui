@@ -7,6 +7,7 @@ set(ktp-call-ui_SRCS
     dtmf-handler.cpp
     dtmf-widget.cpp
     status-area.cpp
+    call-manager.cpp
 )
 
 kde4_add_ui_files(ktp-call-ui_SRCS call-window.ui dtmf-widget.ui)
@@ -15,6 +16,7 @@ target_link_libraries(ktp-call-ui
     ${KDE4_KDEUI_LIBS}
     ${TELEPATHY_QT4_LIBRARIES}
     ${KTP_LIBRARIES}
+    ${QTGSTREAMER_UI_LIBRARIES}
     ktpcall
 )
 

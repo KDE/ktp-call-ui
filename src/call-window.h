@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009-2012 George Kiagiadakis <kiagiadakis.george@gmail.com>
     Copyright (C) 2010-2011 Collabora Ltd. <info@collabora.co.uk>
       @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
@@ -27,19 +27,28 @@ class CallWindow : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
-    CallWindow(const Tp::CallChannelPtr & channel);
+    explicit CallWindow(const Tp::CallChannelPtr & channel);
     virtual ~CallWindow();
+
+    enum Status {
+        StatusConnecting,
+        StatusRemoteRinging,
+        StatusRemoteAccepted,
+        StatusActive,
+        StatusDisconnected
+    };
+    void setStatus(Status status, const Tp::CallStateReason & reason = Tp::CallStateReason());
+
+public Q_SLOTS:
+    void onContentAdded(CallContentHandler *contentHandler);
+    void onContentRemoved(CallContentHandler *contentHandler);
 
 private:
     void setupActions();
+    void checkEnableDtmf();
 
 private Q_SLOTS:
-    void setState(Tp::CallState state);
-    void onCallEnded();
-    void onAudioContentAdded(CallContentHandler *contentHandler);
-    void onAudioContentRemoved(CallContentHandler *contentHandler);
-    void onVideoContentAdded(CallContentHandler *contentHandler);
-    void onVideoContentRemoved(CallContentHandler *contentHandler);
+    void toggleDtmf(bool checked);
     void hangup();
 
 protected:

@@ -62,6 +62,7 @@ int main(int argc, char **argv)
     channelFactory->addFeaturesForCalls(
         Tp::Features() << Tp::CallChannel::FeatureContents
                        << Tp::CallChannel::FeatureCallState
+                       << Tp::CallChannel::FeatureCallMembers
     );
 
     Tp::ContactFactoryPtr contactFactory = Tp::ContactFactory::create(

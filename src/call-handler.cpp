@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009  George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009-2012  George Kiagiadakis <kiagiadakis.george@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "call-handler.h"
-#include "call-window.h"
+#include "call-manager.h"
 #include <KDebug>
 #include <TelepathyQt/CallChannel>
 #include <TelepathyQt/ChannelClassSpec>
@@ -64,10 +64,8 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
             continue;
         }
 
-        callChannel->accept();
-
-        CallWindow *cw = new CallWindow(callChannel);
-        cw->show();
+        //TODO handle multiple calls - queue them if there is an active one
+        CallManager *manager = new CallManager(callChannel, this);
     }
 
     context->setFinished();

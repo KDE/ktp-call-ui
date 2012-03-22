@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 George Kiagiadakis <kiagiadakis.george@gmail.com>
+    Copyright (C) 2009-2012 George Kiagiadakis <kiagiadakis.george@gmail.com>
     Copyright (C) 2010-2011 Collabora Ltd. <info@collabora.co.uk>
       @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
 
@@ -18,11 +18,16 @@
 */
 #include "call-window.h"
 #include "ui_call-window.h"
+
 #include "status-area.h"
 #include "dtmf-handler.h"
 #include "../libktpcall/call-channel-handler.h"
+
 #include <QtGui/QCloseEvent>
-#include <QtGui/QDockWidget>
+
+#include <TelepathyQt/ReferencedHandles>
+#include <TelepathyQt/AvatarData>
+
 #include <KDebug>
 #include <KLocalizedString>
 #include <KToggleAction>
@@ -35,9 +40,17 @@ struct CallWindow::Private
     Tp::CallChannelPtr callChannel;
     CallChannelHandler *channelHandler;
     StatusArea *statusArea;
-    KToggleAction *muteAction;
     Ui::CallWindow ui;
     bool callEnded;
+
+    KToggleAction *showMyVideoAction;
+    KToggleAction *showDtmfAction;
+    KToggleAction *sendVideoAction;
+    KToggleAction *muteAction;
+    KToggleAction *holdAction;
+    KAction *hangupAction;
+
+    QWidget *dtmfToggleLastPage;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -47,31 +60,28 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     : KXmlGuiWindow(), d(new Private)
 {
     d->callChannel = callChannel;
-    connect(callChannel.data(), SIGNAL(callStateChanged(Tp::CallState)),
-            this, SLOT(setState(Tp::CallState)));
-
-    //create the channel handler
-    d->channelHandler = new CallChannelHandler(callChannel, this);
-    connect(d->channelHandler, SIGNAL(callEnded()), this, SLOT(onCallEnded()));
 
     //create ui
     d->ui.setupUi(this);
     d->statusArea = new StatusArea(statusBar());
-    setupActions(); //must be called after creating the channel handler
+    setupActions();
     setupGUI(QSize(430, 300), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
 
-    //enable dtmf
-    if (callChannel->interfaces().contains(TP_QT_IFACE_CHANNEL_INTERFACE_DTMF)) {
-        kDebug() << "Creating DTMF handler";
-        DtmfHandler *handler = new DtmfHandler(callChannel, this);
-        handler->connectDtmfWidget(d->ui.dtmfWidget);
-    } else {
-        d->ui.dtmfWidget->setEnabled(false);
-    }
-    d->ui.dtmfDock->hide();
+    DtmfHandler *handler = new DtmfHandler(d->callChannel, this);
+    handler->connectDtmfWidget(d->ui.dtmfWidget);
 
-    setState(callChannel->callState());
+    //TODO handle member joining later
+    if (!d->callChannel->remoteMembers().isEmpty()) {
+        Tp::ContactPtr remoteMember = *d->callChannel->remoteMembers().begin();
+        d->ui.remoteUserDisplayLabel->setText(QString::fromAscii(
+                "<html><body>"
+                "<p align=\"center\"><img src=\"%1\" /></p>"
+                "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px;\">"
+                    "<span style=\" font-weight:600;\">%2</span></p>"
+                "</body></html>")
+                .arg(remoteMember->avatarData().fileName, remoteMember->alias()));
+    }
 }
 
 CallWindow::~CallWindow()
@@ -80,92 +90,204 @@ CallWindow::~CallWindow()
     delete d;
 }
 
+void CallWindow::setStatus(Status status, const Tp::CallStateReason & reason)
+{
+    switch (status) {
+    case StatusConnecting:
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Connecting..."));
+        break;
+    case StatusRemoteRinging:
+        d->statusArea->setMessage(StatusArea::Status,
+                i18nc("@info:status the remote user's phone is ringing", "Ringing..."));
+        break;
+    case StatusRemoteAccepted:
+        d->statusArea->setMessage(StatusArea::Status,
+                i18nc("@info:status", "Remote user accepted the call, waiting for connection..."));
+        break;
+    case StatusActive:
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
+        d->statusArea->startDurationTimer();
+        break;
+    case StatusDisconnected:
+      {
+        bool actorIsRemoteContact = false;
+        Q_FOREACH(const Tp::ContactPtr & contact, d->callChannel->remoteMembers()) {
+            if (contact->handle()[0] == reason.actor) {
+                actorIsRemoteContact = true;
+            }
+        }
+
+        QString message;
+        switch(reason.reason) {
+        case Tp::CallStateChangeReasonUserRequested:
+            if (actorIsRemoteContact) {
+                message = i18nc("@info:status", "Remote contact ended the call.");
+            }
+            //when disconnected normally, close the window after a while
+            QTimer::singleShot(5000, this, SLOT(close()));
+            break;
+        case Tp::CallStateChangeReasonRejected:
+            if (actorIsRemoteContact) {
+                message = i18nc("@info:status", "Remote contact rejected the call.");
+            }
+            break;
+        case Tp::CallStateChangeReasonNoAnswer:
+            if (actorIsRemoteContact) {
+                message = i18nc("@info:status", "Remote contact didn't answer.");
+            }
+            break;
+        case Tp::CallStateChangeReasonInvalidContact:
+            message = i18nc("@info:status", "Invalid number or contact.");
+            break;
+        case Tp::CallStateChangeReasonPermissionDenied:
+            if (reason.DBusReason == TP_QT_ERROR_INSUFFICIENT_BALANCE) {
+                message = i18nc("@info:status", "You don't have enough balance to make this call.");
+            } else {
+                message = i18nc("@info:status", "You don't have permission to make this call.");
+            }
+            break;
+        case Tp::CallStateChangeReasonBusy:
+            if (actorIsRemoteContact) {
+                message = i18nc("@info:status", "Remote contact is currently busy.");
+            }
+            break;
+        case Tp::CallStateChangeReasonInternalError:
+            message = i18nc("@info:status", "Internal component error.");
+            break;
+        case Tp::CallStateChangeReasonServiceError:
+            message = i18nc("@info:status", "Remote service error.");
+            break;
+        case Tp::CallStateChangeReasonNetworkError:
+            message = i18nc("@info:status", "Network error.");
+            break;
+        case Tp::CallStateChangeReasonMediaError:
+            if (reason.DBusReason == TP_QT_ERROR_MEDIA_CODECS_INCOMPATIBLE) {
+                message = i18nc("@info:status", "Failed to negotiate codecs.");
+            } else {
+                message = i18nc("@info:status", "Unsupported media type.");
+            }
+            break;
+        case Tp::CallStateChangeReasonConnectivityError:
+            message = i18nc("@info:status", "Connectivity error.");
+            break;
+        case Tp::CallStateChangeReasonUnknown:
+        default:
+            message = i18nc("@info:status", "Unknown error.");
+            break;
+        }
+
+        if (message.isEmpty()) {
+            d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Disconnected."));
+        } else {
+            d->statusArea->setMessage(StatusArea::Status,
+                    i18nc("@info:status the call was disconnected because...",
+                          "Disconnected: %1", message));
+        }
+
+        d->statusArea->stopDurationTimer();
+
+        //TODO go back to the audio call page somehow
+        //d->ui.stackedWidget->setCurrentWidget(d->ui.audioCallPage);
+        d->ui.audioCallPage->setEnabled(false);
+
+        d->callEnded = true;
+        break;
+      }
+    default:
+        Q_ASSERT(false);
+    }
+}
+
+void CallWindow::onContentAdded(CallContentHandler *contentHandler)
+{
+    kDebug() << "Content added:" << contentHandler->callContent()->name();
+
+    if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
+        checkEnableDtmf();
+        d->statusArea->showAudioStatusIcon(true);
+        d->muteAction->setEnabled(true);
+        d->muteAction->setChecked(contentHandler->sourceController()->sourceEnabled());
+        connect(d->muteAction, SIGNAL(toggled(bool)),
+                contentHandler->sourceController(), SLOT(setSourceEnabled(bool)));
+    } else {
+        d->statusArea->showVideoStatusIcon(true);
+    }
+}
+
+void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
+{
+    kDebug() << "Content removed:" << contentHandler->callContent()->name();
+
+    if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
+        d->statusArea->showAudioStatusIcon(false);
+        d->muteAction->setEnabled(false);
+    } else {
+        d->statusArea->showVideoStatusIcon(false);
+    }
+}
+
 void CallWindow::setupActions()
 {
-    QAction *showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
-    showMyVideoAction->setIcon(KIcon("camera-web"));
-    actionCollection()->addAction("showMyVideo", showMyVideoAction);
+     //TODO implement this feature
+    d->showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
+    d->showMyVideoAction->setIcon(KIcon("camera-web"));
+    d->showMyVideoAction->setEnabled(false);
+    actionCollection()->addAction("showMyVideo", d->showMyVideoAction);
 
-    QAction *showDtmfAction = d->ui.dtmfDock->toggleViewAction();
-    showDtmfAction->setText(i18nc("@action", "Show dialpad"));
-    showDtmfAction->setIcon(KIcon("phone"));
-    actionCollection()->addAction("showDtmf", showDtmfAction);
+    d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);
+    d->showDtmfAction->setIcon(KIcon("phone"));
+    d->showDtmfAction->setEnabled(false);
+    connect(d->showDtmfAction, SIGNAL(toggled(bool)), SLOT(toggleDtmf(bool)));
+    actionCollection()->addAction("showDtmf", d->showDtmfAction);
 
-    QAction *sendVideoAction = new KToggleAction(i18nc("@action", "Send video"), this);
-    sendVideoAction->setIcon(KIcon("webcamsend"));
-    sendVideoAction->setEnabled(false); //TODO implement this feature
-    actionCollection()->addAction("sendVideo", sendVideoAction);
+    //TODO implement this feature
+    d->sendVideoAction = new KToggleAction(i18nc("@action", "Send video"), this);
+    d->sendVideoAction->setIcon(KIcon("webcamsend"));
+    d->sendVideoAction->setEnabled(false);
+    actionCollection()->addAction("sendVideo", d->sendVideoAction);
 
     d->muteAction = new KToggleAction(KIcon("audio-volume-medium"), i18nc("@action", "Mute"), this);
     d->muteAction->setCheckedState(KGuiItem(i18nc("@action", "Mute"), KIcon("audio-volume-muted")));
     d->muteAction->setEnabled(false); //will be enabled later
     actionCollection()->addAction("mute", d->muteAction);
 
-    QAction *holdAction = new KToggleAction(i18nc("@action", "Hold"), this);
-    holdAction->setIcon(KIcon("media-playback-pause"));
-    holdAction->setEnabled(false); //TODO implement this feature
-    actionCollection()->addAction("hold", holdAction);
+    //TODO implement this feature
+    d->holdAction = new KToggleAction(i18nc("@action", "Hold"), this);
+    d->holdAction->setIcon(KIcon("media-playback-pause"));
+    d->holdAction->setEnabled(false);
+    actionCollection()->addAction("hold", d->holdAction);
 
-    QAction *hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
-    connect(hangupAction, SIGNAL(triggered()), this, SLOT(hangup()));
-    actionCollection()->addAction("hangup", hangupAction);
+    d->hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
+    connect(d->hangupAction, SIGNAL(triggered()), SLOT(hangup()));
+    actionCollection()->addAction("hangup", d->hangupAction);
 }
 
-void CallWindow::setState(Tp::CallState state)
+void CallWindow::checkEnableDtmf()
 {
-    //TODO take into account the CallFlags
-    switch (state) {
-    case Tp::CallStatePendingInitiator:
-    case Tp::CallStateInitialising:
-    case Tp::CallStateInitialised:
-    case Tp::CallStateAccepted:
-        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Connecting..."));
-        break;
-    case Tp::CallStateActive:
-        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
-        d->statusArea->startDurationTimer();
-        break;
-    case Tp::CallStateEnded:
-        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Disconnected."));
-        d->statusArea->stopDurationTimer();
-        break;
-    default:
-        Q_ASSERT(false);
+    bool dtmfSupported = false;
+    Q_FOREACH(const Tp::CallContentPtr & content, d->callChannel->contentsForType(Tp::MediaStreamTypeAudio)) {
+        if (content->supportsDTMF()) {
+            dtmfSupported = true;
+            break;
+        }
+    }
+
+    kDebug() << "DTMF supported:" << dtmfSupported;
+    d->showDtmfAction->setEnabled(dtmfSupported);
+
+    if (!dtmfSupported && d->ui.stackedWidget->currentWidget() == d->ui.dtmfPage) {
+        toggleDtmf(false);
     }
 }
 
-void CallWindow::onCallEnded()
+void CallWindow::toggleDtmf(bool checked)
 {
-    d->callEnded = true;
-    QTimer::singleShot(5000, this, SLOT(close()));
-}
-
-void CallWindow::onAudioContentAdded(CallContentHandler *contentHandler)
-{
-    d->statusArea->showAudioStatusIcon(true);
-    d->muteAction->setEnabled(true);
-    d->muteAction->setChecked(contentHandler->sourceController()->sourceEnabled());
-    connect(d->muteAction, SIGNAL(toggled(bool)),
-            contentHandler->sourceController(), SLOT(setSourceEnabled(bool)));
-}
-
-void CallWindow::onAudioContentRemoved(CallContentHandler *contentHandler)
-{
-    Q_UNUSED(contentHandler);
-    d->statusArea->showAudioStatusIcon(false);
-    d->muteAction->setEnabled(false);
-}
-
-void CallWindow::onVideoContentAdded(CallContentHandler *contentHandler)
-{
-    Q_UNUSED(contentHandler);
-    d->statusArea->showVideoStatusIcon(true);
-}
-
-void CallWindow::onVideoContentRemoved(CallContentHandler *contentHandler)
-{
-    Q_UNUSED(contentHandler);
-    d->statusArea->showVideoStatusIcon(false);
+    if (checked) {
+        d->dtmfToggleLastPage = d->ui.stackedWidget->currentWidget();
+        d->ui.stackedWidget->setCurrentWidget(d->ui.dtmfPage);
+    } else {
+        d->ui.stackedWidget->setCurrentWidget(d->dtmfToggleLastPage);
+    }
 }
 
 void CallWindow::hangup()

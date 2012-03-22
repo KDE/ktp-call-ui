@@ -6,15 +6,11 @@ pkg_check_modules(TP_FARSTREAM REQUIRED telepathy-farstream)
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${QTGSTREAMER_INCLUDES}
     ${TP_FARSTREAM_INCLUDE_DIRS}
     ${TELEPATHY_QT4_FARSTREAM_INCLUDE_DIR}
 )
 
 add_definitions(
-    ${QTGSTREAMER_DEFINITIONS}
-    ${KDE4_ENABLE_EXCEPTIONS}
-
     # These prevent gstreamer from including libxml2 headers
     -DGST_DISABLE_XML
     -DGST_DISABLE_LOADSAVE

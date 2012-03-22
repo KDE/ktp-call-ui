@@ -1,11 +1,8 @@
-include_directories(${QTGSTREAMER_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 #####
 
-add_definitions(${QTGSTREAMER_DEFINITIONS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTGSTREAMER_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
-
-set(libtelepathy-kde-call_SRCS
+set(libktpcall_SRCS
     callchannelhandler.cpp
     callcontenthandler.cpp
     sourcecontrollers.cpp
@@ -15,17 +12,16 @@ set(libtelepathy-kde-call_SRCS
     phononintegration.cpp
 )
 
-kde4_add_library(telepathy-kde-call STATIC ${libtelepathy-kde-call_SRCS})
-target_link_libraries(telepathy-kde-call
+kde4_add_library(ktpcall STATIC ${libktpcall_SRCS})
+target_link_libraries(ktpcall
     ${KDE4_KDECORE_LIBS}
     ${QT_QTDBUS_LIBRARY}
     ${QTGSTREAMER_LIBRARIES}
     ${TELEPATHY_QT4_LIBRARIES}
-    ${PC_TPQT4_YELL_LDFLAGS}
     qtf
 )
 
-install(FILES codec-preferences.ini DESTINATION ${DATA_INSTALL_DIR}/libtelepathy-kde-call)
+install(FILES codec-preferences.ini DESTINATION ${DATA_INSTALL_DIR}/libktpcall)
 
 
 #####

@@ -32,7 +32,7 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData aboutData("telepathy-kde-call-ui", 0, ki18n("KCall"), "0.8",
+    KAboutData aboutData("ktp-call-ui", 0, ki18n("KDE Telepathy Call Ui"), "0.3.60",
                           ki18n("VoIP client for KDE"), KAboutData::License_GPL,
                           ki18n("(C) 2009, George Kiagiadakis"));
     aboutData.setProgramIconName("internet-telephony");
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
                                     channelFactory, contactFactory);
 
     Tp::SharedPtr<CallHandler> callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
-    registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "KDE.CallUi");
+    registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "KTp.CallUi");
 
     return app.exec();
 }

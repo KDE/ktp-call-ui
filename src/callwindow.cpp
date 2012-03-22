@@ -20,7 +20,7 @@
 #include "ui_callwindow.h"
 #include "statusarea.h"
 #include "dtmfhandler.h"
-#include "../libtelepathy-kde-call/callchannelhandler.h"
+#include "../libktpcall/callchannelhandler.h"
 #include <QtGui/QCloseEvent>
 #include <QtGui/QDockWidget>
 #include <KDebug>

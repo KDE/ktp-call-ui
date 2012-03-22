@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=org.freedesktop.Telepathy.Client.KDE.CallUi
-Exec=@LIBEXEC_INSTALL_DIR@/telepathy-kde-call-ui

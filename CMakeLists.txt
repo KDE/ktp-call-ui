@@ -1,4 +1,4 @@
-project(telepathy-kde-call-ui)
+project(ktp-call-ui)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
@@ -15,10 +15,10 @@ include_directories(
 )
 add_definitions(
     ${KDE4_DEFINITIONS}
-    ${KDE4_ENABLE_EXCEPTIONS}
     ${QTGSTREAMER_DEFINITIONS}
 )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTGSTREAMER_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
 
 add_subdirectory(libqtf)
-add_subdirectory(libtelepathy-kde-call)
+add_subdirectory(libktpcall)
 add_subdirectory(src)

@@ -21,7 +21,6 @@
 #include <KAboutData>
 #include <KCmdLineArgs>
 #include <KLocalizedString>
-#include <KUniqueApplication>
 
 #include <TelepathyQt/Types>
 #include <TelepathyQt/Debug>
@@ -29,6 +28,8 @@
 #include <TelepathyQt/CallChannel>
 #include <TelepathyQt/ChannelClassSpec>
 #include <TelepathyQt/ChannelFactory>
+
+#include <KTp/telepathy-handler-application.h>
 
 int main(int argc, char **argv)
 {
@@ -41,16 +42,7 @@ int main(int argc, char **argv)
 
     KCmdLineArgs::init(argc, argv, &aboutData);
 
-    if ( !KUniqueApplication::start() ) {
-        return 0;
-    }
-
-    KUniqueApplication app;
-    app.disableSessionManagement();
-
-    Tp::registerTypes();
-    Tp::enableDebug(true);
-    Tp::enableWarnings(true);
+    KTp::TelepathyHandlerApplication app;
 
     Tp::AccountFactoryPtr accountFactory = Tp::AccountFactory::create(
         QDBusConnection::sessionBus(),

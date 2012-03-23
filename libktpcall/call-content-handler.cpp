@@ -43,8 +43,7 @@ void PendingCallContentHandler::findCallContent()
 {
     Tp::CallContents callContents = m_callChannel->contents();
     Q_FOREACH (const Tp::CallContentPtr & callContent, callContents) {
-        //FIXME telepathy-farstream should provide an object path here
-        if (callContent->type() == m_tfContent->property("media-type").toInt()) {
+        if (callContent->objectPath() == m_tfContent->property("object-path").toString()) {
             m_contentHandler->d->setCallContent(callContent);
             Q_EMIT ready(m_tfContent, m_contentHandler);
             deleteLater();
@@ -59,8 +58,7 @@ void PendingCallContentHandler::findCallContent()
 
 void PendingCallContentHandler::onContentAdded(const Tp::CallContentPtr & callContent)
 {
-    //FIXME telepathy-farstream should provide an object path here
-    if (callContent->type() == m_tfContent->property("media-type").toInt()) {
+    if (callContent->objectPath() == m_tfContent->property("object-path").toString()) {
         m_contentHandler->d->setCallContent(callContent);
         Q_EMIT ready(m_tfContent, m_contentHandler);
         deleteLater();

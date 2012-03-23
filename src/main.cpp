@@ -70,6 +70,8 @@ int main(int argc, char **argv)
                        << Tp::Contact::FeatureAvatarData
     );
 
+    KGlobal::ref(); //do not allow the KMainWindow destructor to shut us down
+
     Tp::ClientRegistrarPtr registrar =
         Tp::ClientRegistrar::create(accountFactory, connectionFactory,
                                     channelFactory, contactFactory);

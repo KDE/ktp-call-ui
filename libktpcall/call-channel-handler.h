@@ -37,9 +37,19 @@ public:
 
     QList<CallContentHandler*> contents() const;
 
+public Q_SLOTS:
+    /**
+     * This method closes the channel and stops the streaming engine.
+     * The operation is asyncrhonous. When finished, the channelClosed()
+     * signal is emited. You should call this method AND wait for
+     * channelClosed() before destroying this object.
+     */
+    void shutdown();
+
 Q_SIGNALS:
     void contentAdded(CallContentHandler *content);
     void contentRemoved(CallContentHandler *content);
+    void channelClosed();
 
 private:
     friend class CallChannelHandlerPrivate;

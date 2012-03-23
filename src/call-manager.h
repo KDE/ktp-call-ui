@@ -29,8 +29,6 @@ public:
 
 private Q_SLOTS:
     void onCallStateChanged(Tp::CallState state);
-    void selfDestruct();
-    void onCallChannelInvalidated();
 
 private:
     void ensureCallWindow();

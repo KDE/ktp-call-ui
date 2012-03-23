@@ -37,9 +37,10 @@ private Q_SLOTS:
     void onPendingTfChannelFinished(Tp::PendingOperation *op);
     void onCallContentHandlerReady(const QTf::ContentPtr & tfContent,
                                    CallContentHandler *contentHandler);
-    void onCallStateChanged(Tp::CallState state);
+    void onCallChannelInvalidated();
 
 private:
+    void onTfChannelClosed();
     void onContentAdded(const QTf::ContentPtr & tfContent);
     void onContentRemoved(const QTf::ContentPtr & tfContent);
     void onFsConferenceAdded(const QGst::ElementPtr & conference);
@@ -49,20 +50,24 @@ private:
 private:
     CallChannelHandler * const q;
 
-    Tp::CallChannelPtr m_callChannel;
     QGst::PipelinePtr m_pipeline;
     QTf::ChannelPtr m_tfChannel;
+    uint m_channelClosedCounter;
 
 public:
+    Tp::CallChannelPtr m_callChannel;
     QHash<QTf::ContentPtr, CallContentHandler*> m_contents;
 };
 
 CallChannelHandlerPrivate::CallChannelHandlerPrivate(const Tp::CallChannelPtr & channel,
                                                      CallChannelHandler *qq)
-    : QObject(), q(qq), m_callChannel(channel)
+    : QObject(),
+      q(qq),
+      m_channelClosedCounter(0),
+      m_callChannel(channel)
 {
-    connect(m_callChannel.data(), SIGNAL(callStateChanged(Tp::CallState)),
-            SLOT(onCallStateChanged(Tp::CallState)));
+    connect(m_callChannel.data(), SIGNAL(invalidated (Tp::DBusProxy*,QString,QString)),
+            SLOT(onCallChannelInvalidated()));
 
     QTimer::singleShot(0, this, SLOT(init()));
 }
@@ -77,6 +82,7 @@ void CallChannelHandlerPrivate::init()
         m_callChannel->hangup(Tp::CallStateChangeReasonInternalError,
                               TP_QT_ERROR_MEDIA_STREAMING_ERROR,
                               error.message());
+
         return;
     }
 
@@ -104,6 +110,8 @@ void CallChannelHandlerPrivate::onPendingTfChannelFinished(Tp::PendingOperation 
     m_pipeline->bus()->addSignalWatch();
     QGlib::connect(m_pipeline->bus(), "message", this, &CallChannelHandlerPrivate::onBusMessage);
 
+    QGlib::connect(m_tfChannel, "closed",
+                   this, &CallChannelHandlerPrivate::onTfChannelClosed);
     QGlib::connect(m_tfChannel, "content-added",
                    this, &CallChannelHandlerPrivate::onContentAdded);
     QGlib::connect(m_tfChannel, "content-removed",
@@ -114,13 +122,27 @@ void CallChannelHandlerPrivate::onPendingTfChannelFinished(Tp::PendingOperation 
                    this, &CallChannelHandlerPrivate::onFsConferenceRemoved);
 }
 
-void CallChannelHandlerPrivate::onCallStateChanged(Tp::CallState state)
+void CallChannelHandlerPrivate::onCallChannelInvalidated()
 {
-    if (state == Tp::CallStateEnded) {
-        if (m_pipeline) {
-            m_pipeline->bus()->removeSignalWatch();
-            m_pipeline->setState(QGst::StateNull);
-        }
+    kDebug() << "Tp::Channel invalidated";
+
+    if (++m_channelClosedCounter == 2) {
+        kDebug() << "emit channelClosed()";
+        Q_EMIT q->channelClosed();
+    }
+}
+
+void CallChannelHandlerPrivate::onTfChannelClosed()
+{
+    kDebug() << "TfChannel closed";
+
+    Q_ASSERT(m_pipeline);
+    m_pipeline->bus()->removeSignalWatch();
+    m_pipeline->setState(QGst::StateNull);
+
+    if (++m_channelClosedCounter == 2) {
+        kDebug() << "emit channelClosed()";
+        Q_EMIT q->channelClosed();
     }
 }
 
@@ -184,6 +206,15 @@ CallChannelHandler::~CallChannelHandler()
 QList<CallContentHandler*> CallChannelHandler::contents() const
 {
     return d->m_contents.values();
+}
+
+void CallChannelHandler::shutdown()
+{
+    //This will cause invalidated() to be emited on the 2 proxies (Tp::Channel & TpChannel)
+    //we catch the tp-qt one in onCallChannelInvalidated() and the tp-glib one
+    //in onTfChannelClosed() through TfChannel, which is closed when the TpChannel
+    //is invalidated. When both are invalidated, we emit the channelClosed() signal.
+    d->m_callChannel->requestClose();
 }
 
 //END CallChannelHandler

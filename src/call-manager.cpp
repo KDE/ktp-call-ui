@@ -36,12 +36,18 @@ CallManager::CallManager(const Tp::CallChannelPtr & callChannel, QObject *parent
     d->callChannel = callChannel;
     connect(callChannel.data(), SIGNAL(callStateChanged(Tp::CallState)),
             SLOT(onCallStateChanged(Tp::CallState)));
-    connect(callChannel.data(), SIGNAL(invalidated (Tp::DBusProxy*,QString,QString)),
-            SLOT(onCallChannelInvalidated()));
 
     //create the channel handler
     d->channelHandler = new CallChannelHandler(callChannel, this);
 
+    //delete the CallManager when the channel has closed
+    //and the farstream side has safely shut down.
+    //NOTE this MUST be used with Qt::QueuedConnection because of
+    // https://bugreports.qt-project.org/browse/QTBUG-24571
+    connect(d->channelHandler, SIGNAL(channelClosed()),
+            this, SLOT(deleteLater()), Qt::QueuedConnection);
+
+    //bring us up-to-date with the current call state
     onCallStateChanged(d->callChannel->callState());
 }
 
@@ -106,31 +112,17 @@ void CallManager::onCallStateChanged(Tp::CallState state)
             Tp::CallStateReason reason = d->callChannel->callStateReason();
             d->callWindow.data()->setStatus(CallWindow::StatusDisconnected, reason);
 
-            // kill the call manager when the call window is closed.
-            connect(d->callWindow.data(), SIGNAL(destroyed()), this, SLOT(deleteLater()));
+            //kill the call manager when the call window is closed,
+            //after shutting down the channelHandler
+            connect(d->callWindow.data(), SIGNAL(destroyed()), d->channelHandler, SLOT(shutdown()));
         } else {
             //TODO if the approver was running, tell the user that he missed the call
-            deleteLater();
+            d->channelHandler->shutdown();
         }
         break;
     default:
         Q_ASSERT(false);
     }
-}
-
-void CallManager::selfDestruct()
-{
-    kDebug();
-
-    //close the channel before destroying the manager
-    //onCallChannelInvalidated() will be called a bit later
-    d->callChannel->requestClose();
-}
-
-void CallManager::onCallChannelInvalidated()
-{
-    kDebug();
-    deleteLater();
 }
 
 void CallManager::ensureCallWindow()

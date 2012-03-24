@@ -50,28 +50,28 @@ int main(int argc, char **argv)
 
     kDebug() << "connecting...";
     timer.restart();
-    sc->setSourceEnabled(true);
+    sc->connectToSource();
     kDebug() << "connected" << timer.elapsed();
 
     sleep(3);
 
     kDebug() << "disconnecting...";
     timer.restart();
-    sc->setSourceEnabled(false);
+    sc->disconnectFromSource();
     kDebug() << "disconnected" << timer.elapsed();
 
     sleep(3);
 
     kDebug() << "connecting...";
     timer.restart();
-    sc->setSourceEnabled(true);
+    sc->connectToSource();
     kDebug() << "connected" << timer.elapsed();
 
     sleep(3);
 
     kDebug() << "disconnecting...";
     timer.restart();
-    sc->setSourceEnabled(false);
+    sc->disconnectFromSource();
     kDebug() << "disconnected" << timer.elapsed();
 
     kDebug() << "removing...";

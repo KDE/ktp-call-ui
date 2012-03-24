@@ -7,6 +7,7 @@ set(libktpcall_SRCS
     call-content-handler.cpp
     source-controllers.cpp
     sink-controllers.cpp
+    sink-managers.cpp
     volume-controller.cpp
     device-element-factory.cpp
     phonon-integration.cpp

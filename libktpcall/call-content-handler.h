@@ -18,18 +18,19 @@
 #ifndef CALL_CONTENT_HANDLER_H
 #define CALL_CONTENT_HANDLER_H
 
-#include "source-controllers.h"
-#include "sink-controllers.h"
+#include "volume-controller.h"
 #include <TelepathyQt/CallContent>
 
 class CallContentHandlerPrivate;
 class PendingCallContentHandler;
 class CallChannelHandlerPrivate;
 
-/** This class handles streaming in a telepathy Call channel Content.
- * Everything related to streaming is handled internally. You only need
- * to access the controller classes that this class exports to be able
- * to control properties of the internal gstreamer pipeline.
+/**
+ * This class handles streaming in a telepathy Call channel Content.
+ * Everything related to streaming is handled internally.
+ * In audio contents, this class can be safely cast to AudioContentHandler
+ * and on video contents, to VideoContentHandler. Those subclasses expose
+ * all you need to interract with the internal gstreamer pipeline.
  */
 class CallContentHandler : public QObject
 {
@@ -38,31 +39,51 @@ public:
     /** \returns the telepathy content associated with this handler */
     Tp::CallContentPtr callContent() const;
 
-    /** \returns the controller for the input source that is used in this content.
-     * In audio contents, this can be safely cast to AudioSourceController*
-     * and in video contents, to VideoSourceController*.
+    /**
+     * \returns a set of contacts that are actively participating in
+     * the call at the moment (i.e. there is media flowing from them to us)
      */
-    BaseSourceController *sourceController() const;
-
-    /** \returns the controllers for the output sinks. Typically, there
-     * is one sink controller for each participant in this content.
-     * In audio contents, every sink controller can be safely cast to
-     * AudioSinkController* and in video contents, to VideoSinkController*.
-     */
-    QSet<BaseSinkController*> sinkControllers() const;
+    Tp::Contacts remoteMembers() const;
 
 Q_SIGNALS:
-    void sinkControllerAdded(BaseSinkController *controller);
-    void sinkControllerRemoved(BaseSinkController *controller);
+    void remoteMemberJoined(const Tp::ContactPtr & contact);
+    void remoteMemberLeft(const Tp::ContactPtr & contact);
 
-private:
+protected:
     explicit CallContentHandler(QObject *parent = 0);
     virtual ~CallContentHandler();
 
     friend class CallContentHandlerPrivate; //emits the signals
-    friend class PendingCallContentHandler; //calls the constructor and uses d
+    friend class PendingCallContentHandler; //uses d
     friend class CallChannelHandlerPrivate; //calls the destructor
     CallContentHandlerPrivate *const d;
+};
+
+
+class AudioContentHandler : public CallContentHandler
+{
+    Q_OBJECT
+public:
+    VolumeController *sourceVolumeControl() const;
+    VolumeController *remoteMemberVolumeControl(const Tp::ContactPtr & contact) const;
+
+private:
+    friend class PendingCallContentHandler;
+    explicit AudioContentHandler(QObject *parent = 0);
+    virtual ~AudioContentHandler() {}
+};
+
+
+class VideoContentHandler : public CallContentHandler
+{
+    Q_OBJECT
+public:
+    //TODO
+
+private:
+    friend class PendingCallContentHandler;
+    explicit VideoContentHandler(QObject *parent = 0);
+    virtual ~VideoContentHandler() {}
 };
 
 #endif // CALL_CONTENT_HANDLER_H

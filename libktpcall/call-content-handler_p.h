@@ -19,11 +19,12 @@
 #define CALL_CONTENT_HANDLER_P_H
 
 #include "call-content-handler.h"
+#include "source-controllers.h"
+#include "sink-controllers.h"
+#include "sink-managers.h"
 #include "../libqtf/qtf.h"
 #include <QGst/Pipeline>
 #include <QGst/Pad>
-
-class BaseSinkManager;
 
 /* This class constructs a CallContentHandler. This operation is asynchronous
  * because we need to construct a CallContentHandler as soon as we receive
@@ -81,7 +82,7 @@ private Q_SLOTS:
 
 public: //accessed from the public class
     BaseSourceController *m_sourceController;
-    QSet<BaseSinkController*> m_sinkControllers;
+    QHash<Tp::ContactPtr, BaseSinkController*> m_sinkControllers;
     Tp::CallContentPtr m_callContent;
 
 private:

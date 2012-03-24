@@ -16,8 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "call-content-handler_p.h"
-#include "source-controllers.h"
-#include "sink-controllers_p.h"
 #include <QGlib/Connect>
 #include <QGst/Pad>
 #include <QGst/ElementFactory>
@@ -31,7 +29,17 @@ PendingCallContentHandler::PendingCallContentHandler(const Tp::CallChannelPtr & 
                                                      QObject *parent)
     : QObject(parent)
 {
-    m_contentHandler = new CallContentHandler(parent);
+    switch(tfContent->property("media-type").toInt()) {
+    case Tp::MediaStreamTypeAudio:
+        m_contentHandler = new AudioContentHandler(parent);
+        break;
+    case Tp::MediaStreamTypeVideo:
+        m_contentHandler = new VideoContentHandler(parent);
+        break;
+    default:
+        Q_ASSERT(false);
+    }
+
     m_contentHandler->d->init(tfContent, pipeline);
 
     m_callChannel = callChannel;
@@ -76,6 +84,9 @@ CallContentHandlerPrivate::~CallContentHandlerPrivate()
     m_queue->setState(QGst::StateNull);
     m_sourceController->releaseSrcPad(m_sourceControllerPad);
     m_sinkManager->unlinkAllPads();
+
+    delete m_sourceController;
+    delete m_sinkManager;
 }
 
 void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
@@ -91,11 +102,11 @@ void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
 
     switch(tfContent->property("media-type").toInt()) {
     case Tp::MediaStreamTypeAudio:
-        m_sourceController = new AudioSourceController(pipeline, this);
+        m_sourceController = new AudioSourceController(pipeline);
         m_sinkManager = new AudioSinkManager(pipeline, this);
         break;
     case Tp::MediaStreamTypeVideo:
-        m_sourceController = new VideoSourceController(pipeline, this);
+        m_sourceController = new VideoSourceController(pipeline);
         m_sinkManager = new VideoSinkManager(pipeline, this);
         break;
     default:
@@ -136,29 +147,29 @@ void CallContentHandlerPrivate::onSrcPadAdded(uint contactHandle,
 bool CallContentHandlerPrivate::onStartSending()
 {
     kDebug() << "Start sending requested";
-    m_sourceController->setSourceEnabled(true);
+    m_sourceController->connectToSource();
     return true;
 }
 
 bool CallContentHandlerPrivate::onStopSending()
 {
     kDebug() << "Stop sending requested";
-    m_sourceController->setSourceEnabled(false);
+    m_sourceController->disconnectFromSource();
     return true;
 }
 
 void CallContentHandlerPrivate::onControllerCreated(BaseSinkController *controller)
 {
     kDebug() << "Sink controller created for" << controller->contact()->alias();
-    m_sinkControllers.insert(controller);
-    Q_EMIT q->sinkControllerAdded(controller);
+    m_sinkControllers.insert(controller->contact(), controller);
+    Q_EMIT q->remoteMemberJoined(controller->contact());
 }
 
 void CallContentHandlerPrivate::onControllerDestroyed(BaseSinkController *controller)
 {
-    kDebug() << "Sink controller destroyed";
-    m_sinkControllers.remove(controller);
-    Q_EMIT q->sinkControllerRemoved(controller);
+    kDebug() << "Sink controller of" << controller->contact()->alias() << "destroyed";
+    m_sinkControllers.remove(controller->contact());
+    Q_EMIT q->remoteMemberLeft(controller->contact());
 }
 
 //END CallContentHandlerPrivate
@@ -179,18 +190,43 @@ Tp::CallContentPtr CallContentHandler::callContent() const
     return d->m_callContent;
 }
 
-BaseSourceController *CallContentHandler::sourceController() const
+Tp::Contacts CallContentHandler::remoteMembers() const
 {
-    return d->m_sourceController;
+    return d->m_sinkControllers.keys().toSet();
 }
-
-QSet<BaseSinkController*> CallContentHandler::sinkControllers() const
-{
-    return d->m_sinkControllers;
-}
-
 
 //END CallContentHandler
+//BEGIN AudioContentHandler
+
+AudioContentHandler::AudioContentHandler(QObject *parent)
+    : CallContentHandler(parent)
+{
+}
+
+VolumeController *AudioContentHandler::sourceVolumeControl() const
+{
+    return static_cast<AudioSourceController*>(d->m_sourceController)->volumeController();
+}
+
+VolumeController *AudioContentHandler::remoteMemberVolumeControl(const Tp::ContactPtr & contact) const
+{
+    const BaseSinkController *ctrl = d->m_sinkControllers.value(contact);
+    if (ctrl) {
+        return static_cast<const AudioSinkController*>(ctrl)->volumeController();
+    } else {
+        return NULL;
+    }
+}
+
+//END AudioContentHandler
+//BEGIN VideoContentHandler
+
+VideoContentHandler::VideoContentHandler(QObject *parent)
+    : CallContentHandler(parent)
+{
+}
+
+//END VideoContentHandler
 
 #include "moc_call-content-handler.cpp"
 #include "moc_call-content-handler_p.cpp"

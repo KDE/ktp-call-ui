@@ -15,8 +15,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef SINK_CONTROLLERS_P_H
-#define SINK_CONTROLLERS_P_H
+#ifndef SINK_MANAGERS_H
+#define SINK_MANAGERS_H
 
 #include "sink-controllers.h"
 #include <TelepathyQt/Types>
@@ -38,21 +38,19 @@ protected:
     explicit BaseSinkManager(QObject *parent = 0);
 
     /* Called from the streaming thread to do the initial linking of srcPad to the sink */
-    virtual BaseSinkControllerPrivate *createControllerPrivate(const QGst::PadPtr & srcPad) = 0;
+    virtual BaseSinkController *createController(const QGst::PadPtr & srcPad) = 0;
 
-    /* Called from the main thread to create the full QObject controller */
-    virtual BaseSinkController *createFullController(BaseSinkControllerPrivate *priv) = 0;
-
-    /* Called from the streaming thread when the src pad associated with priv is unlinked */
-    virtual void releaseControllerData(BaseSinkControllerPrivate *priv) = 0;
+    /* Called from the streaming thread when the src pad associated with ctrl is unlinked */
+    virtual void releaseControllerData(BaseSinkController *ctrl) = 0;
 
 private Q_SLOTS:
     void handleNewSinkPadAsync(uint contactHandle);
     void onStreamAdded(const Tp::CallStreamPtr & stream);
     void onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tp::SendingState> & states);
-    void onControllerAboutToBeDestroyed(QObject *controller);
+    void destroyController(BaseSinkController *controller);
 
 private:
+    void checkForNewContacts(const QList<Tp::ContactPtr> & contacts);
     /* Called from the streaming thread */
     void onPadUnlinked(const QGst::PadPtr & srcPad);
 
@@ -63,8 +61,8 @@ Q_SIGNALS:
 private:
     Tp::CallContentPtr m_content;
     QMutex m_mutex;
-    QHash<uint, BaseSinkControllerPrivate*> m_controllersWaitingForContact;
-    QHash<QGst::PadPtr, BaseSinkControllerPrivate*> m_controllers;
+    QHash<uint, BaseSinkController*> m_controllersWaitingForContact;
+    QHash<QGst::PadPtr, BaseSinkController*> m_controllers;
 };
 
 
@@ -76,9 +74,8 @@ public:
     virtual ~AudioSinkManager();
 
 protected:
-    virtual BaseSinkControllerPrivate *createControllerPrivate(const QGst::PadPtr & srcPad);
-    virtual BaseSinkController *createFullController(BaseSinkControllerPrivate *priv);
-    virtual void releaseControllerData(BaseSinkControllerPrivate* priv);
+    virtual BaseSinkController *createController(const QGst::PadPtr & srcPad);
+    virtual void releaseControllerData(BaseSinkController *priv);
 
 private:
     void refSink();
@@ -99,12 +96,11 @@ public:
     explicit VideoSinkManager(const QGst::PipelinePtr & pipeline, QObject *parent = 0);
 
 protected:
-    virtual BaseSinkControllerPrivate* createControllerPrivate(const QGst::PadPtr& srcPad);
-    virtual BaseSinkController* createFullController(BaseSinkControllerPrivate* priv);
-    virtual void releaseControllerData(BaseSinkControllerPrivate* priv);
+    virtual BaseSinkController *createController(const QGst::PadPtr & srcPad);
+    virtual void releaseControllerData(BaseSinkController *priv);
 
 private:
     QGst::PipelinePtr m_pipeline;
 };
 
-#endif //SINK_CONTROLLERS_P_H
+#endif //SINK_MANAGERS_H

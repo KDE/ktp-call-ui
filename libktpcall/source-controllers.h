@@ -19,67 +19,69 @@
 #define SOURCE_CONTROLLERS_H
 
 #include "volume-controller.h"
+#include "private/input-control-bin.h"
 
-class CallContentHandlerPrivate;
-class BaseSourceControllerPrivate;
-class AudioSourceControllerPrivate;
-class VideoSourceControllerPrivate;
+#include <QGst/Pipeline>
+#include <QGst/Pad>
 
-
-class BaseSourceController : public QObject
+class BaseSourceController
 {
-    Q_OBJECT
-    Q_DECLARE_PRIVATE(BaseSourceController)
-    Q_PROPERTY(bool sourceEnabled READ sourceEnabled WRITE setSourceEnabled
-                                  NOTIFY sourceEnabledChanged)
 public:
-    /** This returns a new 'src' pad from the source bin that can be
-     * connected to any sink that needs to get the data of the source.
-     * This is useful for connecting a video preview sink on video contents
-     * or for connecting an encoder and recording the call.
-     * \note The pad must be released with releaseSrcPad() when
-     * it is no longer needed.
-     */
+    explicit BaseSourceController(const QGst::PipelinePtr & pipeline);
+    virtual ~BaseSourceController();
+
     QGst::PadPtr requestSrcPad();
     void releaseSrcPad(const QGst::PadPtr & pad);
 
-    bool sourceEnabled() const;
-
-public Q_SLOTS:
-    void setSourceEnabled(bool enabled);
-
-Q_SIGNALS:
-    void sourceEnabledChanged(bool isEnabled);
+    void connectToSource();
+    void disconnectFromSource();
 
 protected:
-    explicit BaseSourceController(BaseSourceControllerPrivate *d, QObject *parent = 0);
-    virtual ~BaseSourceController();
+    virtual QGst::ElementPtr makeSilenceSource() = 0;
+    virtual QGst::ElementPtr makeRealSource() = 0;
+    virtual QGst::ElementPtr makeFilterBin() = 0;
+    virtual void releaseRealSource() {}
 
-    BaseSourceControllerPrivate * const d_ptr;
+private:
+    void createBin();
+    void destroyBin();
+
+
+    QGst::PipelinePtr m_pipeline;
+    QGst::ElementPtr m_source;
+    InputControlBin *m_inputCtrlBin;
 };
 
 
 class AudioSourceController : public BaseSourceController
 {
-    Q_OBJECT
-    Q_DECLARE_PRIVATE(AudioSourceController)
-    Q_PROPERTY(VolumeController* volumeController READ volumeController)
 public:
-    explicit AudioSourceController(const QGst::PipelinePtr & pipeline, QObject *parent = 0);
+    explicit AudioSourceController(const QGst::PipelinePtr & pipeline);
+    virtual ~AudioSourceController();
 
     VolumeController *volumeController() const;
     //TODO level monitor
+
+protected:
+    virtual QGst::ElementPtr makeSilenceSource();
+    virtual QGst::ElementPtr makeRealSource();
+    virtual QGst::ElementPtr makeFilterBin();
+    virtual void releaseRealSource();
+
+private:
+    VolumeController *m_volumeController;
 };
 
 
 class VideoSourceController : public BaseSourceController
 {
-    Q_OBJECT
-    Q_DECLARE_PRIVATE(VideoSourceController)
 public:
-    explicit VideoSourceController(const QGst::PipelinePtr & pipeline, QObject *parent = 0);
+    explicit VideoSourceController(const QGst::PipelinePtr & pipeline);
 
-    //TODO colorbalance controls
+protected:
+    virtual QGst::ElementPtr makeSilenceSource();
+    virtual QGst::ElementPtr makeRealSource();
+    virtual QGst::ElementPtr makeFilterBin();
 };
 
 #endif // SOURCE_CONTROLLERS_H

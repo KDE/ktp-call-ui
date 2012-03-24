@@ -27,6 +27,7 @@
 
 #include <TelepathyQt/ReferencedHandles>
 #include <TelepathyQt/AvatarData>
+#include <TelepathyQt/Contact>
 
 #include <KDebug>
 #include <KLocalizedString>
@@ -203,12 +204,15 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
     kDebug() << "Content added:" << contentHandler->callContent()->name();
 
     if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
+        AudioContentHandler *audioContentHandler = qobject_cast<AudioContentHandler*>(contentHandler);
+        Q_ASSERT(audioContentHandler);
+
         checkEnableDtmf();
         d->statusArea->showAudioStatusIcon(true);
         d->muteAction->setEnabled(true);
-        d->muteAction->setChecked(contentHandler->sourceController()->sourceEnabled());
+        d->muteAction->setChecked(audioContentHandler->sourceVolumeControl()->isMuted());
         connect(d->muteAction, SIGNAL(toggled(bool)),
-                contentHandler->sourceController(), SLOT(setSourceEnabled(bool)));
+                audioContentHandler->sourceVolumeControl(), SLOT(setMuted(bool)));
     } else {
         d->statusArea->showVideoStatusIcon(true);
     }

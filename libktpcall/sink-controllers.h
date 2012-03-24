@@ -20,63 +20,63 @@
 
 #include "volume-controller.h"
 #include <TelepathyQt/Contact>
+#include <QGst/Pipeline>
+#include <QGst/Pad>
 
-class BaseSinkControllerPrivate;
-class AudioSinkControllerPrivate;
-class VideoSinkControllerPrivate;
-class BaseSinkManager;
-class AudioSinkManager;
-class VideoSinkManager;
-
-//FIXME shouldn't this be in tp-qt4?
-Q_DECLARE_METATYPE(Tp::ContactPtr)
-
-
-class BaseSinkController : public QObject
+class BaseSinkController
 {
-    Q_OBJECT
-    Q_DECLARE_PRIVATE(BaseSinkController)
-    Q_PROPERTY(Tp::ContactPtr contact READ contact)
 public:
+    virtual ~BaseSinkController() {}
+
     Tp::ContactPtr contact() const;
 
-protected:
-    friend class BaseSinkManager;
-    explicit BaseSinkController(BaseSinkControllerPrivate *d, QObject *parent = 0);
-    virtual ~BaseSinkController();
+    virtual void initFromStreamingThread(const QGst::PadPtr & srcPad,
+                                         const QGst::PipelinePtr & pipeline) = 0;
+    virtual void initFromMainThread(const Tp::ContactPtr & contact);
+    virtual void releaseFromStreamingThread(const QGst::PipelinePtr & pipeline);
 
-    BaseSinkControllerPrivate * const d_ptr;
+protected:
+    Tp::ContactPtr m_contact;
+    QGst::BinPtr m_bin;
 };
 
 
 class AudioSinkController : public BaseSinkController
 {
-    Q_OBJECT
-    Q_DECLARE_PRIVATE(AudioSinkController)
-    Q_PROPERTY(VolumeController* volumeController READ volumeController)
 public:
+    AudioSinkController(const QGst::PadPtr & adderRequestPad);
+    virtual ~AudioSinkController();
+
+    QGst::PadPtr adderRequestPad() const;
     VolumeController *volumeController() const;
-    //TODO level monitor
+
+    virtual void initFromStreamingThread(const QGst::PadPtr & srcPad,
+                                         const QGst::PipelinePtr & pipeline);
+    virtual void initFromMainThread(const Tp::ContactPtr & contact);
+    virtual void releaseFromStreamingThread(const QGst::PipelinePtr & pipeline);
 
 private:
-    friend class AudioSinkManager;
-    explicit AudioSinkController(AudioSinkControllerPrivate *d, QObject *parent = 0);
+    QGst::PadPtr m_adderRequestPad;
+    VolumeController *m_volumeController;
 };
 
 
 class VideoSinkController : public BaseSinkController
 {
-    Q_OBJECT
-    Q_DECLARE_PRIVATE(VideoSinkController)
 public:
+    VideoSinkController();
+
     QGst::PadPtr requestSrcPad();
     void releaseSrcPad(const QGst::PadPtr & pad);
 
-    //TODO colorbalance control
+    virtual void initFromStreamingThread(const QGst::PadPtr & srcPad,
+                                         const QGst::PipelinePtr & pipeline);
 
 private:
-    friend class VideoSinkManager;
-    explicit VideoSinkController(VideoSinkControllerPrivate *d, QObject *parent = 0);
+    //<ghost src pad, tee request src pad>
+    QHash<QGst::PadPtr, QGst::PadPtr> m_pads;
+    QGst::ElementPtr m_tee;
+    uint m_padNameCounter;
 };
 
 #endif //SINK_CONTROLLERS_H

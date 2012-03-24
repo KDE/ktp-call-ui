@@ -15,7 +15,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "source-controllers_p.h"
+#include "source-controllers.h"
 #include "device-element-factory_p.h"
 #include <QGst/ElementFactory>
 #include <QGst/GhostPad>
@@ -26,62 +26,20 @@
 
 //BEGIN BaseSourceController
 
-BaseSourceController::BaseSourceController(BaseSourceControllerPrivate *d, QObject *parent)
-    : QObject(parent), d_ptr(d)
+BaseSourceController::BaseSourceController(const QGst::PipelinePtr & pipeline)
+    : m_pipeline(pipeline),
+      m_inputCtrlBin(NULL)
 {
-    d->q_ptr = this;
 }
 
 BaseSourceController::~BaseSourceController()
-{
-    delete d_ptr;
-}
-
-QGst::PadPtr BaseSourceController::requestSrcPad()
-{
-    Q_D(BaseSourceController);
-    return d->requestSrcPad();
-}
-
-void BaseSourceController::releaseSrcPad(const QGst::PadPtr & pad)
-{
-    Q_D(BaseSourceController);
-    return d->releaseSrcPad(pad);
-}
-
-bool BaseSourceController::sourceEnabled() const
-{
-    Q_D(const BaseSourceController);
-    return !d->m_source.isNull();
-}
-
-void BaseSourceController::setSourceEnabled(bool enabled)
-{
-    Q_D(BaseSourceController);
-    if (enabled) {
-        d->connectToSource();
-    } else {
-        d->disconnectFromSource();
-    }
-}
-
-//END BaseSourceController
-//BEGIN BaseSourceControllerPrivate
-
-BaseSourceControllerPrivate::BaseSourceControllerPrivate(const QGst::PipelinePtr & pipeline)
-{
-    m_inputCtrlBin = NULL;
-    m_pipeline = pipeline;
-}
-
-BaseSourceControllerPrivate::~BaseSourceControllerPrivate()
 {
     if (m_inputCtrlBin) {
         destroyBin();
     }
 }
 
-QGst::PadPtr BaseSourceControllerPrivate::requestSrcPad()
+QGst::PadPtr BaseSourceController::requestSrcPad()
 {
     if (!m_inputCtrlBin) {
         createBin();
@@ -90,15 +48,13 @@ QGst::PadPtr BaseSourceControllerPrivate::requestSrcPad()
     return m_inputCtrlBin->requestSrcPad();
 }
 
-void BaseSourceControllerPrivate::releaseSrcPad(const QGst::PadPtr & pad)
+void BaseSourceController::releaseSrcPad(const QGst::PadPtr & pad)
 {
     m_inputCtrlBin->releaseSrcPad(pad);
 }
 
-void BaseSourceControllerPrivate::connectToSource()
+void BaseSourceController::connectToSource()
 {
-    Q_Q(BaseSourceController);
-
     if (m_source.isNull()) {
         //create the source
         //TODO this should happen async, as some cameras take a long time to initialize
@@ -107,28 +63,22 @@ void BaseSourceControllerPrivate::connectToSource()
             return;
         }
         m_inputCtrlBin->connectSource(m_source);
-
-        Q_EMIT q->sourceEnabledChanged(true);
     }
     //else we are already connected
 }
 
-void BaseSourceControllerPrivate::disconnectFromSource()
+void BaseSourceController::disconnectFromSource()
 {
-    Q_Q(BaseSourceController);
-
     if (!m_source.isNull()) {
         releaseRealSource(); //release any pointers that the subclass keeps
 
         m_inputCtrlBin->disconnectSource();
         m_source.clear();
-
-        Q_EMIT q->sourceEnabledChanged(false);
     }
     //else we are already disconnected
 }
 
-void BaseSourceControllerPrivate::createBin()
+void BaseSourceController::createBin()
 {
     m_inputCtrlBin = new InputControlBin(makeSilenceSource(), makeFilterBin());
 
@@ -137,7 +87,7 @@ void BaseSourceControllerPrivate::createBin()
     m_inputCtrlBin->bin()->syncStateWithParent();
 }
 
-void BaseSourceControllerPrivate::destroyBin()
+void BaseSourceController::destroyBin()
 {
     disconnectFromSource();
 
@@ -147,31 +97,26 @@ void BaseSourceControllerPrivate::destroyBin()
     delete m_inputCtrlBin;
 }
 
-
-//END BaseSourceControllerPrivate
+//END BaseSourceController
 //BEGIN AudioSourceController
 
-AudioSourceController::AudioSourceController(const QGst::PipelinePtr & pipeline, QObject *parent)
-    : BaseSourceController(new AudioSourceControllerPrivate(pipeline), parent)
-{
-}
-
-VolumeController *AudioSourceController::volumeController() const
-{
-    Q_D(const AudioSourceController);
-    return d->m_volumeController;
-}
-
-//END AudioSourceController
-//BEGIN AudioSourceControllerPrivate
-
-AudioSourceControllerPrivate::AudioSourceControllerPrivate(const QGst::PipelinePtr & pipeline)
-    : BaseSourceControllerPrivate(pipeline)
+AudioSourceController::AudioSourceController(const QGst::PipelinePtr & pipeline)
+    : BaseSourceController(pipeline)
 {
     m_volumeController = new VolumeController;
 }
 
-QGst::ElementPtr AudioSourceControllerPrivate::makeSilenceSource()
+AudioSourceController::~AudioSourceController()
+{
+    delete m_volumeController;
+}
+
+VolumeController *AudioSourceController::volumeController() const
+{
+    return m_volumeController;
+}
+
+QGst::ElementPtr AudioSourceController::makeSilenceSource()
 {
     QGst::ElementPtr src = QGst::ElementFactory::make("audiotestsrc");
     src->setProperty("wave", 4); //generate silence
@@ -179,7 +124,7 @@ QGst::ElementPtr AudioSourceControllerPrivate::makeSilenceSource()
     return src;
 }
 
-QGst::ElementPtr AudioSourceControllerPrivate::makeRealSource()
+QGst::ElementPtr AudioSourceController::makeRealSource()
 {
     QGst::ElementPtr src = DeviceElementFactory::makeAudioCaptureElement();
     if (!src) {
@@ -201,7 +146,7 @@ QGst::ElementPtr AudioSourceControllerPrivate::makeRealSource()
     return bin;
 }
 
-QGst::ElementPtr AudioSourceControllerPrivate::makeFilterBin()
+QGst::ElementPtr AudioSourceController::makeFilterBin()
 {
     return QGst::Bin::fromDescription(
         "audiorate ! "
@@ -209,28 +154,20 @@ QGst::ElementPtr AudioSourceControllerPrivate::makeFilterBin()
     );
 }
 
-void AudioSourceControllerPrivate::releaseRealSource()
+void AudioSourceController::releaseRealSource()
 {
     m_volumeController->setElement(QGst::StreamVolumePtr());
 }
 
-//END AudioSourceControllerPrivate
+//END AudioSourceController
 //BEGIN VideoSourceController
 
-VideoSourceController::VideoSourceController(const QGst::PipelinePtr & pipeline, QObject *parent)
-    : BaseSourceController(new VideoSourceControllerPrivate(pipeline), parent)
+VideoSourceController::VideoSourceController(const QGst::PipelinePtr & pipeline)
+    : BaseSourceController(pipeline)
 {
 }
 
-//END VideoSourceController
-//BEGIN VideoSourceControllerPrivate
-
-VideoSourceControllerPrivate::VideoSourceControllerPrivate(const QGst::PipelinePtr & pipeline)
-    : BaseSourceControllerPrivate(pipeline)
-{
-}
-
-QGst::ElementPtr VideoSourceControllerPrivate::makeSilenceSource()
+QGst::ElementPtr VideoSourceController::makeSilenceSource()
 {
     QGst::ElementPtr src = QGst::ElementFactory::make("videotestsrc");
     src->setProperty("pattern", 2); //black picture
@@ -238,7 +175,7 @@ QGst::ElementPtr VideoSourceControllerPrivate::makeSilenceSource()
     return src;
 }
 
-QGst::ElementPtr VideoSourceControllerPrivate::makeRealSource()
+QGst::ElementPtr VideoSourceController::makeRealSource()
 {
     QGst::ElementPtr src = DeviceElementFactory::makeVideoCaptureElement();
     if (!src) {
@@ -266,7 +203,7 @@ QGst::ElementPtr VideoSourceControllerPrivate::makeRealSource()
 //     }
 }
 
-QGst::ElementPtr VideoSourceControllerPrivate::makeFilterBin()
+QGst::ElementPtr VideoSourceController::makeFilterBin()
 {
     QGst::BinPtr bin = QGst::Bin::create();
 
@@ -323,6 +260,4 @@ QGst::ElementPtr VideoSourceControllerPrivate::makeFilterBin()
     return bin;
 }
 
-//END VideoSourceControllerPrivate
-
-#include "moc_source-controllers.cpp"
+//END VideoSourceController

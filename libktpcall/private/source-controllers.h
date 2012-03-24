@@ -20,6 +20,7 @@
 
 #include "../volume-controller.h"
 #include "input-control-bin.h"
+#include "video-sink-bin.h"
 
 #include <QGst/Pipeline>
 #include <QGst/Pad>
@@ -42,12 +43,12 @@ protected:
     virtual QGst::ElementPtr makeFilterBin() = 0;
     virtual void releaseRealSource() {}
 
+    QGst::PipelinePtr m_pipeline;
+
 private:
     void createBin();
     void destroyBin();
 
-
-    QGst::PipelinePtr m_pipeline;
     QGst::ElementPtr m_source;
     InputControlBin *m_inputCtrlBin;
 };
@@ -77,11 +78,18 @@ class VideoSourceController : public BaseSourceController
 {
 public:
     explicit VideoSourceController(const QGst::PipelinePtr & pipeline);
+    virtual ~VideoSourceController();
+
+    void linkVideoPreviewSink(const QGst::ElementPtr & sink);
+    void unlinkVideoPreviewSink();
 
 protected:
     virtual QGst::ElementPtr makeSilenceSource();
     virtual QGst::ElementPtr makeRealSource();
     virtual QGst::ElementPtr makeFilterBin();
+
+private:
+    VideoSinkBin *m_videoSinkBin;
 };
 
 #endif // SOURCE_CONTROLLERS_H

@@ -101,7 +101,12 @@ void AudioSinkController::releaseFromStreamingThread(const QGst::PipelinePtr & p
 //BEGIN VideoSinkController
 
 VideoSinkController::VideoSinkController()
-    : m_padNameCounter(0)
+    : m_padNameCounter(0),
+      m_videoSinkBin(NULL)
+{
+}
+
+VideoSinkController::~VideoSinkController()
 {
 }
 
@@ -129,6 +134,42 @@ void VideoSinkController::releaseSrcPad(const QGst::PadPtr & pad)
     m_tee->releaseRequestPad(teeSrcPad);
 }
 
+void VideoSinkController::linkVideoSink(const QGst::ElementPtr & sink)
+{
+    //initFromStreamingThread() is always called before the user knows
+    //anything about this content's src pad, so nobody can possibly link
+    //a video sink before the bin is created.
+    Q_ASSERT(m_bin);
+
+    QGst::PadPtr srcPad = m_tee->getRequestPad("src%d");
+    m_videoSinkBin = new VideoSinkBin(sink);
+
+    m_bin->add(m_videoSinkBin->bin());
+    m_videoSinkBin->bin()->syncStateWithParent();
+    srcPad->link(m_videoSinkBin->bin()->getStaticPad("sink"));
+}
+
+void VideoSinkController::unlinkVideoSink()
+{
+    //lock because releaseFromStreamingThread() is always called before the user
+    //knows about the removal of the content's src pad and may try to unlink
+    //externally while releaseFromStreamingThread() is running.
+    QMutexLocker l(&m_videoSinkMutex);
+
+    if (m_videoSinkBin) {
+        QGst::PadPtr sinkPad = m_videoSinkBin->bin()->getStaticPad("sink");
+        QGst::PadPtr srcPad = sinkPad->peer();
+
+        srcPad->unlink(sinkPad);
+        m_videoSinkBin->bin()->setState(QGst::StateNull);
+        m_bin->remove(m_videoSinkBin->bin());
+        delete m_videoSinkBin;
+        m_videoSinkBin = NULL;
+
+        m_tee->releaseRequestPad(srcPad);
+    }
+}
+
 void VideoSinkController::initFromStreamingThread(const QGst::PadPtr & srcPad,
                                                   const QGst::PipelinePtr & pipeline)
 {
@@ -153,5 +194,10 @@ void VideoSinkController::initFromStreamingThread(const QGst::PadPtr & srcPad,
     srcPad->link(binSinkPad);
 }
 
+void VideoSinkController::releaseFromStreamingThread(const QGst::PipelinePtr & pipeline)
+{
+    unlinkVideoSink();
+    BaseSinkController::releaseFromStreamingThread(pipeline);
+}
 
 //END VideoSinkController

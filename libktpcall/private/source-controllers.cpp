@@ -163,8 +163,40 @@ void AudioSourceController::releaseRealSource()
 //BEGIN VideoSourceController
 
 VideoSourceController::VideoSourceController(const QGst::PipelinePtr & pipeline)
-    : BaseSourceController(pipeline)
+    : BaseSourceController(pipeline),
+      m_videoSinkBin(NULL)
 {
+}
+
+VideoSourceController::~VideoSourceController()
+{
+    unlinkVideoPreviewSink();
+}
+
+void VideoSourceController::linkVideoPreviewSink(const QGst::ElementPtr & sink)
+{
+    QGst::PadPtr srcPad = requestSrcPad();
+    m_videoSinkBin = new VideoSinkBin(sink);
+
+    m_pipeline->add(m_videoSinkBin->bin());
+    m_videoSinkBin->bin()->syncStateWithParent();
+    srcPad->link(m_videoSinkBin->bin()->getStaticPad("sink"));
+}
+
+void VideoSourceController::unlinkVideoPreviewSink()
+{
+    if (m_videoSinkBin) {
+        QGst::PadPtr sinkPad = m_videoSinkBin->bin()->getStaticPad("sink");
+        QGst::PadPtr srcPad = sinkPad->peer();
+
+        srcPad->unlink(sinkPad);
+        m_videoSinkBin->bin()->setState(QGst::StateNull);
+        m_pipeline->remove(m_videoSinkBin->bin());
+        delete m_videoSinkBin;
+        m_videoSinkBin = NULL;
+
+        releaseSrcPad(srcPad);
+    }
 }
 
 QGst::ElementPtr VideoSourceController::makeSilenceSource()

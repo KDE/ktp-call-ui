@@ -226,6 +226,33 @@ VideoContentHandler::VideoContentHandler(QObject *parent)
 {
 }
 
+void VideoContentHandler::linkVideoPreviewSink(const QGst::ElementPtr & sink)
+{
+    static_cast<VideoSourceController*>(d->m_sourceController)->linkVideoPreviewSink(sink);
+}
+
+void VideoContentHandler::unlinkVideoPreviewSink()
+{
+    static_cast<VideoSourceController*>(d->m_sourceController)->unlinkVideoPreviewSink();
+}
+
+void VideoContentHandler::linkRemoteMemberVideoSink(const Tp::ContactPtr & contact,
+                                                    const QGst::ElementPtr & sink)
+{
+    if (d->m_sinkControllers.contains(contact)) {
+        BaseSinkController *ctrl = d->m_sinkControllers[contact];
+        static_cast<VideoSinkController*>(ctrl)->linkVideoSink(sink);
+    }
+}
+
+void VideoContentHandler::unlinkRemoteMemberVideoSink(const Tp::ContactPtr & contact)
+{
+    if (d->m_sinkControllers.contains(contact)) {
+        BaseSinkController *ctrl = d->m_sinkControllers[contact];
+        static_cast<VideoSinkController*>(ctrl)->unlinkVideoSink();
+    }
+}
+
 //END VideoContentHandler
 
 #include "moc_call-content-handler.cpp"

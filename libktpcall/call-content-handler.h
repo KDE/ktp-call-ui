@@ -78,7 +78,10 @@ class VideoContentHandler : public CallContentHandler
 {
     Q_OBJECT
 public:
-    //TODO
+    void linkVideoPreviewSink(const QGst::ElementPtr & sink);
+    void unlinkVideoPreviewSink();
+    void linkRemoteMemberVideoSink(const Tp::ContactPtr & contact, const QGst::ElementPtr & sink);
+    void unlinkRemoteMemberVideoSink(const Tp::ContactPtr & contact);
 
 private:
     friend class PendingCallContentHandler;

@@ -13,6 +13,7 @@ set(libktpcall_SRCS
     private/device-element-factory.cpp
     private/phonon-integration.cpp
     private/input-control-bin.cpp
+    private/video-sink-bin.cpp
 )
 
 kde4_add_library(ktpcall STATIC ${libktpcall_SRCS})

@@ -19,6 +19,7 @@
 #define SINK_CONTROLLERS_H
 
 #include "../volume-controller.h"
+#include "video-sink-bin.h"
 #include <TelepathyQt/Contact>
 #include <QGst/Pipeline>
 #include <QGst/Pad>
@@ -65,18 +66,25 @@ class VideoSinkController : public BaseSinkController
 {
 public:
     VideoSinkController();
+    virtual ~VideoSinkController();
 
     QGst::PadPtr requestSrcPad();
     void releaseSrcPad(const QGst::PadPtr & pad);
 
+    void linkVideoSink(const QGst::ElementPtr & sink);
+    void unlinkVideoSink();
+
     virtual void initFromStreamingThread(const QGst::PadPtr & srcPad,
                                          const QGst::PipelinePtr & pipeline);
+    virtual void releaseFromStreamingThread(const QGst::PipelinePtr & pipeline);
 
 private:
     //<ghost src pad, tee request src pad>
     QHash<QGst::PadPtr, QGst::PadPtr> m_pads;
     QGst::ElementPtr m_tee;
     uint m_padNameCounter;
+    VideoSinkBin *m_videoSinkBin;
+    QMutex m_videoSinkMutex;
 };
 
 #endif //SINK_CONTROLLERS_H

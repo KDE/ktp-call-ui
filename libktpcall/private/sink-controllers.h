@@ -18,7 +18,7 @@
 #ifndef SINK_CONTROLLERS_H
 #define SINK_CONTROLLERS_H
 
-#include "volume-controller.h"
+#include "../volume-controller.h"
 #include <TelepathyQt/Contact>
 #include <QGst/Pipeline>
 #include <QGst/Pad>

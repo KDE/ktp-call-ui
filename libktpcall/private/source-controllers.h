@@ -18,8 +18,8 @@
 #ifndef SOURCE_CONTROLLERS_H
 #define SOURCE_CONTROLLERS_H
 
-#include "volume-controller.h"
-#include "private/input-control-bin.h"
+#include "../volume-controller.h"
+#include "input-control-bin.h"
 
 #include <QGst/Pipeline>
 #include <QGst/Pad>

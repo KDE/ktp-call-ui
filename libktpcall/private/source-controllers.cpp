@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "source-controllers.h"
-#include "device-element-factory_p.h"
+#include "device-element-factory.h"
 #include <QGst/ElementFactory>
 #include <QGst/GhostPad>
 #include <QGst/Structure>

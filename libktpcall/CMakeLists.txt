@@ -5,12 +5,13 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(libktpcall_SRCS
     call-channel-handler.cpp
     call-content-handler.cpp
-    source-controllers.cpp
-    sink-controllers.cpp
-    sink-managers.cpp
     volume-controller.cpp
-    device-element-factory.cpp
-    phonon-integration.cpp
+
+    private/source-controllers.cpp
+    private/sink-controllers.cpp
+    private/sink-managers.cpp
+    private/device-element-factory.cpp
+    private/phonon-integration.cpp
     private/input-control-bin.cpp
 )
 
@@ -24,8 +25,5 @@ target_link_libraries(ktpcall
 )
 
 #####
-
-kde4_add_executable(configuration_test configuration_test.cpp device-element-factory.cpp phonon-integration.cpp)
-target_link_libraries(configuration_test ${KDE4_KDECORE_LIBS} ${QT_QTDBUS_LIBRARY} ${QTGSTREAMER_LIBRARIES})
 
 add_subdirectory(tests)

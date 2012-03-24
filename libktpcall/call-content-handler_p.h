@@ -19,9 +19,9 @@
 #define CALL_CONTENT_HANDLER_P_H
 
 #include "call-content-handler.h"
-#include "source-controllers.h"
-#include "sink-controllers.h"
-#include "sink-managers.h"
+#include "private/source-controllers.h"
+#include "private/sink-controllers.h"
+#include "private/sink-managers.h"
 #include "../libqtf/qtf.h"
 #include <QGst/Pipeline>
 #include <QGst/Pad>

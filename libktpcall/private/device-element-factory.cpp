@@ -15,8 +15,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "device-element-factory_p.h"
-#include "phonon-integration_p.h"
+#include "device-element-factory.h"
+#include "phonon-integration.h"
 #include <QGst/Bin>
 #include <QGst/ElementFactory>
 #include <KDebug>

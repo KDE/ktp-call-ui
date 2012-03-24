@@ -22,7 +22,7 @@
     You should have received a copy of the GNU Lesser General Public
     License along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "phonon-integration_p.h"
+#include "phonon-integration.h"
 #include <QtCore/QSettings>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>

@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "sink-managers.h"
-#include "device-element-factory_p.h"
+#include "device-element-factory.h"
 #include <TelepathyQt/ReferencedHandles>
 #include <QGlib/Connect>
 #include <QGst/ElementFactory>

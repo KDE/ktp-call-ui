@@ -84,7 +84,6 @@ CallContentHandlerPrivate::~CallContentHandlerPrivate()
     m_queue->getStaticPad("src")->unlink(m_tfContent->property("sink-pad").get<QGst::PadPtr>());
     m_queue->setState(QGst::StateNull);
     m_sourceController->releaseSrcPad(m_sourceControllerPad);
-    m_sinkManager->unlinkAllPads();
 
     delete m_sourceController;
     delete m_sinkManager;

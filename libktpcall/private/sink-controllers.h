@@ -87,4 +87,7 @@ private:
     QMutex m_videoSinkMutex;
 };
 
+
+Q_DECLARE_METATYPE(BaseSinkController*)
+
 #endif //SINK_CONTROLLERS_H

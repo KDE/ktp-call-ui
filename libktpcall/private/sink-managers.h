@@ -27,10 +27,10 @@ class BaseSinkManager : public QObject
 {
     Q_OBJECT
 public:
+    virtual ~BaseSinkManager();
+
     /* Called from the streaming thread */
     void handleNewSinkPad(uint contactHandle, const QGst::PadPtr & pad);
-
-    void unlinkAllPads();
 
     void setCallContent(const Tp::CallContentPtr & callContent);
 
@@ -51,6 +51,7 @@ private Q_SLOTS:
 
 private:
     void checkForNewContacts(const QList<Tp::ContactPtr> & contacts);
+    void unlinkAllPads();
     /* Called from the streaming thread */
     void onPadUnlinked(const QGst::PadPtr & srcPad);
 
@@ -63,6 +64,7 @@ private:
     QMutex m_mutex;
     QHash<uint, BaseSinkController*> m_controllersWaitingForContact;
     QHash<QGst::PadPtr, BaseSinkController*> m_controllers;
+    QSet<BaseSinkController*> m_releasedControllers;
 };
 
 

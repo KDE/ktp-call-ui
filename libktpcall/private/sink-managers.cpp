@@ -31,6 +31,11 @@ BaseSinkManager::BaseSinkManager(QObject *parent)
 {
 }
 
+BaseSinkManager::~BaseSinkManager()
+{
+    unlinkAllPads();
+}
+
 void BaseSinkManager::handleNewSinkPad(uint contactHandle, const QGst::PadPtr & pad)
 {
     kDebug() << "New src pad" << pad->name() << "from handle" << contactHandle;
@@ -146,10 +151,23 @@ void BaseSinkManager::unlinkAllPads()
         QGlib::disconnect(srcPad, 0, this, 0);
         srcPad->unlink(sinkPad);
 
+        Q_ASSERT(!m_releasedControllers.contains(it.value()));
+
         releaseControllerData(it.value());
-        destroyController(it.value());
+        Q_EMIT controllerDestroyed(it.value());
+        delete it.value();
     }
     m_controllers.clear();
+
+    //this is not empty when onPadUnlinked() was called from the streaming thread
+    //but destroyController() has not yet been executed in the main thread.
+    //since this is the destructor, we need to cleanup because destroyController()
+    //will never be actually executed.
+    Q_FOREACH(BaseSinkController *ctrl, m_releasedControllers) {
+        Q_EMIT controllerDestroyed(ctrl);
+        delete ctrl;
+    }
+    m_releasedControllers.clear();
 }
 
 void BaseSinkManager::onPadUnlinked(const QGst::PadPtr & srcPad)
@@ -177,16 +195,30 @@ void BaseSinkManager::onPadUnlinked(const QGst::PadPtr & srcPad)
         }
     }
 
-    //release data now and delete from the main thread
+    //release data now
     releaseControllerData(ctrl);
-    QMetaObject::invokeMethod(this, "destroyController", Qt::QueuedConnection,
-                              Q_ARG(BaseSinkController*, ctrl));
+
+    //delete from the main thread, if we are not being called from the main thread
+    if (QThread::currentThread() != QCoreApplication::instance()->thread()) {
+        m_releasedControllers.insert(ctrl);
+        QMetaObject::invokeMethod(this, "destroyController", Qt::QueuedConnection,
+                                  Q_ARG(BaseSinkController*, ctrl));
+    } else {
+        Q_EMIT controllerDestroyed(ctrl);
+        delete ctrl;
+    }
+
+    m_controllers.remove(srcPad);
 }
 
 void BaseSinkManager::destroyController(BaseSinkController *controller)
 {
     Q_EMIT controllerDestroyed(controller);
     delete controller;
+
+    m_mutex.lock();
+    m_releasedControllers.remove(controller);
+    m_mutex.unlock();
 }
 
 //END BaseSinkManager

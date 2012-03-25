@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "call-content-handler_p.h"
+#include <TelepathyQt/ReferencedHandles>
 #include <QGlib/Connect>
 #include <QGst/Pad>
 #include <QGst/ElementFactory>
@@ -99,6 +100,8 @@ void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
     QGlib::connect(tfContent, "src-pad-added", this, &CallContentHandlerPrivate::onSrcPadAdded);
     QGlib::connect(tfContent, "start-sending", this, &CallContentHandlerPrivate::onStartSending);
     QGlib::connect(tfContent, "stop-sending", this, &CallContentHandlerPrivate::onStopSending);
+    QGlib::connect(tfContent, "start-receiving", this, &CallContentHandlerPrivate::onStartReceiving);
+    QGlib::connect(tfContent, "stop-receiving", this, &CallContentHandlerPrivate::onStopReceiving);
 
     switch(tfContent->property("media-type").toInt()) {
     case Tp::MediaStreamTypeAudio:
@@ -147,29 +150,85 @@ void CallContentHandlerPrivate::onSrcPadAdded(uint contactHandle,
 bool CallContentHandlerPrivate::onStartSending()
 {
     kDebug() << "Start sending requested";
+
     m_sourceController->connectToSource();
+    Q_EMIT q->localSendingStateChanged(true);
     return true;
 }
 
-bool CallContentHandlerPrivate::onStopSending()
+void CallContentHandlerPrivate::onStopSending()
 {
     kDebug() << "Stop sending requested";
+
     m_sourceController->disconnectFromSource();
+    Q_EMIT q->localSendingStateChanged(false);
+}
+
+bool CallContentHandlerPrivate::onStartReceiving(void *handles, uint handleCount)
+{
+    kDebug() << "Start receiving requested";
+
+    uint *ihandles = reinterpret_cast<uint*>(handles);
+    for (uint i = 0; i < handleCount; ++i) {
+        if (m_handlesToContacts.contains(ihandles[i])) {
+            Tp::ContactPtr contact = m_handlesToContacts[ihandles[i]];
+            Q_ASSERT(m_sinkControllers.contains(contact));
+
+            //if we are not already receiving
+            if (!m_sinkControllers[contact].second) {
+                kDebug() << "Starting receiving from" << contact->alias();
+
+                m_sinkControllers[contact].second = true;
+                Q_EMIT q->remoteSendingStateChanged(contact, true);
+            }
+        }
+    }
     return true;
+}
+
+void CallContentHandlerPrivate::onStopReceiving(void *handles, uint handleCount)
+{
+    kDebug() << "Stop receiving requested";
+
+    uint *ihandles = reinterpret_cast<uint*>(handles);
+    for (uint i = 0; i < handleCount; ++i) {
+        if (m_handlesToContacts.contains(ihandles[i])) {
+            Tp::ContactPtr contact = m_handlesToContacts[ihandles[i]];
+            Q_ASSERT(m_sinkControllers.contains(contact));
+
+            //if we are receiving
+            if (m_sinkControllers[contact].second) {
+                kDebug() << "Stopping receiving from" << contact->alias();
+
+                m_sinkControllers[contact].second = false;
+                Q_EMIT q->remoteSendingStateChanged(contact, false);
+            }
+        }
+    }
 }
 
 void CallContentHandlerPrivate::onControllerCreated(BaseSinkController *controller)
 {
-    kDebug() << "Sink controller created for" << controller->contact()->alias();
-    m_sinkControllers.insert(controller->contact(), controller);
-    Q_EMIT q->remoteMemberJoined(controller->contact());
+    kDebug() << "Sink controller created. Contact:" << controller->contact()->alias()
+             << "media-type:" << m_tfContent->property("media-type").toInt();
+
+    m_sinkControllers.insert(controller->contact(), qMakePair(controller, true));
+    m_handlesToContacts.insert(controller->contact()->handle()[0], controller->contact());
+
+    Q_EMIT q->remoteSendingStateChanged(controller->contact(), true);
 }
 
 void CallContentHandlerPrivate::onControllerDestroyed(BaseSinkController *controller)
 {
-    kDebug() << "Sink controller of" << controller->contact()->alias() << "destroyed";
-    m_sinkControllers.remove(controller->contact());
-    Q_EMIT q->remoteMemberLeft(controller->contact());
+    kDebug() << "Sink controller destroyed. Contact:" << controller->contact()->alias()
+             << "media-type:" << m_tfContent->property("media-type").toInt();
+
+    bool wasReceiving = m_sinkControllers.take(controller->contact()).second;
+    m_handlesToContacts.remove(controller->contact()->handle()[0]);
+
+    if (wasReceiving) {
+        Q_EMIT q->remoteSendingStateChanged(controller->contact(), false);
+    }
 }
 
 //END CallContentHandlerPrivate
@@ -210,9 +269,9 @@ VolumeController *AudioContentHandler::sourceVolumeControl() const
 
 VolumeController *AudioContentHandler::remoteMemberVolumeControl(const Tp::ContactPtr & contact) const
 {
-    const BaseSinkController *ctrl = d->m_sinkControllers.value(contact);
-    if (ctrl) {
-        return static_cast<const AudioSinkController*>(ctrl)->volumeController();
+    if (d->m_sinkControllers.contains(contact)) {
+        BaseSinkController *ctrl = d->m_sinkControllers[contact].first;
+        return static_cast<AudioSinkController*>(ctrl)->volumeController();
     } else {
         return NULL;
     }
@@ -240,7 +299,7 @@ void VideoContentHandler::linkRemoteMemberVideoSink(const Tp::ContactPtr & conta
                                                     const QGst::ElementPtr & sink)
 {
     if (d->m_sinkControllers.contains(contact)) {
-        BaseSinkController *ctrl = d->m_sinkControllers[contact];
+        BaseSinkController *ctrl = d->m_sinkControllers[contact].first;
         static_cast<VideoSinkController*>(ctrl)->linkVideoSink(sink);
     }
 }
@@ -248,7 +307,7 @@ void VideoContentHandler::linkRemoteMemberVideoSink(const Tp::ContactPtr & conta
 void VideoContentHandler::unlinkRemoteMemberVideoSink(const Tp::ContactPtr & contact)
 {
     if (d->m_sinkControllers.contains(contact)) {
-        BaseSinkController *ctrl = d->m_sinkControllers[contact];
+        BaseSinkController *ctrl = d->m_sinkControllers[contact].first;
         static_cast<VideoSinkController*>(ctrl)->unlinkVideoSink();
     }
 }

@@ -74,7 +74,9 @@ private:
                        const QGlib::ObjectPtr & fsStream,
                        const QGst::PadPtr & pad);
     bool onStartSending();
-    bool onStopSending();
+    void onStopSending();
+    bool onStartReceiving(void *handles, uint handleCount);
+    void onStopReceiving(void *handles, uint handleCount);
 
 private Q_SLOTS:
     void onControllerCreated(BaseSinkController *controller);
@@ -82,7 +84,7 @@ private Q_SLOTS:
 
 public: //accessed from the public class
     BaseSourceController *m_sourceController;
-    QHash<Tp::ContactPtr, BaseSinkController*> m_sinkControllers;
+    QHash<Tp::ContactPtr, QPair<BaseSinkController*, bool> > m_sinkControllers; //bool -> receiving state
     Tp::CallContentPtr m_callContent;
 
 private:
@@ -92,6 +94,7 @@ private:
     QGst::PipelinePtr m_pipeline;
     QGst::PadPtr m_sourceControllerPad;
     QGst::ElementPtr m_queue;
+    QHash<uint, Tp::ContactPtr> m_handlesToContacts;
 };
 
 #endif // CALL_CONTENT_HANDLER_P_H

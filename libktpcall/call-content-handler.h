@@ -46,8 +46,8 @@ public:
     Tp::Contacts remoteMembers() const;
 
 Q_SIGNALS:
-    void remoteMemberJoined(const Tp::ContactPtr & contact);
-    void remoteMemberLeft(const Tp::ContactPtr & contact);
+    void localSendingStateChanged(bool sending);
+    void remoteSendingStateChanged(const Tp::ContactPtr & contact, bool sending);
 
 protected:
     explicit CallContentHandler(QObject *parent = 0);

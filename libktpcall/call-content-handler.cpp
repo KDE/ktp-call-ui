@@ -81,7 +81,9 @@ CallContentHandlerPrivate::~CallContentHandlerPrivate()
 {
     kDebug();
     m_sourceControllerPad->unlink(m_queue->getStaticPad("sink"));
-    m_queue->getStaticPad("src")->unlink(m_tfContent->property("sink-pad").get<QGst::PadPtr>());
+    if (m_tfContent->property("sink-pad").get<QGst::PadPtr>()) {
+        m_queue->getStaticPad("src")->unlink(m_tfContent->property("sink-pad").get<QGst::PadPtr>());
+    }
     m_queue->setState(QGst::StateNull);
     m_sourceController->releaseSrcPad(m_sourceControllerPad);
 

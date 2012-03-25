@@ -183,6 +183,7 @@ void CallChannelHandlerPrivate::onFsConferenceRemoved(const QGst::ElementPtr & c
 {
     kDebug() << "Removing fsconference from the pipeline";
     m_pipeline->remove(conference);
+    conference->setState(QGst::StateNull);
 }
 
 void CallChannelHandlerPrivate::onBusMessage(const QGst::MessagePtr & message)

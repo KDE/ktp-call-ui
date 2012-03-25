@@ -140,6 +140,7 @@ void VideoSinkController::linkVideoSink(const QGst::ElementPtr & sink)
     //anything about this content's src pad, so nobody can possibly link
     //a video sink before the bin is created.
     Q_ASSERT(m_bin);
+    kDebug();
 
     QGst::PadPtr srcPad = m_tee->getRequestPad("src%d");
     m_videoSinkBin = new VideoSinkBin(sink);
@@ -157,6 +158,8 @@ void VideoSinkController::unlinkVideoSink()
     QMutexLocker l(&m_videoSinkMutex);
 
     if (m_videoSinkBin) {
+        kDebug();
+
         QGst::PadPtr sinkPad = m_videoSinkBin->bin()->getStaticPad("sink");
         QGst::PadPtr srcPad = sinkPad->peer();
 

@@ -175,6 +175,8 @@ VideoSourceController::~VideoSourceController()
 
 void VideoSourceController::linkVideoPreviewSink(const QGst::ElementPtr & sink)
 {
+    kDebug();
+
     QGst::PadPtr srcPad = requestSrcPad();
     m_videoSinkBin = new VideoSinkBin(sink);
 
@@ -186,6 +188,8 @@ void VideoSourceController::linkVideoPreviewSink(const QGst::ElementPtr & sink)
 void VideoSourceController::unlinkVideoPreviewSink()
 {
     if (m_videoSinkBin) {
+        kDebug();
+
         QGst::PadPtr sinkPad = m_videoSinkBin->bin()->getStaticPad("sink");
         QGst::PadPtr srcPad = sinkPad->peer();
 

@@ -62,7 +62,7 @@ void StatusArea::showAudioStatusIcon(bool show)
     if (show) {
         if (!m_audioStatusIcon) {
             QLabel *label = new QLabel;
-            label->setPixmap(KIcon("voicecall").pixmap(16));
+            label->setPixmap(KIcon("audio-headset").pixmap(16));
             m_audioStatusIcon = label;
             m_statusBar->insertPermanentWidget(1, m_audioStatusIcon.data());
         } else {

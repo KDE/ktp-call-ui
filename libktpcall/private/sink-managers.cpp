@@ -33,7 +33,6 @@ BaseSinkManager::BaseSinkManager(QObject *parent)
 
 BaseSinkManager::~BaseSinkManager()
 {
-    unlinkAllPads();
 }
 
 void BaseSinkManager::handleNewSinkPad(uint contactHandle, const QGst::PadPtr & pad)

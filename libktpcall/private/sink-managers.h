@@ -29,6 +29,12 @@ class BaseSinkManager : public QObject
 public:
     virtual ~BaseSinkManager();
 
+    /* This needs to be called before the destructor.
+     * It is a public function because it calls pure virtual functions internally,
+     * so it cannot be called from inside the destructor.
+     */
+    void unlinkAllPads();
+
     /* Called from the streaming thread */
     void handleNewSinkPad(uint contactHandle, const QGst::PadPtr & pad);
 
@@ -51,7 +57,6 @@ private Q_SLOTS:
 
 private:
     void checkForNewContacts(const QList<Tp::ContactPtr> & contacts);
-    void unlinkAllPads();
     /* Called from the streaming thread */
     void onPadUnlinked(const QGst::PadPtr & srcPad);
 

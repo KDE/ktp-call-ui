@@ -86,6 +86,7 @@ CallContentHandlerPrivate::~CallContentHandlerPrivate()
     }
     m_queue->setState(QGst::StateNull);
     m_sourceController->releaseSrcPad(m_sourceControllerPad);
+    m_sinkManager->unlinkAllPads();
 
     delete m_sourceController;
     delete m_sinkManager;

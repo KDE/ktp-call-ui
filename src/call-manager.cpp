@@ -16,6 +16,7 @@
 */
 #include "call-manager.h"
 #include "call-window.h"
+#include "approver.h"
 #include "../libktpcall/call-channel-handler.h"
 
 #include <KDebug>
@@ -26,6 +27,7 @@ struct CallManager::Private
     Tp::CallChannelPtr callChannel;
     CallChannelHandler *channelHandler;
     QWeakPointer<CallWindow> callWindow;
+    QWeakPointer<Approver> approver;
 };
 
 CallManager::CallManager(const Tp::CallChannelPtr & callChannel, QObject *parent)
@@ -83,7 +85,10 @@ void CallManager::onCallStateChanged(Tp::CallState state)
             ensureCallWindow();
             d->callWindow.data()->setStatus(CallWindow::StatusRemoteRinging);
         } else {
-            //TODO show approver
+            //show approver
+            d->approver = new Approver(d->callChannel, this);
+            connect(d->approver.data(), SIGNAL(channelAccepted()), SLOT(onCallAccepted()));
+            connect(d->approver.data(), SIGNAL(channelRejected()), SLOT(onCallRejected()));
             (void) d->callChannel->setRinging();
         }
         break;
@@ -93,12 +98,19 @@ void CallManager::onCallStateChanged(Tp::CallState state)
             ensureCallWindow();
             d->callWindow.data()->setStatus(CallWindow::StatusRemoteAccepted);
         } else {
-            //hide approver (TODO) - show call window
+            //hide approver & show call window
+            delete d->approver.data();
             ensureCallWindow();
             d->callWindow.data()->setStatus(CallWindow::StatusConnecting);
         }
         break;
     case Tp::CallStateActive:
+        //normally the approver is already deleted and the call window
+        //already exists at this point, but we just want to be safe
+        //in case the CM decides to do a weird state jump
+        if (!d->callChannel->isRequested()) {
+            delete d->approver.data();
+        }
         ensureCallWindow();
         d->callWindow.data()->setStatus(CallWindow::StatusActive);
         break;
@@ -116,13 +128,25 @@ void CallManager::onCallStateChanged(Tp::CallState state)
             //after shutting down the channelHandler
             connect(d->callWindow.data(), SIGNAL(destroyed()), d->channelHandler, SLOT(shutdown()));
         } else {
-            //TODO if the approver was running, tell the user that he missed the call
+            //missed the call
+            kDebug() << "missed call";
+            delete d->approver.data();
             d->channelHandler->shutdown();
         }
         break;
     default:
         Q_ASSERT(false);
     }
+}
+
+void CallManager::onCallAccepted()
+{
+    (void) d->callChannel->accept();
+}
+
+void CallManager::onCallRejected()
+{
+    (void) d->callChannel->hangup(Tp::CallStateChangeReasonRejected, TP_QT_ERROR_REJECTED);
 }
 
 void CallManager::ensureCallWindow()
@@ -136,5 +160,10 @@ void CallManager::ensureCallWindow()
                 d->callWindow.data(), SLOT(onContentAdded(CallContentHandler*)));
         connect(d->channelHandler, SIGNAL(contentRemoved(CallContentHandler*)),
                 d->callWindow.data(), SLOT(onContentRemoved(CallContentHandler*)));
+
+        //inform the ui about already existing contents
+        Q_FOREACH(CallContentHandler *content, d->channelHandler->contents()) {
+            d->callWindow.data()->onContentAdded(content);
+        }
     }
 }

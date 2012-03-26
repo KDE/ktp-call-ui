@@ -29,6 +29,8 @@ public:
 
 private Q_SLOTS:
     void onCallStateChanged(Tp::CallState state);
+    void onCallAccepted();
+    void onCallRejected();
 
 private:
     void ensureCallWindow();

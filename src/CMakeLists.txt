@@ -8,6 +8,7 @@ set(ktp-call-ui_SRCS
     dtmf-widget.cpp
     status-area.cpp
     call-manager.cpp
+    approver.cpp
 )
 
 kde4_add_ui_files(ktp-call-ui_SRCS call-window.ui dtmf-widget.ui)

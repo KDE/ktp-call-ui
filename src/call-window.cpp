@@ -33,6 +33,8 @@
 #include <KLocalizedString>
 #include <KToggleAction>
 #include <KActionCollection>
+#include <KToolBar>
+
 #include <QGst/ElementFactory>
 
 struct CallWindow::Private
@@ -75,6 +77,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     setupActions();
     setupGUI(QSize(428, 395), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
+    toolBar()->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     DtmfHandler *handler = new DtmfHandler(d->callChannel, this);
     handler->connectDtmfWidget(d->ui.dtmfWidget);
@@ -349,7 +352,7 @@ void CallWindow::setupActions()
     d->holdAction->setEnabled(false);
     actionCollection()->addAction("hold", d->holdAction);
 
-    d->hangupAction = new KAction(KIcon("application-exit"), i18nc("@action", "Hangup"), this);
+    d->hangupAction = new KAction(KIcon("call-stop"), i18nc("@action", "Hangup"), this);
     connect(d->hangupAction, SIGNAL(triggered()), SLOT(hangup()));
     actionCollection()->addAction("hangup", d->hangupAction);
 }

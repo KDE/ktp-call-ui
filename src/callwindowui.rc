@@ -25,14 +25,14 @@
 
   <ToolBar name="mainToolBar" position="bottom" >
     <text>Main Toolbar</text>
-    <Action name="showMyVideo" />
-    <Action name="showDtmf" />
-    <Separator />
-    <Action name="sendVideo" />
-    <Action name="mute" />
-    <Separator />
-    <Action name="hold" />
     <Action name="hangup" />
+    <Action name="hold" />
+    <Separator />
+    <Action name="showDtmf" />
+    <Action name="showMyVideo" />
+    <Separator />
+    <Action name="mute" />
+    <Action name="sendVideo" />
   </ToolBar>
 
 </gui>

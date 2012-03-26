@@ -33,10 +33,15 @@
 #include <KLocalizedString>
 #include <KToggleAction>
 #include <KActionCollection>
+#include <QGst/ElementFactory>
 
 struct CallWindow::Private
 {
-    Private() : callEnded(false) {}
+    Private() :
+        callEnded(false),
+        currentVideoDisplayState(NoVideo),
+        videoContentHandler(NULL)
+    {}
 
     Tp::CallChannelPtr callChannel;
     CallChannelHandler *channelHandler;
@@ -51,7 +56,9 @@ struct CallWindow::Private
     KToggleAction *holdAction;
     KAction *hangupAction;
 
-    QWidget *dtmfToggleLastPage;
+    VideoDisplayFlags currentVideoDisplayState;
+    VideoContentHandler *videoContentHandler;
+    Tp::ContactPtr remoteVideoContact;
 };
 
 /*! This constructor is used to handle an incoming call, in which case
@@ -66,7 +73,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     d->ui.setupUi(this);
     d->statusArea = new StatusArea(statusBar());
     setupActions();
-    setupGUI(QSize(430, 300), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
+    setupGUI(QSize(428, 395), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
 
     DtmfHandler *handler = new DtmfHandler(d->callChannel, this);
@@ -185,12 +192,8 @@ void CallWindow::setStatus(Status status, const Tp::CallStateReason & reason)
                           "Disconnected: %1", message));
         }
 
+        changeVideoDisplayState(NoVideo);
         d->statusArea->stopDurationTimer();
-
-        //TODO go back to the audio call page somehow
-        //d->ui.stackedWidget->setCurrentWidget(d->ui.audioCallPage);
-        d->ui.audioCallPage->setEnabled(false);
-
         d->callEnded = true;
         break;
       }
@@ -214,6 +217,19 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
         connect(d->muteAction, SIGNAL(toggled(bool)),
                 audioContentHandler->sourceVolumeControl(), SLOT(setMuted(bool)));
     } else {
+        if (d->videoContentHandler) {
+            kError() << "Multiple video contents are not supported";
+            return;
+        }
+
+        d->videoContentHandler = qobject_cast<VideoContentHandler*>(contentHandler);
+        Q_ASSERT(d->videoContentHandler);
+
+        connect(d->videoContentHandler, SIGNAL(localSendingStateChanged(bool)),
+                SLOT(onLocalVideoSendingStateChanged(bool)));
+        connect(d->videoContentHandler, SIGNAL(remoteSendingStateChanged(Tp::ContactPtr,bool)),
+                SLOT(onRemoteVideoSendingStateChanged(Tp::ContactPtr,bool)));
+
         d->statusArea->showVideoStatusIcon(true);
     }
 }
@@ -226,8 +242,79 @@ void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
         d->statusArea->showAudioStatusIcon(false);
         d->muteAction->setEnabled(false);
     } else {
+        if (d->videoContentHandler && d->videoContentHandler == contentHandler) {
+            changeVideoDisplayState(NoVideo);
+            d->videoContentHandler = NULL;
+            d->remoteVideoContact.reset();
+        }
+
         d->statusArea->showVideoStatusIcon(false);
     }
+}
+
+void CallWindow::onLocalVideoSendingStateChanged(bool sending)
+{
+    kDebug();
+
+    if (sending) {
+        changeVideoDisplayState(d->currentVideoDisplayState | LocalVideoPreview);
+    } else {
+        changeVideoDisplayState(d->currentVideoDisplayState & ~LocalVideoPreview);
+    }
+}
+
+void CallWindow::onRemoteVideoSendingStateChanged(const Tp::ContactPtr & contact, bool sending)
+{
+    kDebug();
+
+    if (d->remoteVideoContact && d->remoteVideoContact != contact) {
+        kError() << "Multiple participants are not supported";
+        return;
+    }
+
+    if (!d->remoteVideoContact) {
+        d->remoteVideoContact = contact;
+    }
+
+    if (sending) {
+        changeVideoDisplayState(d->currentVideoDisplayState | RemoteVideo);
+    } else {
+        changeVideoDisplayState(d->currentVideoDisplayState & ~RemoteVideo);
+    }
+}
+
+void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
+{
+    static const char * const preferredSinkFactory = "xvimagesink";
+    VideoDisplayFlags oldState = d->currentVideoDisplayState;
+
+    if (oldState.testFlag(LocalVideoPreview) && !newState.testFlag(LocalVideoPreview)) {
+        d->videoContentHandler->unlinkVideoPreviewSink();
+        d->ui.videoPreviewWidget->setVideoSink(QGst::ElementPtr());
+        d->ui.videoPreviewWidget->hide();
+    } else if (!oldState.testFlag(LocalVideoPreview) && newState.testFlag(LocalVideoPreview)) {
+        QGst::ElementPtr sink = QGst::ElementFactory::make(preferredSinkFactory);
+        d->ui.videoPreviewWidget->show();
+        d->ui.videoPreviewWidget->setVideoSink(sink);
+        d->videoContentHandler->linkVideoPreviewSink(sink);
+    }
+
+    if (oldState.testFlag(RemoteVideo) && !newState.testFlag(RemoteVideo)) {
+        d->videoContentHandler->unlinkRemoteMemberVideoSink(d->remoteVideoContact);
+        d->ui.videoWidget->setVideoSink(QGst::ElementPtr());
+    } else if (!oldState.testFlag(RemoteVideo) && newState.testFlag(RemoteVideo)) {
+        QGst::ElementPtr sink = QGst::ElementFactory::make(preferredSinkFactory);
+        d->ui.videoWidget->setVideoSink(sink);
+        d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, sink);
+    }
+
+    if (newState == NoVideo) {
+        d->ui.callStackedWidget->setCurrentIndex(0);
+    } else {
+        d->ui.callStackedWidget->setCurrentIndex(1);
+    }
+
+    d->currentVideoDisplayState = newState;
 }
 
 void CallWindow::setupActions()
@@ -279,19 +366,14 @@ void CallWindow::checkEnableDtmf()
     kDebug() << "DTMF supported:" << dtmfSupported;
     d->showDtmfAction->setEnabled(dtmfSupported);
 
-    if (!dtmfSupported && d->ui.stackedWidget->currentWidget() == d->ui.dtmfPage) {
+    if (!dtmfSupported) {
         toggleDtmf(false);
     }
 }
 
 void CallWindow::toggleDtmf(bool checked)
 {
-    if (checked) {
-        d->dtmfToggleLastPage = d->ui.stackedWidget->currentWidget();
-        d->ui.stackedWidget->setCurrentWidget(d->ui.dtmfPage);
-    } else {
-        d->ui.stackedWidget->setCurrentWidget(d->dtmfToggleLastPage);
-    }
+    d->ui.dtmfStackedWidget->setCurrentIndex(checked ? 1 : 0);
 }
 
 void CallWindow::hangup()

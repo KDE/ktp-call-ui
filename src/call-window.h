@@ -42,8 +42,19 @@ public:
 public Q_SLOTS:
     void onContentAdded(CallContentHandler *contentHandler);
     void onContentRemoved(CallContentHandler *contentHandler);
+    void onLocalVideoSendingStateChanged(bool sending);
+    void onRemoteVideoSendingStateChanged(const Tp::ContactPtr & contact, bool sending);
 
 private:
+    enum VideoDisplayFlag {
+        NoVideo = 0,
+        LocalVideoPreview = 0x1,
+        RemoteVideo = 0x2
+    };
+    Q_DECLARE_FLAGS(VideoDisplayFlags, VideoDisplayFlag);
+
+    void changeVideoDisplayState(VideoDisplayFlags newState);
+
     void setupActions();
     void checkEnableDtmf();
 

@@ -89,6 +89,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
                     "<span style=\" font-weight:600;\">%2</span></p>"
                 "</body></html>")
                 .arg(remoteMember->avatarData().fileName, remoteMember->alias()));
+        setWindowTitle(i18n("Call with %1", remoteMember->alias()));
     }
 }
 

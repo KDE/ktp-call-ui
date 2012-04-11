@@ -53,6 +53,7 @@ private:
     QGst::PipelinePtr m_pipeline;
     QTf::ChannelPtr m_tfChannel;
     uint m_channelClosedCounter;
+    QList<QGlib::ObjectPtr> m_fsElementAddedNotifiers;
 
 public:
     Tp::CallChannelPtr m_callChannel;
@@ -139,6 +140,7 @@ void CallChannelHandlerPrivate::onTfChannelClosed()
     Q_ASSERT(m_pipeline);
     m_pipeline->bus()->removeSignalWatch();
     m_pipeline->setState(QGst::StateNull);
+    m_fsElementAddedNotifiers.clear();
 
     if (++m_channelClosedCounter == 2) {
         kDebug() << "emit channelClosed()";
@@ -175,6 +177,7 @@ void CallChannelHandlerPrivate::onContentRemoved(const QTf::ContentPtr & tfConte
 void CallChannelHandlerPrivate::onFsConferenceAdded(const QGst::ElementPtr & conference)
 {
     kDebug() << "Adding fsconference in the pipeline";
+    m_fsElementAddedNotifiers.append(QTf::loadFsElementAddedNotifier(conference, m_pipeline));
     m_pipeline->add(conference);
     conference->syncStateWithParent();
 }

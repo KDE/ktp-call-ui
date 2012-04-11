@@ -17,8 +17,11 @@
 */
 #include "qtf.h"
 #include <QGlib/Quark>
+#include <QGst/Bin>
 #include <TelepathyQt/Farstream/PendingChannel>
 #include <telepathy-farstream/telepathy-farstream.h>
+#include <farstream/fs-utils.h>
+#include <farstream/fs-element-added-notifier.h>
 
 //BEGIN generated code
 
@@ -77,6 +80,21 @@ void init()
     Private::registerWrapperConstructors();
 }
 
+QGlib::ObjectPtr loadFsElementAddedNotifier(const QGst::ElementPtr & fsConference,
+                                            const QGst::BinPtr & pipeline)
+{
+    GKeyFile *keyfile = fs_utils_get_default_element_properties(fsConference);
+
+    if (keyfile) {
+        FsElementAddedNotifier *notifier = fs_element_added_notifier_new();
+        fs_element_added_notifier_set_properties_from_keyfile(notifier, keyfile);
+        fs_element_added_notifier_add(notifier, pipeline);
+
+        return QGlib::ObjectPtr::wrap(G_OBJECT(notifier), false);
+    }
+
+    return QGlib::ObjectPtr();
+}
 
 PendingChannel::PendingChannel(const Tp::CallChannelPtr& callChannel)
     : PendingOperation(callChannel)

@@ -69,6 +69,11 @@ class QTF_EXPORT Content : public QGlib::Object
 QTF_EXPORT void init();
 
 
+QTF_EXPORT QGlib::ObjectPtr loadFsElementAddedNotifier(
+            const QGst::ElementPtr & fsConference,
+            const QGst::BinPtr & pipeline);
+
+
 /** Constructs a new QTf::Channel from a Tp::CallChannel */
 class QTF_EXPORT PendingChannel : public Tp::PendingOperation
 {

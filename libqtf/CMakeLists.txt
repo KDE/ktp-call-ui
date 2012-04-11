@@ -3,10 +3,12 @@
 # in their public headers instead of doing forward declarations.
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TP_FARSTREAM REQUIRED telepathy-farstream)
+pkg_check_modules(FARSTREAM REQUIRED farstream-0.1)
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${TP_FARSTREAM_INCLUDE_DIRS}
+    ${FARSTREAM_INCLUDE_DIRS}
     ${TELEPATHY_QT4_FARSTREAM_INCLUDE_DIR}
 )
 
@@ -21,5 +23,6 @@ kde4_add_library(qtf STATIC qtf.cpp)
 target_link_libraries(qtf
     ${QTGSTREAMER_LIBRARIES}
     ${TP_FARSTREAM_LDFLAGS}
+    ${FARSTREAM_LDFLAGS}
     ${TELEPATHY_QT4_FARSTREAM_LIBRARIES}
 )

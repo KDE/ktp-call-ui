@@ -215,11 +215,16 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
         Q_ASSERT(audioContentHandler);
 
         checkEnableDtmf();
+
+        VolumeController *vol = audioContentHandler->sourceVolumeControl();
+        d->muteAction->setEnabled(vol->volumeControlSupported());
+        connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
+                d->muteAction, SLOT(setEnabled(bool)));
+        d->muteAction->setChecked(vol->isMuted());
+        connect(vol, SIGNAL(mutedChanged(bool)), d->muteAction, SLOT(setChecked(bool)));
+        d->muteAction->setProperty("volumeController", QVariant::fromValue<QObject*>(vol));
+
         d->statusArea->showAudioStatusIcon(true);
-        d->muteAction->setEnabled(true);
-        d->muteAction->setChecked(audioContentHandler->sourceVolumeControl()->isMuted());
-        connect(d->muteAction, SIGNAL(toggled(bool)),
-                audioContentHandler->sourceVolumeControl(), SLOT(setMuted(bool)));
     } else {
         if (d->videoContentHandler) {
             kError() << "Multiple video contents are not supported";
@@ -243,8 +248,15 @@ void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
     kDebug() << "Content removed:" << contentHandler->callContent()->name();
 
     if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
-        d->statusArea->showAudioStatusIcon(false);
+        AudioContentHandler *audioContentHandler = qobject_cast<AudioContentHandler*>(contentHandler);
+        Q_ASSERT(audioContentHandler);
+
+        VolumeController *vol = audioContentHandler->sourceVolumeControl();
+        disconnect(vol, NULL, d->muteAction, NULL);
         d->muteAction->setEnabled(false);
+        d->muteAction->setProperty("volumeController", QVariant());
+
+        d->statusArea->showAudioStatusIcon(false);
     } else {
         if (d->videoContentHandler && d->videoContentHandler == contentHandler) {
             changeVideoDisplayState(NoVideo);
@@ -344,6 +356,7 @@ void CallWindow::setupActions()
     d->muteAction = new KToggleAction(KIcon("audio-volume-medium"), i18nc("@action", "Mute"), this);
     d->muteAction->setCheckedState(KGuiItem(i18nc("@action", "Mute"), KIcon("audio-volume-muted")));
     d->muteAction->setEnabled(false); //will be enabled later
+    connect(d->muteAction, SIGNAL(toggled(bool)), SLOT(toggleMute(bool)));
     actionCollection()->addAction("mute", d->muteAction);
 
     //TODO implement this feature
@@ -378,6 +391,18 @@ void CallWindow::checkEnableDtmf()
 void CallWindow::toggleDtmf(bool checked)
 {
     d->ui.dtmfStackedWidget->setCurrentIndex(checked ? 1 : 0);
+}
+
+void CallWindow::toggleMute(bool checked)
+{
+    //this slot is here to avoid connecting the mute button directly to the VolumeController
+    //as there is a signal loop: toggled() -> setMuted() -> mutedChanged() -> setChecked()
+    QObject *volControl = qvariant_cast<QObject*>(sender()->property("volumeController"));
+    if (volControl) {
+        sender()->blockSignals(true);
+        volControl->setProperty("muted", checked);
+        sender()->blockSignals(false);
+    }
 }
 
 void CallWindow::hangup()

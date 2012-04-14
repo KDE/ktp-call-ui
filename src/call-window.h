@@ -60,6 +60,7 @@ private:
 
 private Q_SLOTS:
     void toggleDtmf(bool checked);
+    void toggleMute(bool checked);
     void hangup();
 
 protected:

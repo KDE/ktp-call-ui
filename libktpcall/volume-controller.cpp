@@ -71,6 +71,8 @@ void VolumeController::setElement(const QGst::StreamVolumePtr & streamVolumeElem
 
     if (emitChanged) {
         Q_EMIT volumeControlSupportedChanged(volumeControlSupported());
+        Q_EMIT mutedChanged(isMuted());
+        Q_EMIT volumeChanged(volume());
     }
 }
 

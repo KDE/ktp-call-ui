@@ -54,7 +54,9 @@ Approver::Approver(const Tp::CallChannelPtr & channel, QObject *parent)
         m_notification.data()->setPixmap(pixmap);
     }
 
-    m_notification.data()->setActions(QStringList() << i18n("Answer") << i18n("Reject"));
+    m_notification.data()->setActions(QStringList()
+            << i18nc("action, answers the incoming call", "Answer")
+            << i18nc("action, rejects the incoming call", "Reject"));
     connect(m_notification.data(), SIGNAL(action1Activated()), SIGNAL(channelAccepted()));
     connect(m_notification.data(), SIGNAL(action2Activated()), SIGNAL(channelRejected()));
 
@@ -75,8 +77,10 @@ Approver::Approver(const Tp::CallChannelPtr & channel, QObject *parent)
     m_notifierItem->setStandardActionsEnabled(false);
     m_notifierItem->setTitle(title);
     m_notifierItem->setToolTip(QLatin1String("internet-telephony"), message, QString());
-    m_notifierItem->contextMenu()->addAction(i18n("Answer"), this, SIGNAL(channelAccepted()));
-    m_notifierItem->contextMenu()->addAction(i18n("Reject"), this, SIGNAL(channelRejected()));
+    m_notifierItem->contextMenu()->addAction(i18nc("action, answers the incoming call", "Answer"),
+                                             this, SIGNAL(channelAccepted()));
+    m_notifierItem->contextMenu()->addAction(i18nc("action, rejects the incoming call", "Reject"),
+                                             this, SIGNAL(channelRejected()));
     connect(m_notifierItem, SIGNAL(activateRequested(bool,QPoint)), SIGNAL(channelAccepted()));
 }
 

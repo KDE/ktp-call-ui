@@ -19,6 +19,7 @@
 #include "phonon-integration.h"
 #include <QGst/Bin>
 #include <QGst/ElementFactory>
+#include <QGst/Structure>
 #include <KDebug>
 #include <KConfig>
 #include <KConfigGroup>
@@ -44,6 +45,7 @@ QGst::ElementPtr DeviceElementFactory::makeAudioCaptureElement()
     //first try pulseaudio,
     element = tryElement("pulsesrc");
     if (element) {
+        addStreamProperties(element);
         return element;
     }
 
@@ -97,7 +99,7 @@ QGst::ElementPtr DeviceElementFactory::makeAudioOutputElement()
     //first try pulseaudio,
     element = tryElement("pulsesink");
     if (element) {
-        //TODO set category somehow...
+        addStreamProperties(element);
         return element;
     }
 
@@ -199,4 +201,13 @@ QGst::ElementPtr DeviceElementFactory::tryOverrideForKey(const char *keyName)
     }
 
     return element;
+}
+
+void DeviceElementFactory::addStreamProperties (QGst::ElementPtr element)
+{
+    // Echo cancellation magic
+    QGst::Structure streamProperties("stream-properties");
+    streamProperties.setValue("media.role", "phone");
+    streamProperties.setValue("filter.want", "echo-cancel");
+    element->setProperty("stream-properties", streamProperties);
 }

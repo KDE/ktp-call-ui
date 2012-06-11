@@ -27,8 +27,27 @@ static inline Tp::ChannelClassSpecList channelClassSpecList()
                                       << Tp::ChannelClassSpec::videoCallWithAudio();
 }
 
+static inline Tp::AbstractClientHandler::Capabilities capabilities()
+{
+    Tp::AbstractClientHandler::Capabilities caps;
+
+    //we support both audio and video in calls
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/audio"));
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/video"));
+
+    //transport methods - farstream supports them all
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/ice"));
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/galk-p2p"));
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/shm"));
+
+    //significant codecs
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/video/h264"));
+
+    return caps;
+}
+
 CallHandler::CallHandler()
-    : Tp::AbstractClientHandler(channelClassSpecList())
+    : Tp::AbstractClientHandler(channelClassSpecList(), capabilities())
 {
     kDebug();
 }

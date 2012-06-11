@@ -39,7 +39,7 @@ CallHandler::~CallHandler()
 
 bool CallHandler::bypassApproval() const
 {
-    return false;
+    return true;
 }
 
 void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & context,

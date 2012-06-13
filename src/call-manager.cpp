@@ -117,6 +117,9 @@ void CallManager::onCallStateChanged(Tp::CallState state)
         }
         ensureCallWindow();
         d->callWindow.data()->setStatus(CallWindow::StatusActive);
+        if(d->callChannel.data()->hasInterface(TP_QT_IFACE_CHANNEL_INTERFACE_HOLD)) {
+            d->callWindow.data()->enableHoldButton(true);
+        }
         break;
     case Tp::CallStateEnded:
         //if we requested the call, make sure we have a window to show the error (if any)
@@ -137,6 +140,7 @@ void CallManager::onCallStateChanged(Tp::CallState state)
             delete d->approver.data();
             d->channelHandler->shutdown();
         }
+        d->callWindow.data()->enableHoldButton(false);
         break;
     default:
         Q_ASSERT(false);

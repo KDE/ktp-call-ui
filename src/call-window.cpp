@@ -34,6 +34,7 @@
 #include <KToggleAction>
 #include <KActionCollection>
 #include <KToolBar>
+#include <KMessageWidget>
 
 #include <QGst/ElementFactory>
 
@@ -363,10 +364,10 @@ void CallWindow::setupActions()
     connect(d->muteAction, SIGNAL(toggled(bool)), SLOT(toggleMute(bool)));
     actionCollection()->addAction("mute", d->muteAction);
 
-    //TODO implement this feature
     d->holdAction = new KToggleAction(i18nc("@action", "Hold"), this);
     d->holdAction->setIcon(KIcon("media-playback-pause"));
-    d->holdAction->setEnabled(false);
+    d->holdAction->setDisabled(true);
+    connect(d->holdAction, SIGNAL(toggled(bool)), SLOT(hold(bool)));
     actionCollection()->addAction("hold", d->holdAction);
 
     d->hangupAction = new KAction(KIcon("call-stop"), i18nc("@action", "Hangup"), this);
@@ -423,5 +424,71 @@ void CallWindow::closeEvent(QCloseEvent *event)
         event->ignore();
     } else {
         KXmlGuiWindow::closeEvent(event);
+    }
+}
+
+void CallWindow::hold(bool holdCall)
+{
+    kDebug();
+    Tp::PendingOperation* holdRequest = d->callChannel->requestHold(holdCall);
+
+    connect(holdRequest, SIGNAL(finished(Tp::PendingOperation*)),
+            SLOT(operationFinished(Tp::PendingOperation*)));
+}
+
+void CallWindow::enableHoldButton(bool enable)
+{
+    connect(d->callChannel.data(), SIGNAL(localHoldStateChanged(Tp::LocalHoldState,Tp::LocalHoldStateReason)),
+            SLOT(holdStatus(Tp::LocalHoldState,Tp::LocalHoldStateReason)));
+    d->holdAction->setEnabled(enable);
+}
+
+void CallWindow::operationFinished(Tp::PendingOperation* operation)
+{
+    if(!operation->isError()) {
+        KMessageWidget *pauseError = new KMessageWidget("There was a error while pausing the call", this);
+        pauseError->setMessageType(KMessageWidget::Error);
+        pauseError->setMinimumWidth(this->width());
+        pauseError->animatedShow();
+    }
+}
+
+void CallWindow::holdStatus(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason)
+{
+    kDebug() << "Updating hold status" << state << " " << reason;
+
+    switch (state) {
+    case Tp::LocalHoldStateHeld:
+        if(reason == Tp::LocalHoldStateReasonRequested) {
+            d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Call held"));
+        } else if(reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
+            d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Some call resources were not available"));
+        } else if(reason == Tp::LocalHoldStateReasonNone) {
+            d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Unknown error"));
+        }
+        d->holdAction->setIcon(KIcon("media-playback-start"));
+        break;
+
+    case Tp::LocalHoldStateUnheld:
+        if(reason == Tp::LocalHoldStateReasonRequested) {
+            d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Call successfully resumed"));
+        } else if(reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
+            d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Some call resources were not available"));
+        } else if(reason == Tp::LocalHoldStateReasonNone) {
+            d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Unknown error"));
+        }
+        d->holdAction->setIcon(KIcon("media-playback-pause"));
+        break;
+
+    case Tp::LocalHoldStatePendingHold:
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Trying to hold the call"));
+        break;
+
+    case Tp::LocalHoldStatePendingUnhold:
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Trying to resume the call"));
+        break;
+
+    default:
+        d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Internal Error"));
     }
 }

@@ -19,6 +19,7 @@ set(libktpcall_SRCS
 kde4_add_library(ktpcall STATIC ${libktpcall_SRCS})
 target_link_libraries(ktpcall
     ${KDE4_KDECORE_LIBS}
+    ${KDE4_PHONON_LIBRARY}
     ${QT_QTDBUS_LIBRARY}
     ${QTGSTREAMER_LIBRARIES}
     ${TELEPATHY_QT4_LIBRARIES}

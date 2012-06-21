@@ -146,7 +146,24 @@ QGst::ElementPtr DeviceElementFactory::makeVideoCaptureElement()
         return element;
     }
 
-    //TODO implement phonon settings
+
+    //Phonon integration
+    QList<Phonon::DeviceAccessList> phononDeviceLists
+        = PhononIntegration::readDevices(Phonon::VideoCaptureDeviceType, Phonon::CommunicationCaptureCategory);
+
+    Q_FOREACH (const Phonon::DeviceAccessList & deviceList, phononDeviceLists) {
+        Q_FOREACH (const Phonon::DeviceAccess & device, deviceList) {
+            if(device.first == "v4l2") {
+                element = tryElement("v4l2src", device.second);
+            } else if (device.first == "v4l1") {
+                element = tryElement("v4lsrc", device.second);
+            }
+        }
+
+        if (element) {
+            return element;
+        }
+    }
 
     //as a last resort, try gstreamer's autodetection
     element = tryElement("autovideosrc");

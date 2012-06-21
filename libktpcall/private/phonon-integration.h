@@ -37,7 +37,8 @@ public:
 private:
     static QList<Phonon::DeviceAccessList> readAudioDevices(Phonon::ObjectDescriptionType type,
                                                             Phonon::Category category);
-    static QList<Phonon::DeviceAccessList> readVideoDevices(Phonon::Category category);
+    static QList<Phonon::DeviceAccessList> readVideoDevices(Phonon::ObjectDescriptionType type,
+                                                            Phonon::Category category);
     static bool hideAdvancedDevices();
     static QList<int> sortDevicesByCategoryPriority(Phonon::ObjectDescriptionType type,
                                                     Phonon::Category category,

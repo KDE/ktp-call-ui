@@ -149,7 +149,7 @@ QGst::ElementPtr DeviceElementFactory::makeVideoCaptureElement()
 
     //Phonon integration
     QList<Phonon::DeviceAccessList> phononDeviceLists
-        = PhononIntegration::readDevices(Phonon::VideoCaptureDeviceType, Phonon::CommunicationCaptureCategory);
+        = PhononIntegration::readDevices(Phonon::VideoCaptureDeviceType, Phonon::CommunicationCategory);
 
     Q_FOREACH (const Phonon::DeviceAccessList & deviceList, phononDeviceLists) {
         Q_FOREACH (const Phonon::DeviceAccess & device, deviceList) {

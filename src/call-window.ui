@@ -14,6 +14,9 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QStackedWidget" name="dtmfStackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="callPage">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <property name="margin">
@@ -25,8 +28,8 @@
            <number>0</number>
           </property>
           <widget class="QWidget" name="avatarLabelPage">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
              <widget class="QFrame" name="frame">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
@@ -36,14 +39,28 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
                <item>
-                <widget class="QLabel" name="remoteUserDisplayLabel">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
+                <layout class="QVBoxLayout" name="verticalLayout">
+                 <item>
+                  <widget class="KMessageWidget" name="errorWidget">
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="remoteUserDisplayLabel">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -99,8 +116,6 @@
          </widget>
         </item>
        </layout>
-       <zorder>frame</zorder>
-       <zorder>callStackedWidget</zorder>
       </widget>
       <widget class="QWidget" name="dtmfPage">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -151,6 +166,12 @@
    <class>QGst::Ui::VideoWidget</class>
    <extends>QWidget</extends>
    <header location="global">QGst/Ui/VideoWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>KMessageWidget</class>
+   <extends>QFrame</extends>
+   <header location="global">KMessageWidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

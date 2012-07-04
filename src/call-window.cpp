@@ -75,6 +75,8 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     //create ui
     d->ui.setupUi(this);
     d->statusArea = new StatusArea(statusBar());
+    d->ui.errorWidget->hide();
+    d->ui.errorWidget->setMessageType(KMessageWidget::Error);
     setupActions();
     setupGUI(QSize(428, 395), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
@@ -427,6 +429,13 @@ void CallWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void CallWindow::enableHoldButton(bool enable)
+{
+    connect(d->callChannel.data(), SIGNAL(localHoldStateChanged(Tp::LocalHoldState,Tp::LocalHoldStateReason)),
+            SLOT(holdStatus(Tp::LocalHoldState,Tp::LocalHoldStateReason)));
+    d->holdAction->setEnabled(enable);
+}
+
 void CallWindow::hold(bool holdCall)
 {
     kDebug();
@@ -436,20 +445,12 @@ void CallWindow::hold(bool holdCall)
             SLOT(operationFinished(Tp::PendingOperation*)));
 }
 
-void CallWindow::enableHoldButton(bool enable)
-{
-    connect(d->callChannel.data(), SIGNAL(localHoldStateChanged(Tp::LocalHoldState,Tp::LocalHoldStateReason)),
-            SLOT(holdStatus(Tp::LocalHoldState,Tp::LocalHoldStateReason)));
-    d->holdAction->setEnabled(enable);
-}
-
 void CallWindow::operationFinished(Tp::PendingOperation* operation)
 {
-    if(!operation->isError()) {
-        KMessageWidget *pauseError = new KMessageWidget("There was a error while pausing the call", this);
-        pauseError->setMessageType(KMessageWidget::Error);
-        pauseError->setMinimumWidth(this->width());
-        pauseError->animatedShow();
+    if (operation->isError()) {
+        d->ui.errorWidget->setText("There was a error while pausing the call");
+        d->ui.errorWidget->animatedShow();
+        return;
     }
 }
 
@@ -471,7 +472,7 @@ void CallWindow::holdStatus(Tp::LocalHoldState state, Tp::LocalHoldStateReason r
 
     case Tp::LocalHoldStateUnheld:
         if(reason == Tp::LocalHoldStateReasonRequested) {
-            d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Call successfully resumed"));
+            d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
         } else if(reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
             d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Some call resources were not available"));
         } else if(reason == Tp::LocalHoldStateReasonNone) {

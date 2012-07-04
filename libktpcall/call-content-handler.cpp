@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "call-content-handler_p.h"
+#include <TelepathyQt/Connection>
+#include <TelepathyQt/ContactManager>
 #include <TelepathyQt/ReferencedHandles>
 #include <QGlib/Connect>
 #include <QGst/Pad>
@@ -41,7 +43,7 @@ PendingCallContentHandler::PendingCallContentHandler(const Tp::CallChannelPtr & 
         Q_ASSERT(false);
     }
 
-    m_contentHandler->d->init(tfContent, pipeline);
+    m_contentHandler->d->init(callChannel, tfContent, pipeline);
 
     m_callChannel = callChannel;
     m_tfContent = tfContent;
@@ -92,7 +94,8 @@ CallContentHandlerPrivate::~CallContentHandlerPrivate()
     delete m_sinkManager;
 }
 
-void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
+void CallContentHandlerPrivate::init(const Tp::CallChannelPtr & callChannel,
+                                     const QTf::ContentPtr & tfContent,
                                      const QGst::PipelinePtr & pipeline)
 {
     kDebug();
@@ -105,14 +108,16 @@ void CallContentHandlerPrivate::init(const QTf::ContentPtr & tfContent,
     QGlib::connect(tfContent, "start-receiving", this, &CallContentHandlerPrivate::onStartReceiving);
     QGlib::connect(tfContent, "stop-receiving", this, &CallContentHandlerPrivate::onStopReceiving);
 
+    Tp::ContactManagerPtr contactManager = callChannel->connection()->contactManager();
+
     switch(tfContent->property("media-type").toInt()) {
     case Tp::MediaStreamTypeAudio:
         m_sourceController = new AudioSourceController(pipeline);
-        m_sinkManager = new AudioSinkManager(pipeline, this);
+        m_sinkManager = new AudioSinkManager(pipeline, contactManager, this);
         break;
     case Tp::MediaStreamTypeVideo:
         m_sourceController = new VideoSourceController(pipeline);
-        m_sinkManager = new VideoSinkManager(pipeline, this);
+        m_sinkManager = new VideoSinkManager(pipeline, contactManager, this);
         break;
     default:
         Q_ASSERT(false);
@@ -136,9 +141,6 @@ void CallContentHandlerPrivate::setCallContent(const Tp::CallContentPtr & callCo
 {
     kDebug();
     m_callContent = callContent;
-
-    //the sink manager needs the content to discover contacts
-    m_sinkManager->setCallContent(callContent);
 }
 
 void CallContentHandlerPrivate::onSrcPadAdded(uint contactHandle,

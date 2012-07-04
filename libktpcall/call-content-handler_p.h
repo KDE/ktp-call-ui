@@ -64,7 +64,9 @@ public:
     virtual ~CallContentHandlerPrivate();
 
     /* Called from PendingCallContentHandler right after constructing the CallContentHandler */
-    void init(const QTf::ContentPtr & tfContent, const QGst::PipelinePtr & pipeline);
+    void init(const Tp::CallChannelPtr & callChannel,
+              const QTf::ContentPtr & tfContent,
+              const QGst::PipelinePtr & pipeline);
 
     /* Called from PendingCallContentHandler when the CallContent is ready */
     void setCallContent(const Tp::CallContentPtr & callContent);

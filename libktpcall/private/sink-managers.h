@@ -38,10 +38,8 @@ public:
     /* Called from the streaming thread */
     void handleNewSinkPad(uint contactHandle, const QGst::PadPtr & pad);
 
-    void setCallContent(const Tp::CallContentPtr & callContent);
-
 protected:
-    explicit BaseSinkManager(QObject *parent = 0);
+    explicit BaseSinkManager(const Tp::ContactManagerPtr & contactManager, QObject *parent = 0);
 
     /* Called from the streaming thread to do the initial linking of srcPad to the sink */
     virtual BaseSinkController *createController(const QGst::PadPtr & srcPad) = 0;
@@ -51,12 +49,10 @@ protected:
 
 private Q_SLOTS:
     void handleNewSinkPadAsync(uint contactHandle);
-    void onStreamAdded(const Tp::CallStreamPtr & stream);
-    void onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tp::SendingState> & states);
+    void onPendingContactsFinished(Tp::PendingOperation*);
     void destroyController(BaseSinkController *controller);
 
 private:
-    void checkForNewContacts(const QList<Tp::ContactPtr> & contacts);
     /* Called from the streaming thread */
     void onPadUnlinked(const QGst::PadPtr & srcPad);
 
@@ -65,7 +61,7 @@ Q_SIGNALS:
     void controllerDestroyed(BaseSinkController *controller);
 
 private:
-    Tp::CallContentPtr m_content;
+    Tp::ContactManagerPtr m_contactManager;
     QMutex m_mutex;
     QHash<uint, BaseSinkController*> m_controllersWaitingForContact;
     QHash<QGst::PadPtr, BaseSinkController*> m_controllers;
@@ -77,7 +73,9 @@ class AudioSinkManager : public BaseSinkManager
 {
     Q_OBJECT
 public:
-    AudioSinkManager(const QGst::PipelinePtr & pipeline, QObject *parent = 0);
+    AudioSinkManager(const QGst::PipelinePtr & pipeline,
+                     const Tp::ContactManagerPtr & contactManager,
+                     QObject *parent = 0);
     virtual ~AudioSinkManager();
 
 protected:
@@ -100,7 +98,9 @@ class VideoSinkManager : public BaseSinkManager
 {
     Q_OBJECT
 public:
-    explicit VideoSinkManager(const QGst::PipelinePtr & pipeline, QObject *parent = 0);
+    VideoSinkManager(const QGst::PipelinePtr & pipeline,
+                     const Tp::ContactManagerPtr & contactManager,
+                     QObject *parent = 0);
 
 protected:
     virtual BaseSinkController *createController(const QGst::PadPtr & srcPad);

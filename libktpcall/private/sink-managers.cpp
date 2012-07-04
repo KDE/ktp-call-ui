@@ -17,17 +17,23 @@
 */
 #include "sink-managers.h"
 #include "device-element-factory.h"
+
+#include <TelepathyQt/ContactManager>
+#include <TelepathyQt/PendingContacts>
 #include <TelepathyQt/ReferencedHandles>
+
 #include <QGlib/Connect>
 #include <QGst/ElementFactory>
 #include <QGst/Pipeline>
 #include <QGst/Pad>
+
 #include <KDebug>
 
 //BEGIN BaseSinkManager
 
-BaseSinkManager::BaseSinkManager(QObject *parent)
-    : QObject(parent)
+BaseSinkManager::BaseSinkManager(const Tp::ContactManagerPtr & contactManager, QObject *parent)
+    : QObject(parent),
+      m_contactManager(contactManager)
 {
 }
 
@@ -66,72 +72,42 @@ void BaseSinkManager::handleNewSinkPadAsync(uint contactHandle)
         return;
     }
 
-    if (m_content) {
-        kDebug() << "Content exists. Looking for contact...";
-
-        Q_FOREACH (const Tp::CallStreamPtr & stream, m_content->streams()) {
-            Q_FOREACH (const Tp::ContactPtr & contact, stream->remoteMembers()) {
-                if (contact->handle()[0] == contactHandle) {
-                    kDebug() << "Found contact" << contact;
-
-                    m_controllersWaitingForContact.remove(contactHandle);
-                    ctrl->initFromMainThread(contact);
-                    Q_EMIT controllerCreated(ctrl);
-
-                    return;
-                }
-            }
-        }
-    }
-
-    kDebug() << "Contact not found. Waiting for tp-qt to sync with dbus";
+    Tp::PendingContacts *pc = m_contactManager->contactsForHandles(
+                Tp::UIntList() << contactHandle, Tp::Features());
+    connect(pc, SIGNAL(finished(Tp::PendingOperation*)),
+            SLOT(onPendingContactsFinished(Tp::PendingOperation*)));
+    pc->setProperty("ktpcall_contact_handle", QVariant::fromValue(contactHandle));
 }
 
-void BaseSinkManager::setCallContent(const Tp::CallContentPtr & callContent)
-{
-    m_content = callContent;
-    connect(m_content.data(), SIGNAL(streamAdded(Tp::CallStreamPtr)),
-            SLOT(onStreamAdded(Tp::CallStreamPtr)));
-
-    Q_FOREACH(const Tp::CallStreamPtr & stream, m_content->streams()) {
-        onStreamAdded(stream);
-    }
-}
-
-void BaseSinkManager::onStreamAdded(const Tp::CallStreamPtr & stream)
-{
-    connect(stream.data(),
-            SIGNAL(remoteSendingStateChanged(QHash<Tp::ContactPtr,Tp::SendingState>,Tp::CallStateReason)),
-            SLOT(onRemoteSendingStateChanged(QHash<Tp::ContactPtr,Tp::SendingState>)));
-
-    Tp::Contacts remoteMembers = stream->remoteMembers();
-    if (!remoteMembers.isEmpty()) {
-        checkForNewContacts(remoteMembers.toList());
-    }
-}
-
-void BaseSinkManager::onRemoteSendingStateChanged(const QHash<Tp::ContactPtr, Tp::SendingState> & states)
-{
-    checkForNewContacts(states.keys());
-}
-
-void BaseSinkManager::checkForNewContacts(const QList<Tp::ContactPtr> & contacts)
+void BaseSinkManager::onPendingContactsFinished(Tp::PendingOperation *op)
 {
     QMutexLocker l(&m_mutex);
 
-    if (!m_controllersWaitingForContact.isEmpty()) {
-        Q_FOREACH (const Tp::ContactPtr & contact, contacts) {
-            if (m_controllersWaitingForContact.contains(contact->handle()[0])) {
-                kDebug() << "Found contact" << contact;
+    Tp::PendingContacts *pc = qobject_cast<Tp::PendingContacts*>(op);
+    Q_ASSERT(pc);
 
-                BaseSinkController *ctrl = m_controllersWaitingForContact.take(contact->handle()[0]);
-                ctrl->initFromMainThread(contact);
-                Q_EMIT controllerCreated(ctrl);
-
-                return;
-            }
-        }
+    uint contactHandle = pc->property("ktpcall_contact_handle").toUInt();
+    BaseSinkController *ctrl = m_controllersWaitingForContact.value(contactHandle);
+    if (KDE_ISUNLIKELY(!ctrl)) {
+        // just in case the pad was unlinked before we reached this slot
+        kDebug() << "Not handling new pad. The pad was unlinked too early.";
+        return;
     }
+
+    // this can't really fail because the contact is already known
+    if (KDE_ISUNLIKELY(pc->isError())) {
+        kError() << "Failed to fetch contact for handle" << contactHandle
+                 << op->errorName() << op->errorMessage();
+        m_controllersWaitingForContact.remove(contactHandle);
+        return;
+    }
+
+    QList<Tp::ContactPtr> contacts = pc->contacts();
+    Q_ASSERT(contacts.size() == 1);
+
+    m_controllersWaitingForContact.remove(contactHandle);
+    ctrl->initFromMainThread(contacts.at(0));
+    Q_EMIT controllerCreated(ctrl);
 }
 
 void BaseSinkManager::unlinkAllPads()
@@ -223,8 +199,9 @@ void BaseSinkManager::destroyController(BaseSinkController *controller)
 //END BaseSinkManager
 //BEGIN AudioSinkManager
 
-AudioSinkManager::AudioSinkManager(const QGst::PipelinePtr & pipeline, QObject *parent)
-    : BaseSinkManager(parent),
+AudioSinkManager::AudioSinkManager(const QGst::PipelinePtr & pipeline,
+            const Tp::ContactManagerPtr & contactManager, QObject *parent)
+    : BaseSinkManager(contactManager, parent),
       m_pipeline(pipeline),
       m_sinkRefCount(0)
 {
@@ -301,8 +278,9 @@ void AudioSinkManager::unrefSink()
 //END AudioSinkManager
 //BEGIN VideoSinkManager
 
-VideoSinkManager::VideoSinkManager(const QGst::PipelinePtr & pipeline, QObject *parent)
-    : BaseSinkManager(parent),
+VideoSinkManager::VideoSinkManager(const QGst::PipelinePtr & pipeline,
+            const Tp::ContactManagerPtr & contactManager, QObject *parent)
+    : BaseSinkManager(contactManager, parent),
       m_pipeline(pipeline)
 {
 }

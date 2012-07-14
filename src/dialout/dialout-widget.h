@@ -20,6 +20,7 @@
 
 #include <QWidget>
 #include <TelepathyQt/PendingOperation>
+#include <TelepathyQt/Types>
 
 class DialoutWidget : public QWidget
 {
@@ -31,11 +32,15 @@ public:
 private Q_SLOTS:
     void onAccountManagerReady(Tp::PendingOperation *op);
     void onRowsChanged();
+    void on_accountComboBox_currentIndexChanged(int currentIndex);
     void on_uriLineEdit_textChanged(const QString &text);
+    void onPendingContactFinished(Tp::PendingOperation*);
     void on_audioCallButton_clicked();
     void on_videoCallButton_clicked();
 
 private:
+    void requestContact(const Tp::AccountPtr &account, const QString &contactId);
+
     struct Private;
     Private *const d;
 };

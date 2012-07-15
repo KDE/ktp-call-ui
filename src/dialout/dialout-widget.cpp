@@ -160,6 +160,11 @@ DialoutWidget::DialoutWidget(QWidget *parent)
 
 DialoutWidget::~DialoutWidget()
 {
+    int currentIndex = d->ui->accountComboBox->currentIndex();
+    if (currentIndex >= 0) {
+        KGlobal::config()->group("DialoutWidget").writeEntry("LastSelectedAccountIndex", currentIndex);
+    }
+
     delete d->ui;
     delete d;
 }
@@ -180,6 +185,11 @@ void DialoutWidget::onAccountManagerReady(Tp::PendingOperation* op)
     onRowsChanged();
     connect(d->filterModel, SIGNAL(rowsInserted(QModelIndex,int,int)), SLOT(onRowsChanged()));
     connect(d->filterModel, SIGNAL(rowsRemoved(QModelIndex,int,int)), SLOT(onRowsChanged()));
+
+    int savedIndex = KGlobal::config()->group("DialoutWidget").readEntry("LastSelectedAccountIndex", 0);
+    if (d->filterModel->rowCount() > 0 && savedIndex < d->filterModel->rowCount()) {
+        d->ui->accountComboBox->setCurrentIndex(savedIndex);
+    }
 }
 
 void DialoutWidget::onRowsChanged()

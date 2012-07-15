@@ -32,11 +32,14 @@ public:
 private Q_SLOTS:
     void onAccountManagerReady(Tp::PendingOperation *op);
     void onRowsChanged();
+
     void on_accountComboBox_currentIndexChanged(int currentIndex);
     void on_uriLineEdit_textChanged(const QString &text);
     void onPendingContactFinished(Tp::PendingOperation*);
+
     void on_audioCallButton_clicked();
     void on_videoCallButton_clicked();
+    void onPendingChannelRequestFinished(Tp::PendingOperation*);
 
 private:
     void requestContact(const Tp::AccountPtr &account, const QString &contactId);

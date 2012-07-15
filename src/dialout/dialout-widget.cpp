@@ -26,7 +26,10 @@
 #include <TelepathyQt/ContactCapabilities>
 #include <TelepathyQt/ContactManager>
 #include <TelepathyQt/PendingContacts>
+#include <TelepathyQt/PendingChannelRequest>
 #include <TelepathyQt/PendingReady>
+
+#include <KMessageBox>
 #include <KDebug>
 
 #define PREFERRED_CALL_HANDLER "org.freedesktop.Telepathy.Client.KTp.CallUi"
@@ -248,17 +251,33 @@ void DialoutWidget::onPendingContactFinished(Tp::PendingOperation *op)
 
 void DialoutWidget::on_audioCallButton_clicked()
 {
-    d->currentAccount->ensureAudioCall(d->currentContact,
+    Tp::PendingChannelRequest *pcr =
+        d->currentAccount->ensureAudioCall(d->currentContact,
             QLatin1String("audio"),
             QDateTime::currentDateTime(),
             QLatin1String(PREFERRED_CALL_HANDLER));
+
+    connect(pcr, SIGNAL(finished(Tp::PendingOperation*)),
+            SLOT(onPendingChannelRequestFinished(Tp::PendingOperation*)));
 }
 
 void DialoutWidget::on_videoCallButton_clicked()
 {
-    d->currentAccount->ensureAudioVideoCall(d->currentContact,
+    Tp::PendingChannelRequest *pcr =
+        d->currentAccount->ensureAudioVideoCall(d->currentContact,
             QLatin1String("audio"),
             QLatin1String("video"),
             QDateTime::currentDateTime(),
             QLatin1String(PREFERRED_CALL_HANDLER));
+
+    connect(pcr, SIGNAL(finished(Tp::PendingOperation*)),
+            SLOT(onPendingChannelRequestFinished(Tp::PendingOperation*)));
+}
+
+void DialoutWidget::onPendingChannelRequestFinished(Tp::PendingOperation *op)
+{
+    if (op->isError()) {
+        kDebug() << "Failed to start Call channel:" << op->errorName() << op->errorMessage();
+        KMessageBox::sorry(this, i18n("Failed to start call."));
+    }
 }

@@ -136,6 +136,7 @@ DialoutWidget::DialoutWidget(QWidget *parent)
     d->filterModel->setSourceModel(d->model);
     d->filterModel->setPresenceTypeFilterFlags(AccountsFilterModel::ShowOnlyConnected);
     d->filterModel->setCapabilityFilterFlags(AccountsFilterModel::FilterByMediaCallCapability);
+    d->filterModel->setDynamicSortFilter(true);
     d->ui->accountComboBox->setModel(d->filterModel);
 
     Tp::AccountFactoryPtr accountFactory = Tp::AccountFactory::create(

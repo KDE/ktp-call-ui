@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags f)
     : KXmlGuiWindow(parent, f)
 {
     setCentralWidget(new DialoutWidget(this));
-    setupGUI(QSize(450, 150));
-    setWindowTitle(i18n("Audio/Video Calls"));
+    setupGUI(QSize(450, 120), KXmlGuiWindow::Create | KXmlGuiWindow::Save);
+    setWindowTitle(i18n("Make a call"));
 }
 
 MainWindow::~MainWindow()

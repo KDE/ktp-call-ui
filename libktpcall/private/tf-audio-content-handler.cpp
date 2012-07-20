@@ -21,6 +21,7 @@
 #include "device-element-factory.h"
 #include "../volume-controller.h"
 
+#include <QGlib/Error>
 #include <QGst/ElementFactory>
 #include <QGst/GhostPad>
 
@@ -80,42 +81,10 @@ bool TfAudioContentHandler::startSending()
         return false;
     }
 
-    //some unique id for this content - use the name that the CM gives to the content object
-    QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
-
-    QString binDescription = QString(QLatin1String(
-        "audioconvert name=input_bin_first_element_%1 ! "
-        "audioresample ! "
-        "volume name=input_volume_%1 ! "
-        "level name=input_level_%1 ! "
-        "audioconvert ! "
-        "capsfilter caps=\"audio/x-raw-int,rate=[8000,16000];audio/x-raw-float,rate=[8000,16000]\" ! "
-        "tee name=input_tee_%1 ! "
-        "fakesink sync=false async=false silent=true enable-last-buffer=true")).arg(id);
-
-
-    m_srcBin = QGst::Bin::fromDescription(binDescription, QGst::Bin::NoGhost);
-
-    // add the source
-    QGst::ElementPtr firstElement = m_srcBin->getElementByName(
-            QString(QLatin1String("input_bin_first_element_%1")).arg(id).toAscii());
-    m_srcBin->add(src);
-    src->link(firstElement);
-
-    // keep the volume element
-    QGst::ElementPtr volume = m_srcBin->getElementByName(
-            QString(QLatin1String("input_volume_%1")).arg(id).toAscii());
-    m_inputVolumeController->setElement(volume.dynamicCast<QGst::StreamVolume>());
-
-    // TODO level controller
-
-    // add queue and src pad
-    QGst::ElementPtr tee = m_srcBin->getElementByName(
-            QString(QLatin1String("input_tee_%1")).arg(id).toAscii());
-    QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
-    m_srcBin->add(queue);
-    tee->getRequestPad("src%d")->link(queue->getStaticPad("sink"));
-    m_srcBin->addPad(QGst::GhostPad::create(queue->getStaticPad("src"), "src"));
+    if (!createSrcBin(src)) {
+        src->setState(QGst::StateNull); // DeviceElementFactory usually leaves src in StateReady
+        return false;
+    }
 
     // link to fsconference
     channelHandler()->pipeline()->add(m_srcBin);
@@ -218,6 +187,67 @@ void TfAudioContentHandler::unrefSink()
 
         QMetaObject::invokeMethod(this, "onSinkDestroyed");
     }
+}
+
+bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
+{
+    //some unique id for this content - use the name that the CM gives to the content object
+    QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
+
+    QString binDescription = QString(QLatin1String(
+        "audioconvert name=input_bin_first_element_%1 ! "
+        "audioresample ! "
+        "volume name=input_volume_%1 ! "
+        "level name=input_level_%1 ! "
+        "audioconvert ! "
+        "capsfilter caps=\"audio/x-raw-int,rate=[8000,16000];audio/x-raw-float,rate=[8000,16000]\" ! "
+        "tee name=input_tee_%1 ! "
+        "fakesink sync=false async=false silent=true enable-last-buffer=true")).arg(id);
+
+
+    QGst::BinPtr bin;
+    try {
+        bin = QGst::Bin::fromDescription(binDescription, QGst::Bin::NoGhost);
+    } catch (const QGlib::Error & err) {
+        kWarning() << "Failed to create audio source bin" << err;
+        return false;
+    }
+
+    // add the source
+    QGst::ElementPtr firstElement = bin->getElementByName(
+            QString(QLatin1String("input_bin_first_element_%1")).arg(id).toAscii());
+    bin->add(src);
+    if (!src->link(firstElement)) {
+        kWarning() << "Failed to link audiosrc to audio src bin";
+        return false;
+    }
+
+    // keep the volume element
+    QGst::ElementPtr volume = bin->getElementByName(
+            QString(QLatin1String("input_volume_%1")).arg(id).toAscii());
+    m_inputVolumeController->setElement(volume.dynamicCast<QGst::StreamVolume>());
+
+    // TODO level controller
+
+    // add queue and src pad
+    QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
+    if (!queue) {
+        kWarning() << "Failed to load the 'queue' gst element";
+        return false;
+    }
+    bin->add(queue);
+
+    QGst::ElementPtr tee = bin->getElementByName(
+            QString(QLatin1String("input_tee_%1")).arg(id).toAscii());
+    if (tee->getRequestPad("src%d")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
+        kWarning() << "Failed to link tee ! queue";
+        return false;
+    }
+
+    bin->addPad(QGst::GhostPad::create(queue->getStaticPad("src"), "src"));
+
+    m_srcBin = bin;
+    return true;
 }
 
 } // KTpCallPrivate

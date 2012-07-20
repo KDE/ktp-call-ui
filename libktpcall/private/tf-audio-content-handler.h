@@ -51,6 +51,7 @@ private Q_SLOTS:
 private:
     void refSink();
     void unrefSink();
+    bool createSrcBin(const QGst::ElementPtr & src);
 
     QMutex m_mutex;
     QGst::ElementPtr m_sink;

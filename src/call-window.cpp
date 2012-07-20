@@ -307,10 +307,8 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
     if (oldState.testFlag(LocalVideoPreview) && !newState.testFlag(LocalVideoPreview)) {
         d->videoContentHandler->unlinkVideoPreviewSink();
         d->ui.videoPreviewWidget->setVideoSink(QGst::ElementPtr());
-        d->ui.videoPreviewWidget->hide();
     } else if (!oldState.testFlag(LocalVideoPreview) && newState.testFlag(LocalVideoPreview)) {
         QGst::ElementPtr sink = QGst::ElementFactory::make(preferredSinkFactory);
-        d->ui.videoPreviewWidget->show();
         d->ui.videoPreviewWidget->setVideoSink(sink);
         d->videoContentHandler->linkVideoPreviewSink(sink);
     }
@@ -328,6 +326,12 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
         d->ui.callStackedWidget->setCurrentIndex(0);
     } else {
         d->ui.callStackedWidget->setCurrentIndex(1);
+
+        if (newState.testFlag(LocalVideoPreview)) {
+            d->ui.videoPreviewWidget->show();
+        } else {
+            d->ui.videoPreviewWidget->hide();
+        }
     }
 
     d->currentVideoDisplayState = newState;

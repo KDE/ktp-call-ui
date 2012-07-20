@@ -216,7 +216,7 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 
         checkEnableDtmf();
 
-        VolumeController *vol = audioContentHandler->sourceVolumeControl();
+        VolumeController *vol = audioContentHandler->inputVolumeControl();
         d->muteAction->setEnabled(vol->volumeControlSupported());
         connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
                 d->muteAction, SLOT(setEnabled(bool)));
@@ -251,7 +251,7 @@ void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
         AudioContentHandler *audioContentHandler = qobject_cast<AudioContentHandler*>(contentHandler);
         Q_ASSERT(audioContentHandler);
 
-        VolumeController *vol = audioContentHandler->sourceVolumeControl();
+        VolumeController *vol = audioContentHandler->inputVolumeControl();
         disconnect(vol, NULL, d->muteAction, NULL);
         d->muteAction->setEnabled(false);
         d->muteAction->setProperty("volumeController", QVariant());

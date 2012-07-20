@@ -24,6 +24,8 @@
 #include <QGst/Pipeline>
 #include <QGst/Pad>
 
+namespace KTpCallPrivate {
+
 class BaseSinkController
 {
 public:
@@ -87,7 +89,8 @@ private:
     QMutex m_videoSinkMutex;
 };
 
+} // KTpCallPrivate
 
-Q_DECLARE_METATYPE(BaseSinkController*)
+Q_DECLARE_METATYPE(KTpCallPrivate::BaseSinkController*)
 
 #endif //SINK_CONTROLLERS_H

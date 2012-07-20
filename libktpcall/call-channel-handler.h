@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2011 Collabora Ltd. <info@collabora.co.uk>
-      @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
+    Copyright (C) 2012 George Kiagiadakis <kiagiadakis.george@gmail.com>
 
     This library is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -10,18 +10,21 @@
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #ifndef CALL_CHANNEL_HANDLER_H
 #define CALL_CHANNEL_HANDLER_H
 
 #include "call-content-handler.h"
 #include <TelepathyQt/CallChannel>
 
-class CallChannelHandlerPrivate;
+namespace KTpCallPrivate {
+    class TfContentHandler;
+}
 
 /** This class handles streaming in a telepathy Call channel.
  * To begin streaming, construct an instance of this class and use the
@@ -51,9 +54,14 @@ Q_SIGNALS:
     void contentRemoved(CallContentHandler *content);
     void channelClosed();
 
+private Q_SLOTS:
+    void _k_onContentAdded(KTpCallPrivate::TfContentHandler*);
+    void _k_onContentReady(KTpCallPrivate::TfContentHandler*);
+    void _k_onContentRemoved(KTpCallPrivate::TfContentHandler*);
+
 private:
-    friend class CallChannelHandlerPrivate;
-    CallChannelHandlerPrivate *const d;
+    struct Private;
+    Private *const d;
 };
 
 #endif // CALL_CHANNEL_HANDLER_H

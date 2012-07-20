@@ -21,6 +21,8 @@
 #include <QGst/Element>
 #include <KDebug>
 
+using namespace KTpCallPrivate;
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);

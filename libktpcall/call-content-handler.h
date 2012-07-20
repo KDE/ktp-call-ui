@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2011 Collabora Ltd. <info@collabora.co.uk>
-      @author George Kiagiadakis <george.kiagiadakis@collabora.co.uk>
+    Copyright (C) 2012 George Kiagiadakis <kiagiadakis.george@gmail.com>
 
     This library is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -10,20 +10,25 @@
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #ifndef CALL_CONTENT_HANDLER_H
 #define CALL_CONTENT_HANDLER_H
 
 #include "volume-controller.h"
 #include <TelepathyQt/CallContent>
 
-class CallContentHandlerPrivate;
-class PendingCallContentHandler;
-class CallChannelHandlerPrivate;
+class CallChannelHandler;
+
+namespace KTpCallPrivate {
+    class TfContentHandler;
+    class TfAudioContentHandler;
+    class TfVideoContentHandler;
+}
 
 /**
  * This class handles streaming in a telepathy Call channel Content.
@@ -50,13 +55,12 @@ Q_SIGNALS:
     void remoteSendingStateChanged(const Tp::ContactPtr & contact, bool sending);
 
 protected:
-    explicit CallContentHandler(QObject *parent = 0);
+    friend class CallChannelHandler;
+    CallContentHandler(KTpCallPrivate::TfContentHandler *handler, QObject *parent);
     virtual ~CallContentHandler();
 
-    friend class CallContentHandlerPrivate; //emits the signals
-    friend class PendingCallContentHandler; //uses d
-    friend class CallChannelHandlerPrivate; //calls the destructor
-    CallContentHandlerPrivate *const d;
+    struct Private;
+    Private *const d;
 };
 
 
@@ -64,12 +68,12 @@ class AudioContentHandler : public CallContentHandler
 {
     Q_OBJECT
 public:
-    VolumeController *sourceVolumeControl() const;
-    VolumeController *remoteMemberVolumeControl(const Tp::ContactPtr & contact) const;
+    VolumeController *inputVolumeControl() const;
+    VolumeController *outputVolumeControl() const;
 
 private:
-    friend class PendingCallContentHandler;
-    explicit AudioContentHandler(QObject *parent = 0);
+    friend class CallChannelHandler;
+    AudioContentHandler(KTpCallPrivate::TfAudioContentHandler *handler, QObject *parent);
     virtual ~AudioContentHandler() {}
 };
 
@@ -84,8 +88,8 @@ public:
     void unlinkRemoteMemberVideoSink(const Tp::ContactPtr & contact);
 
 private:
-    friend class PendingCallContentHandler;
-    explicit VideoContentHandler(QObject *parent = 0);
+    friend class CallChannelHandler;
+    VideoContentHandler(KTpCallPrivate::TfVideoContentHandler *handler, QObject *parent);
     virtual ~VideoContentHandler() {}
 };
 

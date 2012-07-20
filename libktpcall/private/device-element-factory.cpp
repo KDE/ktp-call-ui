@@ -25,6 +25,8 @@
 #include <KConfigGroup>
 #include <KGlobal>
 
+namespace KTpCallPrivate {
+
 QGst::ElementPtr DeviceElementFactory::makeAudioCaptureElement()
 {
     QGst::ElementPtr element;
@@ -228,3 +230,5 @@ void DeviceElementFactory::addStreamProperties (QGst::ElementPtr element)
     streamProperties.setValue("filter.want", "echo-cancel");
     element->setProperty("stream-properties", streamProperties);
 }
+
+} // KTpCallPrivate

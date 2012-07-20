@@ -22,6 +22,8 @@
 #include <QtCore/QHash>
 #include <QGst/Global>
 
+namespace KTpCallPrivate {
+
 class DeviceElementFactory
 {
 public:
@@ -34,5 +36,7 @@ private:
     static QGst::ElementPtr tryOverrideForKey(const char *keyName);
     static void addStreamProperties(const QGst::ElementPtr element);
 };
+
+} // KTpCallPrivate
 
 #endif // DEVICE_ELEMENT_FACTORY_H

@@ -19,6 +19,8 @@
 #include <QGst/ElementFactory>
 #include <QGst/GhostPad>
 
+namespace KTpCallPrivate {
+
 VideoSinkBin::VideoSinkBin(const QGst::ElementPtr & videoSink)
 {
     m_bin = QGst::Bin::create();
@@ -40,3 +42,4 @@ VideoSinkBin::~VideoSinkBin()
 {
 }
 
+} // KTpCallPrivate

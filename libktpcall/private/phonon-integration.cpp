@@ -31,6 +31,8 @@
 
 Q_DECLARE_METATYPE(QList<int>)
 
+namespace KTpCallPrivate {
+
 struct PhononIntegrationPrivate
 {
     PhononIntegrationPrivate()
@@ -253,3 +255,5 @@ QList<int> PhononIntegration::sortDevicesByCategoryPriority(Phonon::ObjectDescri
     s_priv->phononSettings.endGroup();
     return deviceList;
 }
+
+} // KTpCallPrivate

@@ -28,6 +28,8 @@
 #include <phonon/Global>
 #include <phonon/ObjectDescription>
 
+namespace KTpCallPrivate {
+
 class PhononIntegration
 {
 public:
@@ -44,5 +46,7 @@ private:
                                                     Phonon::Category category,
                                                     QList<int> originalList);
 };
+
+} // KTpCallPrivate
 
 #endif // PHONONINTEGRATION_P_H

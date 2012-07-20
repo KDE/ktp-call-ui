@@ -21,6 +21,8 @@
 #include <QGst/GhostPad>
 #include <KDebug>
 
+namespace KTpCallPrivate {
+
 //BEGIN BaseSinkController
 
 Tp::ContactPtr BaseSinkController::contact() const
@@ -204,3 +206,5 @@ void VideoSinkController::releaseFromStreamingThread(const QGst::PipelinePtr & p
 }
 
 //END VideoSinkController
+
+} // KTpCallPrivate

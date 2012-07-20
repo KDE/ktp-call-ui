@@ -19,6 +19,8 @@
 
 #include <QGst/Bin>
 
+namespace KTpCallPrivate {
+
 class VideoSinkBin
 {
     Q_DISABLE_COPY(VideoSinkBin);
@@ -31,5 +33,7 @@ public:
 private:
     QGst::BinPtr m_bin;
 };
+
+} // KTpCallPrivate
 
 #endif // VIDEO_SINK_BIN_H

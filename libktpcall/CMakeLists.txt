@@ -7,12 +7,14 @@ set(libktpcall_SRCS
     call-content-handler.cpp
     volume-controller.cpp
 
-    private/source-controllers.cpp
-    private/sink-controllers.cpp
-    private/sink-managers.cpp
     private/device-element-factory.cpp
     private/phonon-integration.cpp
-    private/input-control-bin.cpp
+    private/sink-controllers.cpp
+    private/sink-manager.cpp
+    private/tf-audio-content-handler.cpp
+    private/tf-channel-handler.cpp
+    private/tf-content-handler.cpp
+    private/tf-video-content-handler.cpp
     private/video-sink-bin.cpp
 )
 

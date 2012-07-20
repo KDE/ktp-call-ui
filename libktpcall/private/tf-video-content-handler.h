@@ -47,7 +47,7 @@ protected:
     virtual void stopSending();
 
 private:
-    void createSrcBin(const QGst::ElementPtr & src);
+    bool createSrcBin(const QGst::ElementPtr & src);
     QGst::CapsPtr contentCaps() const;
     void onRestartSource();
 

@@ -22,6 +22,7 @@
 #include "video-sink-bin.h"
 
 #include <QGlib/Connect>
+#include <QGst/Clock>
 #include <QGst/ElementFactory>
 #include <QGst/GhostPad>
 #include <QGst/FractionRange>
@@ -107,7 +108,10 @@ bool TfVideoContentHandler::startSending()
         return false;
     }
 
-    createSrcBin(src);
+    if (!createSrcBin(src)) {
+        src->setState(QGst::StateNull); // DeviceElementFactory usually leaves src in StateReady
+        return false;
+    }
 
     // link to fsconference
     channelHandler()->pipeline()->add(m_srcBin);
@@ -130,10 +134,8 @@ void TfVideoContentHandler::stopSending()
     }
 }
 
-void TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
+bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
 {
-    m_srcBin = QGst::Bin::create();
-
     //some unique id for this content - use the name that the CM gives to the content object
     QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
 
@@ -141,18 +143,20 @@ void TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     //in the capsfilter if the camera cannot produce 15fps
     QGst::ElementPtr videomaxrate = QGst::ElementFactory::make("videomaxrate");
 
-    //ffmpegcolorspace converts to yuv for postproc_tmpnoise
-    //to work if the camera cannot produce yuv
-    QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
-
     //videoscale supports the 320x240 restriction in the capsfilter
     //if the camera cannot produce 320x240
     QGst::ElementPtr videoscale = QGst::ElementFactory::make("videoscale");
+
+    //ffmpegcolorspace converts to yuv for postproc_tmpnoise
+    //to work if the camera cannot produce yuv
+    QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
 
     //capsfilter restricts the output to 320x240 @ 15fps or whatever Content.I.VideoControl says
     QString capsfilterName = QString(QLatin1String("input_capsfilter_%1")).arg(id);
     QGst::ElementPtr capsfilter = QGst::ElementFactory::make("capsfilter", capsfilterName.toAscii());
     capsfilter->setProperty("caps", contentCaps());
+
+    kDebug() << "Using video src caps" << capsfilter->property("caps").get<QGst::CapsPtr>();
 
     //postproc_tmpnoise reduces video noise to improve quality
     QGst::ElementPtr postproc = QGst::ElementFactory::make("postproc_tmpnoise");
@@ -171,51 +175,81 @@ void TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     //queue to support fsconference after the tee
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
 
-    m_srcBin->add(src, colorspace, videoscale, capsfilter, tee, fakesink);
-
-    // src ! (videomaxrate) ! colorspace
-    if (videomaxrate) {
-        m_srcBin->add(videomaxrate);
-        QGst::Element::linkMany(src, videomaxrate, colorspace);
-    } else {
-        kDebug() << "NOT using videomaxrate";
-        src->link(colorspace);
+    if (!videoscale || !colorspace || !capsfilter || !tee || !queue || !fakesink) {
+        kWarning() << "Failed to load basic gstreamer elements";
+        return false;
     }
 
-    // colorspace ! videoscale ! capsfilter
-    QGst::Element::linkMany(colorspace, videoscale, capsfilter);
+    QGst::BinPtr bin = QGst::Bin::create();
+    bin->add(src, videoscale, colorspace, capsfilter, tee, fakesink, queue);
+
+    // src ! (videomaxrate) ! videoscale
+    if (videomaxrate) {
+        bin->add(videomaxrate);
+        if (!QGst::Element::linkMany(src, videomaxrate, videoscale)) {
+            kWarning() << "Failed to link videosrc ! videomaxrate ! videoscale";
+            return false;
+        }
+    } else {
+        kDebug() << "NOT using videomaxrate";
+        if (!src->link(videoscale)) {
+            kWarning() << "Failed to link videosrc ! videoscale";
+            return false;
+        }
+    }
+
+    // videoscale ! colorspace ! capsfilter
+    if (!QGst::Element::linkMany(videoscale, colorspace, capsfilter)) {
+        kWarning() << "Failed to link videoscale ! colorspace ! capsfilter";
+        return false;
+    }
 
     // capsfilter ! (postproc_tmpnoise) ! tee
     if (postproc) {
-        m_srcBin->add(postproc);
-        QGst::Element::linkMany(capsfilter, postproc, tee);
+        bin->add(postproc);
+        if (!QGst::Element::linkMany(capsfilter, postproc, tee)) {
+            kWarning() << "Failed to link capsfilter ! postproc_tmpnoise ! tee";
+            return false;
+        }
     } else {
         kDebug() << "NOT using postproc_tmpnoise";
-        capsfilter->link(tee);
+        if (!capsfilter->link(tee)) {
+            kWarning() << "Failed to link capsfilter ! tee";
+            return false;
+        }
     }
 
     // tee ! fakesink
-    tee->getRequestPad("src%d")->link(fakesink->getStaticPad("sink"));
+    if (tee->getRequestPad("src%d")->link(fakesink->getStaticPad("sink")) != QGst::PadLinkOk) {
+        kWarning() << "Failed to link tee ! fakesink";
+        return false;
+    }
 
     // tee ! queue
-    tee->getRequestPad("src%d")->link(queue->getStaticPad("sink"));
+    if (tee->getRequestPad("src%d")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
+        kWarning() << "Failed to link tee ! queue";
+        return false;
+    }
 
     // create bin's src pad
-    m_srcBin->addPad(QGst::GhostPad::create(queue->getStaticPad("src"), "src"));
+    bin->addPad(QGst::GhostPad::create(queue->getStaticPad("src"), "src"));
+
+    m_srcBin = bin;
+    return true;
 }
 
 QGst::CapsPtr TfVideoContentHandler::contentCaps() const
 {
     // TfContent advertises the Content.I.VideoControl properties, if the interface exists,
     // otherwise it returns 0 for all of them
-    uint width = tfContent()->property("width").toUInt();
-    uint height = tfContent()->property("height").toUInt();
+    int width = tfContent()->property("width").toInt();
+    int height = tfContent()->property("height").toInt();
     if (width == 0 || height == 0) {
         width = 320;
         height = 240;
     }
 
-    uint framerate = tfContent()->property("framerate").toUInt();
+    int framerate = tfContent()->property("framerate").toInt();
     if (framerate == 0) {
         framerate = 15;
     }

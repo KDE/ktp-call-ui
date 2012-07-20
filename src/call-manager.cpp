@@ -56,6 +56,10 @@ CallManager::CallManager(const Tp::CallChannelPtr & callChannel, QObject *parent
 CallManager::~CallManager()
 {
     kDebug() << "Deleting CallManager";
+
+    //delete the window just in case CallManager was deleted
+    //before the channel entered CallStateEnded
+    delete d->callWindow.data();
     delete d;
 
     KTp::TelepathyHandlerApplication::jobFinished();

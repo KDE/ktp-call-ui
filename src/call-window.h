@@ -64,8 +64,8 @@ private Q_SLOTS:
     void toggleMute(bool checked);
     void hangup();
     void hold(bool holdCall);
-    void operationFinished(Tp::PendingOperation* operation);
-    void holdStatus(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason);
+    void operationFinished(Tp::PendingOperation *operation);
+    void onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason);
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

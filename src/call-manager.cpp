@@ -117,7 +117,7 @@ void CallManager::onCallStateChanged(Tp::CallState state)
         }
         ensureCallWindow();
         d->callWindow.data()->setStatus(CallWindow::StatusActive);
-        if(d->callChannel.data()->hasInterface(TP_QT_IFACE_CHANNEL_INTERFACE_HOLD)) {
+        if (d->callChannel.data()->hasInterface(TP_QT_IFACE_CHANNEL_INTERFACE_HOLD)) {
             d->callWindow.data()->enableHoldButton(true);
         }
         break;

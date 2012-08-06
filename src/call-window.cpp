@@ -56,7 +56,7 @@ struct CallWindow::Private
     KToggleAction *showDtmfAction;
     KToggleAction *sendVideoAction;
     KToggleAction *muteAction;
-    KToggleAction *holdAction;
+    KAction *holdAction;
     KAction *hangupAction;
 
     VideoDisplayFlags currentVideoDisplayState;
@@ -122,6 +122,11 @@ void CallWindow::setStatus(Status status, const Tp::CallStateReason & reason)
     case StatusActive:
         d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
         d->statusArea->startDurationTimer();
+        if (d->callChannel.data()->hasInterface(TP_QT_IFACE_CHANNEL_INTERFACE_HOLD)) {
+            d->holdAction->setEnabled(true);
+            connect(d->callChannel.data(), SIGNAL(localHoldStateChanged(Tp::LocalHoldState,Tp::LocalHoldStateReason)),
+                    SLOT(onHoldStatusChanged(Tp::LocalHoldState,Tp::LocalHoldStateReason)));
+        }
         break;
     case StatusDisconnected:
       {
@@ -204,6 +209,7 @@ void CallWindow::setStatus(Status status, const Tp::CallStateReason & reason)
         d->callEnded = true;
         break;
       }
+      d->holdAction->setEnabled(false);
     default:
         Q_ASSERT(false);
     }
@@ -366,10 +372,10 @@ void CallWindow::setupActions()
     connect(d->muteAction, SIGNAL(toggled(bool)), SLOT(toggleMute(bool)));
     actionCollection()->addAction("mute", d->muteAction);
 
-    d->holdAction = new KToggleAction(i18nc("@action", "Hold"), this);
+    d->holdAction = new KAction(i18nc("@action", "Hold"), this);
     d->holdAction->setIcon(KIcon("media-playback-pause"));
     d->holdAction->setEnabled(false); //will be enabled later
-    connect(d->holdAction, SIGNAL(toggled(bool)), SLOT(hold(bool)));
+    connect(d->holdAction, SIGNAL(triggered()), SLOT(hold()));
     actionCollection()->addAction("hold", d->holdAction);
 
     d->hangupAction = new KAction(KIcon("call-stop"), i18nc("@action", "Hangup"), this);
@@ -429,26 +435,26 @@ void CallWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void CallWindow::enableHoldButton(bool enable)
+void CallWindow::hold()
 {
-    connect(d->callChannel.data(), SIGNAL(localHoldStateChanged(Tp::LocalHoldState,Tp::LocalHoldStateReason)),
-            SLOT(onHoldStatusChanged(Tp::LocalHoldState,Tp::LocalHoldStateReason)));
-    d->holdAction->setEnabled(enable);
-}
-
-void CallWindow::hold(bool holdCall)
-{
-    kDebug();
-    Tp::PendingOperation *holdRequest = d->callChannel->requestHold(holdCall);
+    Tp::PendingOperation *holdRequest;
+    if (d->callChannel.data()->localHoldState() == Tp::LocalHoldStateHeld) {
+        holdRequest = d->callChannel->requestHold(false);
+    } else if (d->callChannel.data()->localHoldState() == Tp::LocalHoldStateUnheld) {
+        holdRequest = d->callChannel->requestHold(true);
+    } else {
+        kDebug() << "Call is currently being held, please wait before trying again!";
+        return;
+    }
 
     connect(holdRequest, SIGNAL(finished(Tp::PendingOperation*)),
-            SLOT(operationFinished(Tp::PendingOperation*)));
+            SLOT(holdOperationFinished(Tp::PendingOperation*)));
 }
 
-void CallWindow::operationFinished(Tp::PendingOperation* operation)
+void CallWindow::holdOperationFinished(Tp::PendingOperation* operation)
 {
     if (operation->isError()) {
-        d->ui.errorWidget->setText("There was a error while pausing the call");
+        d->ui.errorWidget->setText(i18nc("@info:error", "There was an error while pausing the call"));
         d->ui.errorWidget->animatedShow();
         return;
     }
@@ -456,37 +462,42 @@ void CallWindow::operationFinished(Tp::PendingOperation* operation)
 
 void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason)
 {
-    kDebug() << "Updating hold status" << state << " " << reason;
+    kDebug() << "Hold status changed" << state << " " << reason;
 
     switch (state) {
     case Tp::LocalHoldStateHeld:
         if (reason == Tp::LocalHoldStateReasonRequested) {
             d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Call held"));
         } else if (reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
-            d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Some call resources were not available"));
+            d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Failed to put the call off hold: Some devices are not available"));
         } else if (reason == Tp::LocalHoldStateReasonNone) {
             d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Unknown error"));
         }
+        d->holdAction->setEnabled(true);
         d->holdAction->setIcon(KIcon("media-playback-start"));
+        d->statusArea->stopDurationTimer();
         break;
 
     case Tp::LocalHoldStateUnheld:
         if (reason == Tp::LocalHoldStateReasonRequested) {
             d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
-        } else if (reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
-            d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Some call resources were not available"));
-        } else if (reason == Tp::LocalHoldStateReasonNone) {
+        } else if (reason == Tp::LocalHoldStateReasonNone ||
+		   reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
             d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Unknown error"));
         }
+        d->holdAction->setEnabled(true);
         d->holdAction->setIcon(KIcon("media-playback-pause"));
+        d->statusArea->startDurationTimer();
         break;
 
     case Tp::LocalHoldStatePendingHold:
-        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Trying to hold the call"));
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Putting the call on hold..."));
+        d->holdAction->setEnabled(false);
         break;
 
     case Tp::LocalHoldStatePendingUnhold:
-        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Trying to resume the call"));
+        d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Resuming the call..."));
+        d->holdAction->setEnabled(false);
         break;
 
     default:

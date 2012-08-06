@@ -38,7 +38,6 @@ public:
         StatusDisconnected
     };
     void setStatus(Status status, const Tp::CallStateReason & reason = Tp::CallStateReason());
-    void enableHoldButton(bool enable);
 
 public Q_SLOTS:
     void onContentAdded(CallContentHandler *contentHandler);
@@ -63,8 +62,8 @@ private Q_SLOTS:
     void toggleDtmf(bool checked);
     void toggleMute(bool checked);
     void hangup();
-    void hold(bool holdCall);
-    void operationFinished(Tp::PendingOperation *operation);
+    void hold();
+    void holdOperationFinished(Tp::PendingOperation *operation);
     void onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason);
 
 protected:

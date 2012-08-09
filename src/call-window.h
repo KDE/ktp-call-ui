@@ -60,6 +60,7 @@ private:
     void setupActions();
     void checkEnableDtmf();
     QGst::ElementPtr tryVideoSink(const char *sink);
+    QGst::ElementPtr constructVideoSink();
 
 private Q_SLOTS:
     void toggleDtmf(bool checked);

@@ -326,29 +326,40 @@ QGst::ElementPtr CallWindow::tryVideoSink(const char *videoSink)
     return sink;
 }
 
-void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
+QGst::ElementPtr CallWindow::constructVideoSink()
 {
     QGst::ElementPtr sink = tryVideoSink("xvimagesink");
     if (!sink) {
         sink = tryVideoSink("ximagesink");
     }
 
+    return sink;
+
+}
+void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
+{
     VideoDisplayFlags oldState = d->currentVideoDisplayState;
 
     if (oldState.testFlag(LocalVideoPreview) && !newState.testFlag(LocalVideoPreview)) {
         d->videoContentHandler->unlinkVideoPreviewSink();
         d->ui.videoPreviewWidget->setVideoSink(QGst::ElementPtr());
     } else if (!oldState.testFlag(LocalVideoPreview) && newState.testFlag(LocalVideoPreview)) {
-        d->ui.videoPreviewWidget->setVideoSink(sink);
-        d->videoContentHandler->linkVideoPreviewSink(sink);
+        QGst::ElementPtr localVideoSink = constructVideoSink();
+	if (localVideoSink) {
+            d->ui.videoPreviewWidget->setVideoSink(localVideoSink);
+            d->videoContentHandler->linkVideoPreviewSink(localVideoSink);
+	}
     }
 
     if (oldState.testFlag(RemoteVideo) && !newState.testFlag(RemoteVideo)) {
         d->videoContentHandler->unlinkRemoteMemberVideoSink(d->remoteVideoContact);
         d->ui.videoWidget->setVideoSink(QGst::ElementPtr());
     } else if (!oldState.testFlag(RemoteVideo) && newState.testFlag(RemoteVideo)) {
-        d->ui.videoWidget->setVideoSink(sink);
-        d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, sink);
+        QGst::ElementPtr remoteVideoSink = constructVideoSink();
+        if (remoteVideoSink) {
+            d->ui.videoWidget->setVideoSink(remoteVideoSink);
+            d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, remoteVideoSink);
+	}
     }
 
     if (newState == NoVideo) {

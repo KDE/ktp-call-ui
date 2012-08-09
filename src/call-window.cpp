@@ -308,16 +308,37 @@ void CallWindow::onRemoteVideoSendingStateChanged(const Tp::ContactPtr & contact
     }
 }
 
+QGst::ElementPtr CallWindow::tryVideoSink(const char *videoSink)
+{
+    QGst::ElementPtr sink = QGst::ElementFactory::make(videoSink);
+    if (!sink) {
+        kDebug() << "Could not make video sink" << videoSink;
+        return sink;
+     }
+
+    if (!sink->setState(QGst::StateReady)) {
+        kDebug() << "Video sink" << videoSink << "does not want to become ready";
+        return QGst::ElementPtr();
+    }
+
+    kDebug() << "Using video sink" << videoSink;
+    sink->setState(QGst::StateNull);
+    return sink;
+}
+
 void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
 {
-    static const char * const preferredSinkFactory = "xvimagesink";
+    QGst::ElementPtr sink = tryVideoSink("xvimagesink");
+    if (!sink) {
+        sink = tryVideoSink("ximagesink");
+    }
+
     VideoDisplayFlags oldState = d->currentVideoDisplayState;
 
     if (oldState.testFlag(LocalVideoPreview) && !newState.testFlag(LocalVideoPreview)) {
         d->videoContentHandler->unlinkVideoPreviewSink();
         d->ui.videoPreviewWidget->setVideoSink(QGst::ElementPtr());
     } else if (!oldState.testFlag(LocalVideoPreview) && newState.testFlag(LocalVideoPreview)) {
-        QGst::ElementPtr sink = QGst::ElementFactory::make(preferredSinkFactory);
         d->ui.videoPreviewWidget->setVideoSink(sink);
         d->videoContentHandler->linkVideoPreviewSink(sink);
     }
@@ -326,7 +347,6 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
         d->videoContentHandler->unlinkRemoteMemberVideoSink(d->remoteVideoContact);
         d->ui.videoWidget->setVideoSink(QGst::ElementPtr());
     } else if (!oldState.testFlag(RemoteVideo) && newState.testFlag(RemoteVideo)) {
-        QGst::ElementPtr sink = QGst::ElementFactory::make(preferredSinkFactory);
         d->ui.videoWidget->setVideoSink(sink);
         d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, sink);
     }

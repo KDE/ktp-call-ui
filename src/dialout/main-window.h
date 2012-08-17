@@ -24,7 +24,7 @@ class MainWindow : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    explicit MainWindow(const QString &number = QString(), QWidget *parent = 0, Qt::WindowFlags f = 0);
     virtual ~MainWindow();
 };
 

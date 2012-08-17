@@ -124,7 +124,7 @@ struct DialoutWidget::Private
     Tp::ContactPtr currentContact;
 };
 
-DialoutWidget::DialoutWidget(QWidget *parent)
+DialoutWidget::DialoutWidget(const QString &number, QWidget *parent)
     : QWidget(parent),
       d(new Private)
 {
@@ -157,6 +157,8 @@ DialoutWidget::DialoutWidget(QWidget *parent)
 
     d->ui->stackedWidget->setCurrentWidget(d->ui->messagePage);
     d->ui->messageLabel->setText(i18n("Loading accounts..."));
+
+    d->ui->uriLineEdit->setText(number);
 }
 
 DialoutWidget::~DialoutWidget()

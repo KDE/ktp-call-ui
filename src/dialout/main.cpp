@@ -34,11 +34,23 @@ int main(int argc, char **argv)
                          "kiagiadakis.george@gmail.com");
 
     KCmdLineArgs::init(argc, argv, &aboutData);
+
+    KCmdLineOptions options;
+    options.add("+[number]", ki18n("The number to call"));
+
+    KCmdLineArgs::addCmdLineOptions(options);
+    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
+
     KUniqueApplication app;
 
     Tp::registerTypes();
 
-    MainWindow *mw = new MainWindow;
+    MainWindow *mw;
+    if(args->count()) {
+        mw = new MainWindow(args->arg(0));
+    } else {
+        mw = new MainWindow();
+    }
     mw->show();
 
     return app.exec();

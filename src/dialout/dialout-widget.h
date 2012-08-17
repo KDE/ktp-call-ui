@@ -26,7 +26,7 @@ class DialoutWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DialoutWidget(QWidget *parent = 0);
+    explicit DialoutWidget(const QString &number = QString(), QWidget *parent = 0);
     virtual ~DialoutWidget();
 
 private Q_SLOTS:

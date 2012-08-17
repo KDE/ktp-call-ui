@@ -20,10 +20,10 @@
 
 #include <KLocalizedString>
 
-MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags f)
+MainWindow::MainWindow(const QString &number, QWidget *parent, Qt::WindowFlags f)
     : KXmlGuiWindow(parent, f)
 {
-    setCentralWidget(new DialoutWidget(this));
+    setCentralWidget(new DialoutWidget(number, this));
     setupGUI(QSize(450, 120), KXmlGuiWindow::Create | KXmlGuiWindow::Save);
     setWindowTitle(i18n("Make a call"));
 }

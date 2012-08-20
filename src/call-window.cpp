@@ -333,6 +333,8 @@ QGst::ElementPtr CallWindow::constructVideoSink()
         sink = tryVideoSink("ximagesink");
     }
 
+    sink->setProperty("force-aspect-ratio", true);
+
     return sink;
 
 }

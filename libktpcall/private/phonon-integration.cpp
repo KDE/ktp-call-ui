@@ -97,6 +97,8 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readDevices(Phonon::ObjectDes
     case Phonon::VideoCaptureDeviceType:
         return readVideoDevices(type, category);
         break;
+    default:
+        break;
     }
 
     return QList<Phonon::DeviceAccessList>();

@@ -18,8 +18,7 @@
 #include "dialout-widget.h"
 #include "ui_dialout-widget.h"
 
-#include <KTp/Models/accounts-model.h>
-#include <KTp/Models/accounts-model-item.h>
+#include <KTp/Models/contacts-model.h>
 #include <KTp/Models/accounts-filter-model.h>
 
 #include <TelepathyQt/AccountManager>
@@ -115,7 +114,7 @@ bool audioVideoCalls(const Tp::CapabilitiesBase &caps, const QString &cmName)
 struct DialoutWidget::Private
 {
     Ui::DialoutWidget *ui;
-    AccountsModel *model;
+    ContactsModel *model;
     AccountsFilterModel *filterModel;
     Tp::AccountManagerPtr accountManager;
 
@@ -131,7 +130,7 @@ DialoutWidget::DialoutWidget(const QString &number, QWidget *parent)
     d->ui = new Ui::DialoutWidget;
     d->ui->setupUi(this);
 
-    d->model = new AccountsModel(this);
+    d->model = new ContactsModel(this);
     d->filterModel = new AccountsFilterModel(this);
     d->filterModel->setSourceModel(d->model);
     d->filterModel->setPresenceTypeFilterFlags(AccountsFilterModel::ShowOnlyConnected);
@@ -213,9 +212,7 @@ void DialoutWidget::on_accountComboBox_currentIndexChanged(int currentIndex)
 
     if (!contactId.isEmpty() && currentIndex != -1) {
         QModelIndex index = d->filterModel->index(currentIndex, 0);
-        Tp::AccountPtr account = d->filterModel->data(index,
-                AccountsModel::ItemRole).value<AccountsModelItem*>()->account();
-
+        Tp::AccountPtr account = d->filterModel->data(index,ContactsModel::AccountRole).value<Tp::AccountPtr>();
         requestContact(account, contactId);
     }
 }
@@ -228,9 +225,7 @@ void DialoutWidget::on_uriLineEdit_textChanged(const QString &text)
     d->ui->videoCallButton->setEnabled(false);
 
     if (index.isValid() && !text.isEmpty()) {
-        Tp::AccountPtr account = d->filterModel->data(index,
-                    AccountsModel::ItemRole).value<AccountsModelItem*>()->account();
-
+        Tp::AccountPtr account = d->filterModel->data(index,ContactsModel::AccountRole).value<Tp::AccountPtr>();
         requestContact(account, text);
     }
 }

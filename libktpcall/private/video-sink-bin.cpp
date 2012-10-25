@@ -30,11 +30,15 @@ VideoSinkBin::VideoSinkBin(const QGst::ElementPtr & videoSink)
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
     QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
     QGst::ElementPtr videoscale = QGst::ElementFactory::make("videoscale");
+    QGst::ElementPtr videoflip = QGst::ElementFactory::make("videoflip");
 
-    m_bin->add(queue, colorspace, videoscale, videoSink);
+    // 4 here represents GST_VIDEO_FLIP_METHOD_HORIZ
+    videoflip->setProperty("method", 4);
 
-    if (!QGst::Element::linkMany(queue, colorspace, videoscale, videoSink)) {
-        kDebug() << "queue ! colorspace ! videoscale ! videoSink failed";
+    m_bin->add(queue, colorspace, videoscale, videoflip, videoSink);
+
+    if (!QGst::Element::linkMany(queue, colorspace, videoscale, videoflip, videoSink)) {
+        kDebug() << "queue ! colorspace ! videoscale ! videoflip ! videoSink failed";
     }
 
     QGst::PadPtr sinkPad = queue->getStaticPad("sink");

@@ -35,7 +35,7 @@
 #include <KMessageBox>
 #include <KDebug>
 
-#define PREFERRED_CALL_HANDLER "org.freedesktop.Telepathy.Client.KTp.CallUi"
+#include <KTp/actions.h>
 
 namespace CapabilitiesHackPrivate {
 
@@ -259,25 +259,14 @@ void DialoutWidget::onPendingContactFinished(Tp::PendingOperation *op)
 
 void DialoutWidget::on_audioCallButton_clicked()
 {
-    Tp::PendingChannelRequest *pcr =
-        d->currentAccount->ensureAudioCall(d->currentContact,
-            QLatin1String("audio"),
-            QDateTime::currentDateTime(),
-            QLatin1String(PREFERRED_CALL_HANDLER));
-
+    Tp::PendingChannelRequest *pcr = KTp::Actions::startAudioCall(d->currentAccount, d->currentContact);
     connect(pcr, SIGNAL(finished(Tp::PendingOperation*)),
             SLOT(onPendingChannelRequestFinished(Tp::PendingOperation*)));
 }
 
 void DialoutWidget::on_videoCallButton_clicked()
 {
-    Tp::PendingChannelRequest *pcr =
-        d->currentAccount->ensureAudioVideoCall(d->currentContact,
-            QLatin1String("audio"),
-            QLatin1String("video"),
-            QDateTime::currentDateTime(),
-            QLatin1String(PREFERRED_CALL_HANDLER));
-
+    Tp::PendingChannelRequest *pcr = KTp::Actions::startAudioVideoCall(d->currentAccount, d->currentContact);
     connect(pcr, SIGNAL(finished(Tp::PendingOperation*)),
             SLOT(onPendingChannelRequestFinished(Tp::PendingOperation*)));
 }

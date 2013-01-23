@@ -36,84 +36,8 @@
 #include <KDebug>
 
 #include <KTp/actions.h>
-
-namespace CapabilitiesHackPrivate {
-
-/*
- * This is a hack to workaround a gabble bug.
- * https://bugs.freedesktop.org/show_bug.cgi?id=51978
- */
-
-Tp::RequestableChannelClassSpec gabbleAudioCallRCC()
-{
-    static Tp::RequestableChannelClassSpec spec;
-
-    if (!spec.isValid()) {
-        Tp::RequestableChannelClass rcc;
-        rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".ChannelType"),
-                TP_QT_IFACE_CHANNEL_TYPE_CALL);
-        rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".TargetHandleType"),
-                (uint) Tp::HandleTypeContact);
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudio"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudioName"));
-        spec = Tp::RequestableChannelClassSpec(rcc);
-    }
-
-    return spec;
-}
-
-Tp::RequestableChannelClassSpec gabbleAudioVideoCallRCC()
-{
-    static Tp::RequestableChannelClassSpec spec;
-
-    if (!spec.isValid()) {
-        Tp::RequestableChannelClass rcc;
-       rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".ChannelType"),
-                TP_QT_IFACE_CHANNEL_TYPE_CALL);
-        rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".TargetHandleType"),
-                (uint) Tp::HandleTypeContact);
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudio"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudioName"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialVideo"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialVideoName"));
-        spec = Tp::RequestableChannelClassSpec(rcc);
-    }
-
-    return spec;
-}
-
-bool audioCalls(const Tp::CapabilitiesBase &caps, const QString &cmName)
-{
-    bool gabbleResult = false;
-    if (cmName == QLatin1String("gabble")) {
-        Q_FOREACH (const Tp::RequestableChannelClassSpec &rccSpec, caps.allClassSpecs()) {
-            if (rccSpec.supports(gabbleAudioCallRCC())) {
-                gabbleResult = true;
-                break;
-            }
-        }
-    }
-
-    return gabbleResult || caps.audioCalls();
-}
-
-bool audioVideoCalls(const Tp::CapabilitiesBase &caps, const QString &cmName)
-{
-    bool gabbleResult = false;
-    if (cmName == QLatin1String("gabble")) {
-        Q_FOREACH (const Tp::RequestableChannelClassSpec &rccSpec, caps.allClassSpecs()) {
-            if (rccSpec.supports(gabbleAudioVideoCallRCC())) {
-                gabbleResult = true;
-                break;
-            }
-        }
-    }
-
-    return gabbleResult || caps.videoCalls();
-}
-
-} //namespace CapabilitiesHackPrivate
-
+#include <KTp/contact-factory.h>
+#include <KTp/contact.h>
 
 struct DialoutWidget::Private
 {
@@ -122,7 +46,7 @@ struct DialoutWidget::Private
 
     QPointer<Tp::PendingContacts> pendingContact;
     Tp::AccountPtr currentAccount;
-    Tp::ContactPtr currentContact;
+    KTp::ContactPtr currentContact;
 };
 
 DialoutWidget::DialoutWidget(const QString &number, QWidget *parent)
@@ -137,10 +61,12 @@ DialoutWidget::DialoutWidget(const QString &number, QWidget *parent)
             Tp::Features() << Tp::Account::FeatureCore
                            << Tp::Account::FeatureCapabilities);
     Tp::ConnectionFactoryPtr connectionFactory = Tp::ConnectionFactory::create(
-            QDBusConnection::sessionBus());
+            QDBusConnection::sessionBus(),
+            Tp::Features() << Tp::Connection::FeatureSelfContact);
     Tp::ChannelFactoryPtr channelFactory = Tp::ChannelFactory::create(
             QDBusConnection::sessionBus());
-    Tp::ContactFactoryPtr contactFactory = Tp::ContactFactory::create();
+    Tp::ContactFactoryPtr contactFactory = KTp::ContactFactory::create(
+                Tp::Features() << Tp::Contact::FeatureCapabilities);
 
     d->accountManager = Tp::AccountManager::create(accountFactory, connectionFactory,
                                                    channelFactory, contactFactory);
@@ -249,11 +175,10 @@ void DialoutWidget::onPendingContactFinished(Tp::PendingOperation *op)
     }
 
     if (pc == d->pendingContact && !pc->isError() && pc->contacts().size() > 0) {
-        d->currentContact = pc->contacts().at(0);
-        d->ui->audioCallButton->setEnabled(CapabilitiesHackPrivate::audioCalls(
-                d->currentContact->capabilities(), pc->manager()->connection()->cmName()));
-        d->ui->videoCallButton->setEnabled(CapabilitiesHackPrivate::audioVideoCalls(
-                d->currentContact->capabilities(), pc->manager()->connection()->cmName()));
+        d->currentContact = KTp::ContactPtr::qObjectCast(pc->contacts().at(0));
+
+        d->ui->audioCallButton->setEnabled(d->currentContact->audioCallCapability());
+        d->ui->videoCallButton->setEnabled(d->currentContact->videoCallCapability());
     }
 }
 

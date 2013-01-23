@@ -36,16 +36,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="KComboBox" name="accountComboBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="numberContactURILabel">
            <property name="text">
@@ -59,6 +49,9 @@
             <bool>true</bool>
            </property>
           </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="KTp::AccountsComboBox" name="accountComboBox"/>
          </item>
         </layout>
        </item>
@@ -117,14 +110,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KComboBox</class>
-   <extends>QComboBox</extends>
-   <header>kcombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>KLineEdit</class>
    <extends>QLineEdit</extends>
    <header>klineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KTp::AccountsComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">KTp/Widgets/accounts-combo-box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

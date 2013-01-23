@@ -31,7 +31,6 @@ public:
 
 private Q_SLOTS:
     void onAccountManagerReady(Tp::PendingOperation *op);
-    void onRowsChanged();
 
     void on_accountComboBox_currentIndexChanged(int currentIndex);
     void on_uriLineEdit_textChanged(const QString &text);

@@ -18,109 +18,35 @@
 #include "dialout-widget.h"
 #include "ui_dialout-widget.h"
 
-#include <KTp/Models/contacts-model.h>
-#include <KTp/Models/accounts-filter-model.h>
-
 #include <TelepathyQt/AccountManager>
+#include <TelepathyQt/AccountSet>
+#include <TelepathyQt/Account>
+#include <TelepathyQt/AccountCapabilityFilter>
+#include <TelepathyQt/AccountPropertyFilter>
 #include <TelepathyQt/ContactCapabilities>
 #include <TelepathyQt/ContactManager>
 #include <TelepathyQt/PendingContacts>
 #include <TelepathyQt/PendingChannelRequest>
 #include <TelepathyQt/PendingReady>
+#include <TelepathyQt/AndFilter>
+#include <TelepathyQt/OrFilter>
+
 
 #include <KMessageBox>
 #include <KDebug>
 
-#define PREFERRED_CALL_HANDLER "org.freedesktop.Telepathy.Client.KTp.CallUi"
-
-namespace CapabilitiesHackPrivate {
-
-/*
- * This is a hack to workaround a gabble bug.
- * https://bugs.freedesktop.org/show_bug.cgi?id=51978
- */
-
-Tp::RequestableChannelClassSpec gabbleAudioCallRCC()
-{
-    static Tp::RequestableChannelClassSpec spec;
-
-    if (!spec.isValid()) {
-        Tp::RequestableChannelClass rcc;
-        rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".ChannelType"),
-                TP_QT_IFACE_CHANNEL_TYPE_CALL);
-        rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".TargetHandleType"),
-                (uint) Tp::HandleTypeContact);
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudio"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudioName"));
-        spec = Tp::RequestableChannelClassSpec(rcc);
-    }
-
-    return spec;
-}
-
-Tp::RequestableChannelClassSpec gabbleAudioVideoCallRCC()
-{
-    static Tp::RequestableChannelClassSpec spec;
-
-    if (!spec.isValid()) {
-        Tp::RequestableChannelClass rcc;
-        rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".ChannelType"),
-                TP_QT_IFACE_CHANNEL_TYPE_CALL);
-        rcc.fixedProperties.insert(TP_QT_IFACE_CHANNEL + QLatin1String(".TargetHandleType"),
-                (uint) Tp::HandleTypeContact);
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudio"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialAudioName"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialVideo"));
-        rcc.allowedProperties.append(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String(".InitialVideoName"));
-        spec = Tp::RequestableChannelClassSpec(rcc);
-    }
-
-    return spec;
-}
-
-bool audioCalls(const Tp::CapabilitiesBase &caps, const QString &cmName)
-{
-    bool gabbleResult = false;
-    if (cmName == QLatin1String("gabble")) {
-        Q_FOREACH (const Tp::RequestableChannelClassSpec &rccSpec, caps.allClassSpecs()) {
-            if (rccSpec.supports(gabbleAudioCallRCC())) {
-                gabbleResult = true;
-                break;
-            }
-        }
-    }
-
-    return gabbleResult || caps.audioCalls();
-}
-
-bool audioVideoCalls(const Tp::CapabilitiesBase &caps, const QString &cmName)
-{
-    bool gabbleResult = false;
-    if (cmName == QLatin1String("gabble")) {
-        Q_FOREACH (const Tp::RequestableChannelClassSpec &rccSpec, caps.allClassSpecs()) {
-            if (rccSpec.supports(gabbleAudioVideoCallRCC())) {
-                gabbleResult = true;
-                break;
-            }
-        }
-    }
-
-    return gabbleResult || caps.videoCalls();
-}
-
-} //namespace CapabilitiesHackPrivate
-
+#include <KTp/actions.h>
+#include <KTp/contact-factory.h>
+#include <KTp/contact.h>
 
 struct DialoutWidget::Private
 {
     Ui::DialoutWidget *ui;
-    ContactsModel *model;
-    AccountsFilterModel *filterModel;
     Tp::AccountManagerPtr accountManager;
 
     QPointer<Tp::PendingContacts> pendingContact;
     Tp::AccountPtr currentAccount;
-    Tp::ContactPtr currentContact;
+    KTp::ContactPtr currentContact;
 };
 
 DialoutWidget::DialoutWidget(const QString &number, QWidget *parent)
@@ -130,23 +56,17 @@ DialoutWidget::DialoutWidget(const QString &number, QWidget *parent)
     d->ui = new Ui::DialoutWidget;
     d->ui->setupUi(this);
 
-    d->model = new ContactsModel(this);
-    d->filterModel = new AccountsFilterModel(this);
-    d->filterModel->setSourceModel(d->model);
-    d->filterModel->setPresenceTypeFilterFlags(AccountsFilterModel::ShowOnlyConnected);
-    d->filterModel->setCapabilityFilterFlags(AccountsFilterModel::FilterByMediaCallCapability);
-    d->filterModel->setDynamicSortFilter(true);
-    d->ui->accountComboBox->setModel(d->filterModel);
-
     Tp::AccountFactoryPtr accountFactory = Tp::AccountFactory::create(
             QDBusConnection::sessionBus(),
             Tp::Features() << Tp::Account::FeatureCore
                            << Tp::Account::FeatureCapabilities);
     Tp::ConnectionFactoryPtr connectionFactory = Tp::ConnectionFactory::create(
-            QDBusConnection::sessionBus());
+            QDBusConnection::sessionBus(),
+            Tp::Features() << Tp::Connection::FeatureSelfContact);
     Tp::ChannelFactoryPtr channelFactory = Tp::ChannelFactory::create(
             QDBusConnection::sessionBus());
-    Tp::ContactFactoryPtr contactFactory = Tp::ContactFactory::create();
+    Tp::ContactFactoryPtr contactFactory = KTp::ContactFactory::create(
+                Tp::Features() << Tp::Contact::FeatureCapabilities);
 
     d->accountManager = Tp::AccountManager::create(accountFactory, connectionFactory,
                                                    channelFactory, contactFactory);
@@ -162,9 +82,9 @@ DialoutWidget::DialoutWidget(const QString &number, QWidget *parent)
 
 DialoutWidget::~DialoutWidget()
 {
-    int currentIndex = d->ui->accountComboBox->currentIndex();
-    if (currentIndex >= 0) {
-        KGlobal::config()->group("DialoutWidget").writeEntry("LastSelectedAccountIndex", currentIndex);
+    Tp::AccountPtr account = d->ui->accountComboBox->currentAccount();
+    if (account) {
+        KGlobal::config()->group("DialoutWidget").writeEntry("LastSelectedAccount", account->uniqueIdentifier());
     }
 
     delete d->ui;
@@ -179,53 +99,59 @@ void DialoutWidget::onAccountManagerReady(Tp::PendingOperation* op)
         return;
     }
 
-    d->model->setAccountManager(d->accountManager);
-    d->ui->messageLabel->setText(i18n("No capable accounts found. Please make sure that "
-                                      "you are online and that the accounts that you have "
-                                      "configured support audio and/or video calls"));
+    Tp::AccountPropertyFilterPtr isOnlineFilter = Tp::AccountPropertyFilter::create();
+    isOnlineFilter->addProperty(QLatin1String("online"), true);
 
-    onRowsChanged();
-    connect(d->filterModel, SIGNAL(rowsInserted(QModelIndex,int,int)), SLOT(onRowsChanged()));
-    connect(d->filterModel, SIGNAL(rowsRemoved(QModelIndex,int,int)), SLOT(onRowsChanged()));
+    Tp::AccountCapabilityFilterPtr audioCallFilter = Tp::AccountCapabilityFilter::create(
+                Tp::RequestableChannelClassSpecList() << Tp::RequestableChannelClassSpec::RequestableChannelClassSpec::streamedMediaAudioCall());
 
-    int savedIndex = KGlobal::config()->group("DialoutWidget").readEntry("LastSelectedAccountIndex", 0);
-    if (d->filterModel->rowCount() > 0 && savedIndex < d->filterModel->rowCount()) {
-        d->ui->accountComboBox->setCurrentIndex(savedIndex);
-    }
-}
+    Tp::AccountCapabilityFilterPtr videoCallFilter = Tp::AccountCapabilityFilter::create(
+                Tp::RequestableChannelClassSpecList() << Tp::RequestableChannelClassSpec::RequestableChannelClassSpec::streamedMediaVideoCall());
 
-void DialoutWidget::onRowsChanged()
-{
-    if (d->filterModel->rowCount() > 0) {
+
+    Tp::AccountFilterPtr capabilityFilter = Tp::OrFilter<Tp::Account>::create(QList<Tp::AccountFilterConstPtr>() << audioCallFilter << videoCallFilter);
+    Tp::AccountFilterConstPtr accountFilter = Tp::AndFilter<Tp::Account>::create(QList<Tp::AccountFilterConstPtr>() << isOnlineFilter << capabilityFilter);
+
+    Tp::AccountSetPtr accountSet = d->accountManager->filterAccounts(accountFilter);
+    d->ui->accountComboBox->setAccountSet(accountSet);
+
+    if (accountSet->accounts().size() > 0) {
         d->ui->stackedWidget->setCurrentWidget(d->ui->callPage);
     } else {
         d->ui->stackedWidget->setCurrentWidget(d->ui->messagePage);
     }
+
+    d->ui->messageLabel->setText(i18n("No capable accounts found. Please make sure that "
+                                      "you are online and that the accounts that you have "
+                                      "configured support audio and/or video calls"));
+
+    QString lastAccount = KGlobal::config()->group("DialoutWidget").readEntry("LastSelectedAccount");
+    d->ui->accountComboBox->setCurrentAccount(lastAccount);
 }
 
 void DialoutWidget::on_accountComboBox_currentIndexChanged(int currentIndex)
 {
+    Q_UNUSED(currentIndex);
     QString contactId = d->ui->uriLineEdit->text();
+    Tp::AccountPtr account = d->ui->accountComboBox->currentAccount();
 
     d->ui->audioCallButton->setEnabled(false);
     d->ui->videoCallButton->setEnabled(false);
 
-    if (!contactId.isEmpty() && currentIndex != -1) {
-        QModelIndex index = d->filterModel->index(currentIndex, 0);
-        Tp::AccountPtr account = d->filterModel->data(index,ContactsModel::AccountRole).value<Tp::AccountPtr>();
+
+    if (!contactId.isEmpty() && !account.isNull()) {
         requestContact(account, contactId);
     }
 }
 
 void DialoutWidget::on_uriLineEdit_textChanged(const QString &text)
 {
-    QModelIndex index = d->filterModel->index(d->ui->accountComboBox->currentIndex(), 0);
+    Tp::AccountPtr account = d->ui->accountComboBox->currentAccount();
 
     d->ui->audioCallButton->setEnabled(false);
     d->ui->videoCallButton->setEnabled(false);
 
-    if (index.isValid() && !text.isEmpty()) {
-        Tp::AccountPtr account = d->filterModel->data(index,ContactsModel::AccountRole).value<Tp::AccountPtr>();
+    if (!account.isNull() && !text.isEmpty()) {
         requestContact(account, text);
     }
 }
@@ -249,35 +175,23 @@ void DialoutWidget::onPendingContactFinished(Tp::PendingOperation *op)
     }
 
     if (pc == d->pendingContact && !pc->isError() && pc->contacts().size() > 0) {
-        d->currentContact = pc->contacts().at(0);
-        d->ui->audioCallButton->setEnabled(CapabilitiesHackPrivate::audioCalls(
-                d->currentContact->capabilities(), pc->manager()->connection()->cmName()));
-        d->ui->videoCallButton->setEnabled(CapabilitiesHackPrivate::audioVideoCalls(
-                d->currentContact->capabilities(), pc->manager()->connection()->cmName()));
+        d->currentContact = KTp::ContactPtr::qObjectCast(pc->contacts().at(0));
+
+        d->ui->audioCallButton->setEnabled(d->currentContact->audioCallCapability());
+        d->ui->videoCallButton->setEnabled(d->currentContact->videoCallCapability());
     }
 }
 
 void DialoutWidget::on_audioCallButton_clicked()
 {
-    Tp::PendingChannelRequest *pcr =
-        d->currentAccount->ensureAudioCall(d->currentContact,
-            QLatin1String("audio"),
-            QDateTime::currentDateTime(),
-            QLatin1String(PREFERRED_CALL_HANDLER));
-
+    Tp::PendingChannelRequest *pcr = KTp::Actions::startAudioCall(d->currentAccount, d->currentContact);
     connect(pcr, SIGNAL(finished(Tp::PendingOperation*)),
             SLOT(onPendingChannelRequestFinished(Tp::PendingOperation*)));
 }
 
 void DialoutWidget::on_videoCallButton_clicked()
 {
-    Tp::PendingChannelRequest *pcr =
-        d->currentAccount->ensureAudioVideoCall(d->currentContact,
-            QLatin1String("audio"),
-            QLatin1String("video"),
-            QDateTime::currentDateTime(),
-            QLatin1String(PREFERRED_CALL_HANDLER));
-
+    Tp::PendingChannelRequest *pcr = KTp::Actions::startAudioVideoCall(d->currentAccount, d->currentContact);
     connect(pcr, SIGNAL(finished(Tp::PendingOperation*)),
             SLOT(onPendingChannelRequestFinished(Tp::PendingOperation*)));
 }

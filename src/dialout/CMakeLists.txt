@@ -13,6 +13,7 @@ target_link_libraries(ktp-dialout-ui
     ${TELEPATHY_QT4_LIBRARIES}
     ${KTP_LIBRARIES}
     ${KTP_MODELS_LIBRARIES}
+    ${KTP_WIDGETS_LIBRARIES}
 )
 
 install(TARGETS ktp-dialout-ui DESTINATION ${BIN_INSTALL_DIR})

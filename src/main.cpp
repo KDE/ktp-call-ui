@@ -33,7 +33,7 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData aboutData("ktp-call-ui", 0, ki18n("KDE Telepathy Call Ui"), "0.5.2",
+    KAboutData aboutData("ktp-call-ui", 0, ki18n("KDE Telepathy Call Ui"), "0.5.3",
                           ki18n("VoIP client for KDE"), KAboutData::License_GPL,
                           ki18n("(C) 2009-2012, George Kiagiadakis\n"
                                 "(C) 2010-2011, Collabora Ltd."));

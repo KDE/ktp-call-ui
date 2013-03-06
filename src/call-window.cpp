@@ -347,10 +347,10 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
         d->ui.videoPreviewWidget->setVideoSink(QGst::ElementPtr());
     } else if (!oldState.testFlag(LocalVideoPreview) && newState.testFlag(LocalVideoPreview)) {
         QGst::ElementPtr localVideoSink = constructVideoSink();
-	if (localVideoSink) {
+        if (localVideoSink) {
             d->ui.videoPreviewWidget->setVideoSink(localVideoSink);
             d->videoContentHandler->linkVideoPreviewSink(localVideoSink);
-	}
+        }
     }
 
     if (oldState.testFlag(RemoteVideo) && !newState.testFlag(RemoteVideo)) {
@@ -361,7 +361,7 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
         if (remoteVideoSink) {
             d->ui.videoWidget->setVideoSink(remoteVideoSink);
             d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, remoteVideoSink);
-	}
+        }
     }
 
     if (newState == NoVideo) {
@@ -515,7 +515,7 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
         if (reason == Tp::LocalHoldStateReasonRequested) {
             d->statusArea->setMessage(StatusArea::Status, i18nc("@info:status", "Talking..."));
         } else if (reason == Tp::LocalHoldStateReasonNone ||
-		   reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
+            reason == Tp::LocalHoldStateReasonResourceNotAvailable) {
             d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Unknown error"));
         }
         d->holdAction->setEnabled(true);

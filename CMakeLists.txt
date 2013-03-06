@@ -1,5 +1,6 @@
 project(ktp-call-ui)
 
+set(KTP_CALL_UI_VERSION "0.5.3")
 set(IS_KTP_INTERNAL_MODULE TRUE)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
@@ -22,6 +23,8 @@ add_definitions(
     ${QTGSTREAMER_DEFINITIONS}
 )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTGSTREAMER_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
+
+configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/version.h @ONLY)
 
 add_subdirectory(libqtf)
 add_subdirectory(libktpcall)

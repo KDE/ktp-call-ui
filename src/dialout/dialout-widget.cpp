@@ -102,23 +102,13 @@ void DialoutWidget::onAccountManagerReady(Tp::PendingOperation* op)
     Tp::AccountPropertyFilterPtr isOnlineFilter = Tp::AccountPropertyFilter::create();
     isOnlineFilter->addProperty(QLatin1String("online"), true);
 
-    Tp::AccountCapabilityFilterPtr streamedAudioCallFilter = Tp::AccountCapabilityFilter::create(
-                Tp::RequestableChannelClassSpecList() << Tp::RequestableChannelClassSpec::RequestableChannelClassSpec::streamedMediaAudioCall());
-
-    Tp::AccountCapabilityFilterPtr streamedVideoCallFilter = Tp::AccountCapabilityFilter::create(
-                Tp::RequestableChannelClassSpecList() << Tp::RequestableChannelClassSpec::RequestableChannelClassSpec::streamedMediaVideoCall());
-
-    //need both streamed audio and normal audio to match older and newer CM
-
     Tp::AccountCapabilityFilterPtr audioCallFilter = Tp::AccountCapabilityFilter::create(
                 Tp::RequestableChannelClassSpecList() << Tp::RequestableChannelClassSpec::RequestableChannelClassSpec::audioCall());
 
     Tp::AccountCapabilityFilterPtr videoCallFilter = Tp::AccountCapabilityFilter::create(
                 Tp::RequestableChannelClassSpecList() << Tp::RequestableChannelClassSpec::RequestableChannelClassSpec::videoCall());
 
-    Tp::AccountFilterPtr capabilityFilter = Tp::OrFilter<Tp::Account>::create(QList<Tp::AccountFilterConstPtr>() << streamedAudioCallFilter
-                                                                                                                 << streamedVideoCallFilter
-                                                                                                                 << audioCallFilter
+    Tp::AccountFilterPtr capabilityFilter = Tp::OrFilter<Tp::Account>::create(QList<Tp::AccountFilterConstPtr>() << audioCallFilter
                                                                                                                  << videoCallFilter);
     
     Tp::AccountFilterConstPtr accountFilter = Tp::AndFilter<Tp::Account>::create(QList<Tp::AccountFilterConstPtr>() << isOnlineFilter << capabilityFilter);

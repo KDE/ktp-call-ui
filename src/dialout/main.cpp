@@ -34,6 +34,8 @@ int main(int argc, char **argv)
     aboutData.setProgramIconName("internet-telephony");
     aboutData.addAuthor(ki18nc("@info:credit", "George Kiagiadakis"), KLocalizedString(),
                          "kiagiadakis.george@gmail.com");
+    aboutData.setProductName("telepathy/call-ui"); //set the correct name for bug reporting
+
 
     KCmdLineArgs::init(argc, argv, &aboutData);
 

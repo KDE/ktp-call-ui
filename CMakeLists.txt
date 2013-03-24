@@ -4,6 +4,7 @@ set(KTP_CALL_UI_VERSION "0.5.80")
 set(IS_KTP_INTERNAL_MODULE TRUE)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+cmake_policy(SET CMP0002 OLD)
 
 find_package(KDE4 REQUIRED)
 find_package(TelepathyQt4 REQUIRED)

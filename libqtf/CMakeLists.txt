@@ -2,7 +2,7 @@
 # since gnome people like to include as many headers as possible
 # in their public headers instead of doing forward declarations.
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(TP_FARSTREAM REQUIRED telepathy-farstream)
+pkg_check_modules(TP_FARSTREAM REQUIRED telepathy-farstream-0.4)
 pkg_check_modules(FARSTREAM REQUIRED farstream-0.1)
 
 include_directories(

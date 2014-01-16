@@ -254,7 +254,7 @@ QGst::CapsPtr TfVideoContentHandler::contentCaps() const
         framerate = 15;
     }
 
-    QGst::Structure capsStruct("video/x-raw-yuv");
+    QGst::Structure capsStruct("video/x-raw");
     capsStruct.setValue("width", width);
     capsStruct.setValue("height", height);
     capsStruct.setValue("framerate", QGst::Fraction(framerate, 1));

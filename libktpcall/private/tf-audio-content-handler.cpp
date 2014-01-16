@@ -55,7 +55,7 @@ VolumeController *TfAudioContentHandler::outputVolumeController() const
 BaseSinkController *TfAudioContentHandler::createSinkController(const QGst::PadPtr & srcPad)
 {
     refSink();
-    AudioSinkController *ctrl = new AudioSinkController(m_outputAdder->getRequestPad("sink%d"));
+    AudioSinkController *ctrl = new AudioSinkController(m_outputAdder->getRequestPad("sink_%u"));
     ctrl->initFromStreamingThread(srcPad, channelHandler()->pipeline());
     return ctrl;
 }
@@ -239,7 +239,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     QGst::ElementPtr tee = bin->getElementByName(
             QString(QLatin1String("input_tee_%1")).arg(id).toAscii());
-    if (tee->getRequestPad("src%d")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
+    if (tee->getRequestPad("src_%u")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
         kWarning() << "Failed to link tee ! queue";
         return false;
     }

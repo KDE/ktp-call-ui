@@ -200,10 +200,9 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
         "volume name=input_volume_%1 ! "
         "level name=input_level_%1 ! "
         "audioconvert ! "
-        "capsfilter caps=\"audio/x-raw-int,rate=[8000,16000];audio/x-raw-float,rate=[8000,16000]\" ! "
+        "capsfilter caps=\"audio/x-raw,rate=[8000,16000]\" ! "
         "tee name=input_tee_%1 ! "
-        "fakesink sync=false async=false silent=true enable-last-buffer=true")).arg(id);
-
+        "fakesink sync=false async=false silent=true enable-last-sample=true")).arg(id);
 
     QGst::BinPtr bin;
     try {

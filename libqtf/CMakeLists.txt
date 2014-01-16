@@ -3,7 +3,7 @@
 # in their public headers instead of doing forward declarations.
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TP_FARSTREAM REQUIRED telepathy-farstream)
-pkg_check_modules(FARSTREAM REQUIRED farstream-0.1)
+pkg_check_modules(FARSTREAM REQUIRED farstream-0.2)
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}

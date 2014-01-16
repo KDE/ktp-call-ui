@@ -117,7 +117,7 @@ QGst::PadPtr VideoSinkController::requestSrcPad()
     QString newPadName = QString("src%1").arg(m_padNameCounter);
     m_padNameCounter++;
 
-    QGst::PadPtr teeSrcPad = m_tee->getRequestPad("src%d");
+    QGst::PadPtr teeSrcPad = m_tee->getRequestPad("src_%u");
     QGst::PadPtr ghostSrcPad = QGst::GhostPad::create(teeSrcPad, newPadName.toAscii());
 
     ghostSrcPad->setActive(true);
@@ -144,7 +144,7 @@ void VideoSinkController::linkVideoSink(const QGst::ElementPtr & sink)
     Q_ASSERT(m_bin);
     kDebug();
 
-    QGst::PadPtr srcPad = m_tee->getRequestPad("src%d");
+    QGst::PadPtr srcPad = m_tee->getRequestPad("src_%u");
     m_videoSinkBin = new VideoSinkBin(sink);
 
     m_bin->add(m_videoSinkBin->bin());
@@ -188,7 +188,7 @@ void VideoSinkController::initFromStreamingThread(const QGst::PadPtr & srcPad,
     fakesink->setProperty("enable-last-buffer", false);
 
     m_bin->add(m_tee, fakesink);
-    m_tee->getRequestPad("src%d")->link(fakesink->getStaticPad("sink"));
+    m_tee->getRequestPad("src_%u")->link(fakesink->getStaticPad("sink"));
 
     QGst::PadPtr binSinkPad = QGst::GhostPad::create(m_tee->getStaticPad("sink"), "sink");
     m_bin->addPad(binSinkPad);

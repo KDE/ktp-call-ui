@@ -57,7 +57,7 @@ void TfVideoContentHandler::linkVideoPreviewSink(const QGst::ElementPtr & sink)
     QString teeName = QString(QLatin1String("input_tee_%1")).arg(id);
     QGst::ElementPtr tee = m_srcBin->getElementByName(teeName.toAscii());
 
-    QGst::PadPtr srcPad = tee->getRequestPad("src%d");
+    QGst::PadPtr srcPad = tee->getRequestPad("src_%u");
     m_videoPreviewBin = new VideoSinkBin(sink);
 
     m_srcBin->add(m_videoPreviewBin->bin());
@@ -220,13 +220,13 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     }
 
     // tee ! fakesink
-    if (tee->getRequestPad("src%d")->link(fakesink->getStaticPad("sink")) != QGst::PadLinkOk) {
+    if (tee->getRequestPad("src_%u")->link(fakesink->getStaticPad("sink")) != QGst::PadLinkOk) {
         kWarning() << "Failed to link tee ! fakesink";
         return false;
     }
 
     // tee ! queue
-    if (tee->getRequestPad("src%d")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
+    if (tee->getRequestPad("src_%u")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
         kWarning() << "Failed to link tee ! queue";
         return false;
     }

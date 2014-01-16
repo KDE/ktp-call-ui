@@ -170,7 +170,7 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     fakesink->setProperty("sync", false);
     fakesink->setProperty("async", false);
     fakesink->setProperty("silent", true);
-    fakesink->setProperty("enable-last-buffer", false);
+    fakesink->setProperty("enable-last-sample", false);
 
     //queue to support fsconference after the tee
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");

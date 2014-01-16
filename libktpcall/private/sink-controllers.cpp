@@ -185,7 +185,7 @@ void VideoSinkController::initFromStreamingThread(const QGst::PadPtr & srcPad,
     fakesink->setProperty("sync", false);
     fakesink->setProperty("async", false);
     fakesink->setProperty("silent", true);
-    fakesink->setProperty("enable-last-buffer", false);
+    fakesink->setProperty("enable-last-sample", false);
 
     m_bin->add(m_tee, fakesink);
     m_tee->getRequestPad("src_%u")->link(fakesink->getStaticPad("sink"));

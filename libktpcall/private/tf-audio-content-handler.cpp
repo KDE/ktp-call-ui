@@ -133,7 +133,7 @@ void TfAudioContentHandler::refSink()
             m_sink->setProperty("sync", false);
             m_sink->setProperty("async", false);
             m_sink->setProperty("silent", true);
-            m_sink->setProperty("enable-last-buffer", false);
+            m_sink->setProperty("enable-last-sample", false);
         }
 
         if (!m_sink.dynamicCast<QGst::StreamVolume>()) {

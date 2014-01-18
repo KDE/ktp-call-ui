@@ -149,7 +149,7 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     //ffmpegcolorspace converts to yuv for postproc_tmpnoise
     //to work if the camera cannot produce yuv
-    QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
+    QGst::ElementPtr colorspace = QGst::ElementFactory::make("videoconvert");
 
     //capsfilter restricts the output to 320x240 @ 15fps or whatever Content.I.VideoControl says
     QString capsfilterName = QString(QLatin1String("input_capsfilter_%1")).arg(id);

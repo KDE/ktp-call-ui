@@ -34,6 +34,8 @@ public:
                                 const QList<Tp::ChannelRequestPtr> & requestsSatisfied,
                                 const QDateTime & userActionTime,
                                 const Tp::AbstractClientHandler::HandlerInfo & handlerInfo);
+private:
+    QList<Tp::CallChannelPtr> handledCallChannels;
 };
 
 #endif

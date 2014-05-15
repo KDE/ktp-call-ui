@@ -83,7 +83,7 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
             continue;
         }
         //check if any call manager is already handling this channel
-	if (handledCallChannels.contains(callChannel)) {
+	if (!handledCallChannels.contains(callChannel)) {
 	    handledCallChannels.append(callChannel);
 	    CallManager *manager = new CallManager(callChannel, this);
 	}

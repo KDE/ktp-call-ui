@@ -64,6 +64,7 @@ private:
 
 private Q_SLOTS:
     void toggleDtmf(bool checked);
+    void toggleShowMyVideo(bool checked);
     void toggleMute(bool checked);
     void hangup();
     void hold();

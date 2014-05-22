@@ -381,11 +381,12 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
 
 void CallWindow::setupActions()
 {
-     //TODO implement this feature
     d->showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
     d->showMyVideoAction->setIcon(KIcon("camera-web"));
-    d->showMyVideoAction->setEnabled(false);
+    d->showMyVideoAction->setEnabled(true);
+    connect(d->showMyVideoAction, SIGNAL(toggled(bool)), this,SLOT(toggleShowMyVideo(bool)));
     actionCollection()->addAction("showMyVideo", d->showMyVideoAction);
+
 
     d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);
     d->showDtmfAction->setIcon(KIcon("phone"));
@@ -535,5 +536,15 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
 
     default:
         d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Internal Error"));
+    }
+}
+
+void CallWindow::toggleShowMyVideo(bool checked)
+{
+    if (checked) {
+        d->ui.videoPreviewWidget->hide();
+        d->ui.videoWidget->repaint();
+    } else {
+        d->ui.videoPreviewWidget->show();
     }
 }

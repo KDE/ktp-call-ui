@@ -58,6 +58,8 @@ struct CallWindow::Private
     KToggleAction *muteAction;
     KAction *holdAction;
     KAction *hangupAction;
+    KAction *goToSystemTrayAction;
+    KAction *restoreAction;
 
     VideoDisplayFlags currentVideoDisplayState;
     VideoContentHandler *videoContentHandler;
@@ -97,6 +99,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
                 .arg(remoteMember->avatarData().fileName, remoteMember->alias()));
         setWindowTitle(i18n("Call with %1", remoteMember->alias()));
     }
+    setupSystemTray();
 }
 
 CallWindow::~CallWindow()
@@ -387,12 +390,20 @@ void CallWindow::setupActions()
     connect(d->showMyVideoAction, SIGNAL(toggled(bool)), this,SLOT(toggleShowMyVideo(bool)));
     actionCollection()->addAction("showMyVideo", d->showMyVideoAction);
 
-
     d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);
     d->showDtmfAction->setIcon(KIcon("phone"));
     d->showDtmfAction->setEnabled(false);
     connect(d->showDtmfAction, SIGNAL(toggled(bool)), SLOT(toggleDtmf(bool)));
     actionCollection()->addAction("showDtmf", d->showDtmfAction);
+
+    d->goToSystemTrayAction = new KAction(i18nc("@action", "Hide window"), this);
+    d->goToSystemTrayAction->setEnabled(true);
+    connect(d->goToSystemTrayAction, SIGNAL(triggered(bool)), this, SLOT(hide()));
+    actionCollection()->addAction("goToSystemTray", d->goToSystemTrayAction);
+
+    d->restoreAction= new KAction(i18nc("@action", "Restore window"), this);
+    d->restoreAction->setEnabled(true);
+    connect(d->restoreAction, SIGNAL(triggered(bool)), this, SLOT(show()));
 
     //TODO implement this feature
     d->sendVideoAction = new KToggleAction(i18nc("@action", "Send video"), this);
@@ -460,6 +471,7 @@ void CallWindow::hangup()
 
 void CallWindow::closeEvent(QCloseEvent *event)
 {
+    systemtrayicon->setActivateNext(false);
     if (!d->callEnded) {
         kDebug() << "Ignoring close event";
         hangup();
@@ -539,6 +551,35 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
     }
 }
 
+void CallWindow::setupSystemTray()
+{
+    KMenu *trayIconMenu=new KMenu(this);
+    systemtrayicon=new SystemTrayIcon(this);
+
+
+    //Save the title
+    trayIconMenu->setTitle(windowTitle());
+
+    //Show the title
+    trayIconMenu->addAction(windowTitle());
+    trayIconMenu->addSeparator();
+
+    //Actions
+    trayIconMenu->addAction(d->hangupAction);
+    trayIconMenu->addAction(d->holdAction);
+    trayIconMenu->addAction(d->sendVideoAction);
+    trayIconMenu->addAction(d->muteAction);
+    trayIconMenu->addAction(d->restoreAction);
+    trayIconMenu->addAction(KStandardAction::close(this, SLOT(close()), actionCollection()));
+
+    systemtrayicon->setAssociatedWidget(this);
+
+    //Restore when left click
+    connect(systemtrayicon, SIGNAL(activateRequested(bool,QPoint)), this, SLOT(show()));
+
+    systemtrayicon->setContextMenu(trayIconMenu);
+}
+
 void CallWindow::toggleShowMyVideo(bool checked)
 {
     if (checked) {
@@ -547,4 +588,18 @@ void CallWindow::toggleShowMyVideo(bool checked)
     } else {
         d->ui.videoPreviewWidget->show();
     }
+}
+
+void CallWindow::showEvent(QShowEvent* event)
+{
+    KXmlGuiWindow::showEvent(event);
+    systemtrayicon->setStatus(KStatusNotifierItem::Passive);
+
+}
+void CallWindow::hideEvent(QHideEvent* event)
+{
+    if(isHidden()){
+        systemtrayicon->show();
+    }
+    KXmlGuiWindow::hideEvent(event);
 }

@@ -104,7 +104,7 @@ bool TfVideoContentHandler::startSending()
 {
     QGst::ElementPtr src = DeviceElementFactory::makeVideoCaptureElement();
     if (!src) {
-        kDebug() << "Could not initialize video capture device";
+        kError() << "Could not initialize video capture device";
         return false;
     }
 

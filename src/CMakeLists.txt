@@ -7,25 +7,43 @@ set(ktp-call-ui_SRCS
     call-window.cpp
     call-handler.cpp
     dtmf-handler.cpp
-    dtmf-widget.cpp
+#     dtmf-widget.cpp
     status-area.cpp
     call-manager.cpp
     approver.cpp
     systemtray-icon.cpp
+    qml-interface.cpp
+    dtmf-qml.cpp
 )
 
-kde4_add_ui_files(ktp-call-ui_SRCS call-window.ui dtmf-widget.ui)
 kde4_add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
 target_link_libraries(ktp-call-ui
     ${KDE4_KDEUI_LIBS}
     ${TELEPATHY_QT4_LIBRARIES}
     ${KTP_LIBRARIES}
     ${QTGSTREAMER_UI_LIBRARIES}
+    ${QT_QTDECLARATIVE_LIBRARY}
     ktpcall
 )
 
 install(TARGETS ktp-call-ui DESTINATION ${LIBEXEC_INSTALL_DIR})
 install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui)
+
+install( FILES
+        qml/Main.qml
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui 
+)
+install( FILES
+        qml/core/Dtmf.qml
+        qml/core/Toolbar.qml
+        qml/core/Tooltip.qml
+        qml/core/Button.qml
+        qml/core/ToggleButton.qml
+        qml/core/DtmfButton.qml
+        qml/core/Separator.qml
+        qml/core/Label.qml
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui/core 
+)
 
 configure_file(org.freedesktop.Telepathy.Client.KTp.CallUi.service.in
                 org.freedesktop.Telepathy.Client.KTp.CallUi.service)

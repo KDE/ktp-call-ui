@@ -15,7 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "dtmf-handler.h"
-#include "dtmf-widget.h"
 
 struct DtmfHandler::Private
 {
@@ -33,12 +32,11 @@ DtmfHandler::~DtmfHandler()
     delete d;
 }
 
-void DtmfHandler::connectDtmfWidget(DtmfWidget *dtmfWidget)
+//! Connects the GUI of the \a Dialpad with the internal logic of \a DtmfHandler. \a Ekaitz
+void DtmfHandler::connectDtmfQml(DtmfQml *dtmfQml)
 {
-    connect(dtmfWidget, SIGNAL(startSendDtmfEvent(Tp::DTMFEvent)),
-            SLOT(onStartSendDtmfEvent(Tp::DTMFEvent)));
-    connect(dtmfWidget, SIGNAL(stopSendDtmfEvent()),
-            SLOT(onStopSendDtmfEvent()));
+    connect(dtmfQml, SIGNAL(startSendDtmfEvent(Tp::DTMFEvent)), SLOT(onStartSendDtmfEvent(Tp::DTMFEvent)));
+    connect(dtmfQml, SIGNAL(stopSendDtmfEvent()), SLOT(onStopSendDtmfEvent()));
 }
 
 void DtmfHandler::onStartSendDtmfEvent(Tp::DTMFEvent event)

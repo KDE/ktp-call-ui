@@ -16,24 +16,11 @@
       <Action name="showMyVideo" />
       <Action name="showDtmf" />
       <Action name="goToSystemTray" />
+      <Action name="fullScreen" />
     </Menu>
-    <Menu name="media" >
-      <text>Media</text>
-      <Action name="sendVideo" />
-      <Action name="mute" />
+    <Menu name="window">
+      <text>Window</text>
+      <Action name="fullScreen" />
     </Menu>
   </MenuBar>
-
-  <ToolBar name="mainToolBar" position="bottom" >
-    <text>Main Toolbar</text>
-    <Action name="hangup" />
-    <Action name="hold" />
-    <Separator />
-    <Action name="showDtmf" />
-    <Action name="showMyVideo" />
-    <Separator />
-    <Action name="mute" />
-    <Action name="sendVideo" />
-  </ToolBar>
-
 </gui>

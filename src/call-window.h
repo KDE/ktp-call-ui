@@ -24,7 +24,7 @@
 #include <QGst/Global>
 
 #include "systemtray-icon.h"
-
+#include "qml-interface.h"
 
 class CallContentHandler;
 
@@ -61,18 +61,20 @@ private:
     void changeVideoDisplayState(VideoDisplayFlags newState);
 
     void setupActions();
+    void setupQmlUi();
     void checkEnableDtmf();
     QGst::ElementPtr tryVideoSink(const char *sink);
     QGst::ElementPtr constructVideoSink();
 
 private Q_SLOTS:
     void toggleDtmf(bool checked);
-    void toggleShowMyVideo(bool checked);
     void toggleMute(bool checked);
     void hangup();
     void hold();
     void holdOperationFinished(Tp::PendingOperation *operation);
     void onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason);
+
+    void fullScreen();
 
 
 protected:

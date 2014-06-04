@@ -11,6 +11,7 @@ find_package(TelepathyQt4 REQUIRED)
 find_package(TelepathyQt4Farstream REQUIRED)
 find_package(KTp REQUIRED)
 find_package(QtGStreamer REQUIRED)
+find_package(Qt4 COMPONENTS QtDeclarative)
 find_package(PkgConfig REQUIRED)
 
 include_directories(
@@ -18,6 +19,7 @@ include_directories(
     ${TELEPATHY_QT4_INCLUDE_DIR}
     ${KTP_INCLUDE_DIR}
     ${QTGSTREAMER_INCLUDES}
+    ${QTGSTREAMER_UI_LIBRARIES}
 )
 add_definitions(
     ${KDE4_DEFINITIONS}

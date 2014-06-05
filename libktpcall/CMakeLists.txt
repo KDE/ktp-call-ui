@@ -1,4 +1,9 @@
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FARSTREAM REQUIRED farstream-0.2)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR}
+        ${FARSTREAM_INCLUDE_DIRS}
+)
 
 #####
 

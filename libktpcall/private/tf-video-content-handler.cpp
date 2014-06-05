@@ -159,9 +159,6 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     kDebug() << "Using video src caps" << capsfilter->property("caps").get<QGst::CapsPtr>();
 
-    //postproc_tmpnoise reduces video noise to improve quality
-    QGst::ElementPtr postproc = QGst::ElementFactory::make("postproc_tmpnoise");
-
     //tee to support fakesink + fsconference + video preview sink
     QString teeName = QString(QLatin1String("input_tee_%1")).arg(id);
     QGst::ElementPtr tee = QGst::ElementFactory::make("tee", teeName.toAscii());
@@ -206,18 +203,13 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     }
 
     // capsfilter ! (postproc_tmpnoise) ! tee
-    if (postproc) {
-        bin->add(postproc);
-        if (!QGst::Element::linkMany(capsfilter, postproc, tee)) {
-            kWarning() << "Failed to link capsfilter ! postproc_tmpnoise ! tee";
-            return false;
-        }
-    } else {
-        kDebug() << "NOT using postproc_tmpnoise";
-        if (!capsfilter->link(tee)) {
-            kWarning() << "Failed to link capsfilter ! tee";
-            return false;
-        }
+    // FIXME: GStreamer 0.10 version used postproc_tmpnoise to reduce video noise
+    // there doesn't appear to be an equivalent in gstreamer 1.0.
+    // consider investigating alternatives.
+
+    if (!capsfilter->link(tee)) {
+        kWarning() << "Failed to link capsfilter ! tee";
+        return false;
     }
 
     // tee ! fakesink

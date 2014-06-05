@@ -139,9 +139,10 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     //some unique id for this content - use the name that the CM gives to the content object
     QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
 
-    //videomaxrate drops frames to support the 15fps restriction
+    //videorate drops frames to support the 15fps restriction
     //in the capsfilter if the camera cannot produce 15fps
-    QGst::ElementPtr videomaxrate = QGst::ElementFactory::make("videomaxrate");
+    QGst::ElementPtr videorate = QGst::ElementFactory::make("videorate");
+    videorate->setProperty("max-rate", 15);
 
     //videoscale supports the 320x240 restriction in the capsfilter
     //if the camera cannot produce 320x240
@@ -183,15 +184,15 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     QGst::BinPtr bin = QGst::Bin::create();
     bin->add(src, videoscale, colorspace, capsfilter, tee, fakesink, queue);
 
-    // src ! (videomaxrate) ! videoscale
-    if (videomaxrate) {
-        bin->add(videomaxrate);
-        if (!QGst::Element::linkMany(src, videomaxrate, videoscale)) {
-            kWarning() << "Failed to link videosrc ! videomaxrate ! videoscale";
+    // src ! (videorate) ! videoscale
+    if (videorate) {
+        bin->add(videorate);
+        if (!QGst::Element::linkMany(src, videorate, videoscale)) {
+            kWarning() << "Failed to link videosrc ! videorate ! videoscale";
             return false;
         }
     } else {
-        kDebug() << "NOT using videomaxrate";
+        kDebug() << "NOT using videorate";
         if (!src->link(videoscale)) {
             kWarning() << "Failed to link videosrc ! videoscale";
             return false;

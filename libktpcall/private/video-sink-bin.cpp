@@ -28,7 +28,7 @@ VideoSinkBin::VideoSinkBin(const QGst::ElementPtr & videoSink)
     m_bin = QGst::Bin::create();
 
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
-    QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
+    QGst::ElementPtr colorspace = QGst::ElementFactory::make("videoconvert");
     QGst::ElementPtr videoscale = QGst::ElementFactory::make("videoscale");
     QGst::ElementPtr videoflip = QGst::ElementFactory::make("videoflip");
 

@@ -55,7 +55,7 @@ VolumeController *TfAudioContentHandler::outputVolumeController() const
 BaseSinkController *TfAudioContentHandler::createSinkController(const QGst::PadPtr & srcPad)
 {
     refSink();
-    AudioSinkController *ctrl = new AudioSinkController(m_outputAdder->getRequestPad("sink%d"));
+    AudioSinkController *ctrl = new AudioSinkController(m_outputAdder->getRequestPad("sink_%u"));
     ctrl->initFromStreamingThread(srcPad, channelHandler()->pipeline());
     return ctrl;
 }
@@ -133,7 +133,7 @@ void TfAudioContentHandler::refSink()
             m_sink->setProperty("sync", false);
             m_sink->setProperty("async", false);
             m_sink->setProperty("silent", true);
-            m_sink->setProperty("enable-last-buffer", false);
+            m_sink->setProperty("enable-last-sample", false);
         }
 
         if (!m_sink.dynamicCast<QGst::StreamVolume>()) {
@@ -200,10 +200,9 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
         "volume name=input_volume_%1 ! "
         "level name=input_level_%1 ! "
         "audioconvert ! "
-        "capsfilter caps=\"audio/x-raw-int,rate=[8000,16000];audio/x-raw-float,rate=[8000,16000]\" ! "
+        "capsfilter caps=\"audio/x-raw,rate=[8000,16000]\" ! "
         "tee name=input_tee_%1 ! "
-        "fakesink sync=false async=false silent=true enable-last-buffer=true")).arg(id);
-
+        "fakesink sync=false async=false silent=true enable-last-sample=true")).arg(id);
 
     QGst::BinPtr bin;
     try {
@@ -239,7 +238,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     QGst::ElementPtr tee = bin->getElementByName(
             QString(QLatin1String("input_tee_%1")).arg(id).toAscii());
-    if (tee->getRequestPad("src%d")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
+    if (tee->getRequestPad("src_%u")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
         kWarning() << "Failed to link tee ! queue";
         return false;
     }

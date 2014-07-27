@@ -57,7 +57,7 @@ void TfVideoContentHandler::linkVideoPreviewSink(const QGst::ElementPtr & sink)
     QString teeName = QString(QLatin1String("input_tee_%1")).arg(id);
     QGst::ElementPtr tee = m_srcBin->getElementByName(teeName.toAscii());
 
-    QGst::PadPtr srcPad = tee->getRequestPad("src%d");
+    QGst::PadPtr srcPad = tee->getRequestPad("src_%u");
     m_videoPreviewBin = new VideoSinkBin(sink);
 
     m_srcBin->add(m_videoPreviewBin->bin());
@@ -139,9 +139,10 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     //some unique id for this content - use the name that the CM gives to the content object
     QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
 
-    //videomaxrate drops frames to support the 15fps restriction
+    //videorate drops frames to support the 15fps restriction
     //in the capsfilter if the camera cannot produce 15fps
-    QGst::ElementPtr videomaxrate = QGst::ElementFactory::make("videomaxrate");
+    QGst::ElementPtr videorate = QGst::ElementFactory::make("videorate");
+    videorate->setProperty("max-rate", 15);
 
     //videoscale supports the 320x240 restriction in the capsfilter
     //if the camera cannot produce 320x240
@@ -149,7 +150,7 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     //ffmpegcolorspace converts to yuv for postproc_tmpnoise
     //to work if the camera cannot produce yuv
-    QGst::ElementPtr colorspace = QGst::ElementFactory::make("ffmpegcolorspace");
+    QGst::ElementPtr colorspace = QGst::ElementFactory::make("videoconvert");
 
     //capsfilter restricts the output to 320x240 @ 15fps or whatever Content.I.VideoControl says
     QString capsfilterName = QString(QLatin1String("input_capsfilter_%1")).arg(id);
@@ -157,9 +158,6 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     capsfilter->setProperty("caps", contentCaps());
 
     kDebug() << "Using video src caps" << capsfilter->property("caps").get<QGst::CapsPtr>();
-
-    //postproc_tmpnoise reduces video noise to improve quality
-    QGst::ElementPtr postproc = QGst::ElementFactory::make("postproc_tmpnoise");
 
     //tee to support fakesink + fsconference + video preview sink
     QString teeName = QString(QLatin1String("input_tee_%1")).arg(id);
@@ -170,7 +168,7 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     fakesink->setProperty("sync", false);
     fakesink->setProperty("async", false);
     fakesink->setProperty("silent", true);
-    fakesink->setProperty("enable-last-buffer", false);
+    fakesink->setProperty("enable-last-sample", false);
 
     //queue to support fsconference after the tee
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
@@ -183,15 +181,15 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     QGst::BinPtr bin = QGst::Bin::create();
     bin->add(src, videoscale, colorspace, capsfilter, tee, fakesink, queue);
 
-    // src ! (videomaxrate) ! videoscale
-    if (videomaxrate) {
-        bin->add(videomaxrate);
-        if (!QGst::Element::linkMany(src, videomaxrate, videoscale)) {
-            kWarning() << "Failed to link videosrc ! videomaxrate ! videoscale";
+    // src ! (videorate) ! videoscale
+    if (videorate) {
+        bin->add(videorate);
+        if (!QGst::Element::linkMany(src, videorate, videoscale)) {
+            kWarning() << "Failed to link videosrc ! videorate ! videoscale";
             return false;
         }
     } else {
-        kDebug() << "NOT using videomaxrate";
+        kDebug() << "NOT using videorate";
         if (!src->link(videoscale)) {
             kWarning() << "Failed to link videosrc ! videoscale";
             return false;
@@ -205,28 +203,23 @@ bool TfVideoContentHandler::createSrcBin(const QGst::ElementPtr & src)
     }
 
     // capsfilter ! (postproc_tmpnoise) ! tee
-    if (postproc) {
-        bin->add(postproc);
-        if (!QGst::Element::linkMany(capsfilter, postproc, tee)) {
-            kWarning() << "Failed to link capsfilter ! postproc_tmpnoise ! tee";
-            return false;
-        }
-    } else {
-        kDebug() << "NOT using postproc_tmpnoise";
-        if (!capsfilter->link(tee)) {
-            kWarning() << "Failed to link capsfilter ! tee";
-            return false;
-        }
+    // FIXME: GStreamer 0.10 version used postproc_tmpnoise to reduce video noise
+    // there doesn't appear to be an equivalent in gstreamer 1.0.
+    // consider investigating alternatives.
+
+    if (!capsfilter->link(tee)) {
+        kWarning() << "Failed to link capsfilter ! tee";
+        return false;
     }
 
     // tee ! fakesink
-    if (tee->getRequestPad("src%d")->link(fakesink->getStaticPad("sink")) != QGst::PadLinkOk) {
+    if (tee->getRequestPad("src_%u")->link(fakesink->getStaticPad("sink")) != QGst::PadLinkOk) {
         kWarning() << "Failed to link tee ! fakesink";
         return false;
     }
 
     // tee ! queue
-    if (tee->getRequestPad("src%d")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
+    if (tee->getRequestPad("src_%u")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
         kWarning() << "Failed to link tee ! queue";
         return false;
     }
@@ -254,7 +247,7 @@ QGst::CapsPtr TfVideoContentHandler::contentCaps() const
         framerate = 15;
     }
 
-    QGst::Structure capsStruct("video/x-raw-yuv");
+    QGst::Structure capsStruct("video/x-raw");
     capsStruct.setValue("width", width);
     capsStruct.setValue("height", height);
     capsStruct.setValue("framerate", QGst::Fraction(framerate, 1));

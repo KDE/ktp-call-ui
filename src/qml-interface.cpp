@@ -49,6 +49,8 @@ QmlInterface::QmlInterface(CallWindow* parent): QDeclarativeView(parent), d(new 
     setResizeMode(QDeclarativeView::SizeRootObjectToView);
 
     rootContext()->setContextProperty("showMyVideoAction", parent->actionCollection()->action("showMyVideo"));
+    rootContext()->setContextProperty("showDtmfAction", parent->actionCollection()->action("showDtmf"));
+    rootContext()->setContextProperty("muteAction", parent->actionCollection()->action("mute"));
 
     setupSignals();
 }
@@ -80,27 +82,12 @@ void QmlInterface::setHoldEnabled(bool enable)
 {
     QMetaObject::invokeMethod(rootObject(), "setHoldEnabled", Q_ARG(QVariant, enable));
 }
-void QmlInterface::setSoundEnabled(bool enable)
-{
-    QMetaObject::invokeMethod(rootObject(), "setSoundEnabled", Q_ARG(QVariant, enable));
-}
-void QmlInterface::setShowDialpadEnabled(bool enable)
-{
-    QMetaObject::invokeMethod(rootObject(), "setShowDialpadEnabled", Q_ARG(QVariant, enable));
-}
-
 
 void QmlInterface::setupSignals()
 {
     //GUI->logic
     connect(rootObject(), SIGNAL(hangupClicked()), this, SIGNAL(hangupClicked()));
     connect(rootObject(), SIGNAL(holdClicked()), this, SIGNAL(holdClicked()));
-    connect(rootObject(), SIGNAL(soundClicked(bool)), this, SIGNAL(muteClicked(bool)));
-    connect(rootObject(), SIGNAL(showDialpadClicked(bool)), this, SIGNAL(showDialpadClicked(bool)));
-
-    //logic->GUI
-    connect(this, SIGNAL(soundChangeState(bool)),rootObject(), SIGNAL(soundChangeState(bool)));
-    connect(this, SIGNAL(showDialpadChangeState(bool)),rootObject(), SIGNAL(showDialpadChangeState(bool)));
 }
 
 QmlInterface::~QmlInterface()

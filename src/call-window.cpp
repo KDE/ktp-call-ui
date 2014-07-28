@@ -236,7 +236,6 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 
         VolumeController *vol = audioContentHandler->inputVolumeControl();
         d->muteAction->setEnabled(vol->volumeControlSupported());
-        d->qmlUi->setSoundEnabled(vol->volumeControlSupported());
         connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
                 d->muteAction, SLOT(setEnabled(bool)));
         connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
@@ -275,7 +274,6 @@ void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
         VolumeController *vol = audioContentHandler->inputVolumeControl();
         disconnect(vol, NULL, d->muteAction, NULL);
         d->muteAction->setEnabled(false);
-        d->qmlUi->setSoundEnabled(false);
         d->muteAction->setProperty("volumeController", QVariant());
 
         d->statusArea->showAudioStatusIcon(false);
@@ -425,7 +423,6 @@ void CallWindow::checkEnableDtmf()
 
     kDebug() << "DTMF supported:" << dtmfSupported;
     d->showDtmfAction->setEnabled(dtmfSupported);
-    d->qmlUi->setShowDialpadEnabled(dtmfSupported);
 
     if (!dtmfSupported) {
         toggleDtmf(false);

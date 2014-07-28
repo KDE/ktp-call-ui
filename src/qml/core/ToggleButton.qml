@@ -22,36 +22,12 @@ Item{
   
   id: root
   height: 30; width: 30
-  property alias initialState: activated.state
   property bool enabled: false
   property alias containsMouse: area.containsMouse
-  
+  property bool checked: false
+
   signal buttonClick(bool toggled)
-  signal activate(bool toggled)
-  
-  function setEnabled(enable)
-  {
-    root.enabled=enable
-    if(enable){
-      container.opacity=1
-    }else{
-      container.opacity=0.5
-    }
-  }
-  
-  onActivate:
-  {
-    if(root.enabled){
-      if(toggled){
-	  activated.state = ""
-      }
-      else{
-	  activated.state = "unchecked"
-      }
-    }
-  }
-  
-  
+
   property alias iconSource: icon.source
   
   
@@ -76,6 +52,7 @@ Item{
       anchors.bottom: parent.bottom
       source: "/usr/share/icons/oxygen/16x16/actions/application-exit.png"
       visible: false
+      state: enabled && checked ? "" : "unchecked"
       
       states: [
 	  State {

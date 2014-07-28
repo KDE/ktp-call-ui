@@ -25,21 +25,11 @@ Item{
     property int toolsHeight: menu.height +30
    
       function setHoldEnabled(enable){ hold.setEnabled(enable)}
-      function setSoundEnabled(enable){ sound.setEnabled(enable)}
-      function setShowDialpadEnabled(enable){ showDialpad.setEnabled(enable)}
  
     //SIGNALS
     signal hangup()
     signal hold()
-    signal sound (bool toggled)
-    signal showDialpad (bool toggled)
-    
-    signal soundChangeState(bool toggled)
-    signal showDialpadChangeState(bool toggled)
-    
-    onSoundChangeState: sound.activate(toggled)
-    onShowDialpadChangeState: showDialpad.activate(toggled)
-    
+
     function changeHoldIcon(icon){
       if(icon=="start")
       {
@@ -100,8 +90,9 @@ Item{
       ToggleButton{
 	id: sound
 	iconSource: "/usr/share/icons/oxygen/32x32/status/audio-volume-medium.png"
-	onButtonClick: root.sound(toggled)
-	enabled:false
+	onButtonClick: muteAction.toggle();
+	enabled: muteAction.enabled
+	checked: muteAction.checked
 	Tooltip{
 	  text: qsTr("Mute")
 	}
@@ -110,7 +101,8 @@ Item{
 	id: showMyVideo
 	iconSource: "/usr/share/icons/oxygen/32x32/devices/camera-web.png"
 	onButtonClick: showMyVideoAction.toggle();
-	enabled: true
+	enabled: showMyVideoAction.enabled
+	checked: showMyVideoAction.checked
 	Tooltip{
 	  text: qsTr("Show my video")
 	}
@@ -119,9 +111,9 @@ Item{
       ToggleButton{
 	id:showDialpad
 	iconSource: "/usr/share/icons/oxygen/32x32/devices/phone.png"
-	onButtonClick: root.showDialpad(toggled)
-	initialState: "unchecked"
-	enabled: false
+	onButtonClick: showDtmfAction.toggle();
+	enabled: showDtmfAction.enabled
+        checked: showDtmfAction.checked
 	Tooltip{
 	  text: qsTr("Show dialpad")
 	}

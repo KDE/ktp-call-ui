@@ -61,19 +61,11 @@ public:
 
 public Q_SLOTS:
     void setHoldEnabled(bool enable);
-    void setSoundEnabled(bool enable);
-    void setShowDialpadEnabled(bool enable);
 
 Q_SIGNALS:
     //to outside
     void hangupClicked();
     void holdClicked();
-    void muteClicked(bool toggled);
-    void showDialpadClicked(bool toggled);
-
-    //to inside
-    void soundChangeState(bool toggled);
-    void showDialpadChangeState(bool toggled);
 
 private:
     void setupSignals();

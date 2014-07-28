@@ -599,9 +599,6 @@ void CallWindow::setupSystemTray()
     connect(systemtrayicon, SIGNAL(activateRequested(bool,QPoint)), this, SLOT(show()));
     systemtrayicon->setToolTip("call-start", windowTitle(),"");
 
-    //Restore when left click
-    connect(systemtrayicon, SIGNAL(activateRequested(bool,QPoint)), this, SLOT(showWithSystemTray()));
-
     systemtrayicon->setContextMenu(trayIconMenu);
 }
 

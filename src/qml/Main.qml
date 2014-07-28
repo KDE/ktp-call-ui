@@ -29,13 +29,11 @@ Rectangle{
      signal hangupClicked()
      signal holdClicked()
      signal soundClicked (bool toggled)
-     signal showMyVideoClicked (bool toggled)
      signal showDialpadClicked (bool toggled)
      signal exitFullScreen()
   
   //SIGNALS from outside
      signal soundChangeState(bool toggled)
-     signal showMyVideoChangeState(bool toggled)
      signal showDialpadChangeState(bool toggled)
      
      focus: true
@@ -43,7 +41,6 @@ Rectangle{
      Keys.onEscapePressed: {exitFullScreen()}
      
      onSoundChangeState: toolbar.soundChangeState(!toggled)//mute VS sound active (they are oposites)
-     onShowMyVideoChangeState:{ showPreviewVideo(toggled); toolbar.showMyVideoChangeState(toggled)}
      onShowDialpadChangeState: toolbar.showDialpadChangeState(toggled)
      
     function changeHoldIcon(icon){
@@ -61,24 +58,10 @@ Rectangle{
       label.visible=!show
     }
     
-    function showPreviewVideo(show)
-    {
-      if(show){
-	 sendingVideo.visible=true
-      }else{
-	 sendingVideo.visible=false
-      }
-    }
-    
     function setHoldEnabled(enable){toolbar.setHoldEnabled(enable)}
     function setSoundEnabled(enable){toolbar.setSoundEnabled(enable)}    
     function setShowDialpadEnabled(enable){toolbar.setShowDialpadEnabled(enable)} 
-     
-    onShowMyVideoClicked:
-    {
-       showPreviewVideo(toggled)
-    }
-     
+
   Rectangle{
     id: receivingVideo
       x: 70
@@ -121,6 +104,7 @@ Rectangle{
     anchors.bottomMargin: 70
     border.width: 2
     border.color: "dimgray"
+    visible: showMyVideoAction.checked
     
     VideoItem {
       id: videoPreviewWidget
@@ -136,7 +120,6 @@ Rectangle{
      onHangup: root.hangupClicked()
      onHold: root.holdClicked()
      onSound: root.soundClicked(!toggled) //The app uses Mute button, the oposite
-     onShowMyVideo: root.showMyVideoClicked(toggled)
      onShowDialpad: root.showDialpadClicked(toggled)
   }  
 }

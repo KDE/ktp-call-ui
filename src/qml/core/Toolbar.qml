@@ -32,15 +32,12 @@ Item{
     signal hangup()
     signal hold()
     signal sound (bool toggled)
-    signal showMyVideo (bool toggled)
     signal showDialpad (bool toggled)
     
     signal soundChangeState(bool toggled)
-    signal showMyVideoChangeState(bool toggled)
     signal showDialpadChangeState(bool toggled)
     
     onSoundChangeState: sound.activate(toggled)
-    onShowMyVideoChangeState: showMyVideo.activate(toggled)
     onShowDialpadChangeState: showDialpad.activate(toggled)
     
     function changeHoldIcon(icon){
@@ -112,7 +109,7 @@ Item{
       ToggleButton{
 	id: showMyVideo
 	iconSource: "/usr/share/icons/oxygen/32x32/devices/camera-web.png"
-	onButtonClick: root.showMyVideo(toggled)
+	onButtonClick: showMyVideoAction.toggle();
 	enabled: true
 	Tooltip{
 	  text: qsTr("Show my video")

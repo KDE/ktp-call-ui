@@ -56,10 +56,10 @@ struct CallWindow::Private
     StatusArea *statusArea;
     bool callEnded;
 
-    QmlInterface *qmlUi; //TODO Ekaitz
-    DtmfQml *dtmfQml; //TODO Ekaitz
+    QmlInterface *qmlUi;
+    DtmfQml *dtmfQml;
 
-    KToggleAction *showMyVideoAction; //TODO Ekaitz
+    KToggleAction *showMyVideoAction;
     KToggleAction *showDtmfAction;
     KToggleAction *sendVideoAction;
     KToggleAction *muteAction;
@@ -81,6 +81,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     : KXmlGuiWindow(), d(new Private)
 {
     d->callChannel = callChannel;
+    setupActions();
 
     //create ui
     setupQmlUi();
@@ -88,7 +89,6 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     // TODO Ekaitz. (Error widget is deleted)
     //d->ui.errorWidget->hide();
     //d->ui.errorWidget->setMessageType(KMessageWidget::Error);
-    setupActions();
     setupGUI(QSize(750, 450), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
     toolBar()->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -407,24 +407,6 @@ void CallWindow::setupActions()
     connect(d->hangupAction, SIGNAL(triggered()), SLOT(hangup()));
     actionCollection()->addAction("hangup", d->hangupAction);
 
-
-    //QML-UI <---> Actions
-    //Show my video. TODO Ekaitz.
-    connect(d->showMyVideoAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(showMyVideoChangeState(bool)));
-    connect(d->qmlUi,SIGNAL(showMyVideoClicked(bool)), d->showMyVideoAction, SLOT(setChecked(bool)));
-    //Show dialpad
-    connect(d->qmlUi, SIGNAL(showDialpadClicked(bool)), SLOT(toggleDtmf(bool)));
-    connect(d->showDtmfAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(showDialpadChangeState(bool)));
-    connect(d->qmlUi, SIGNAL(showDialpadClicked(bool)), d->showDtmfAction, SLOT(setChecked(bool)));
-    //Mute <-> Sound activated
-    connect(d->qmlUi,SIGNAL(muteClicked(bool)), SLOT(toggleMute(bool)));
-    connect(d->muteAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(soundChangeState(bool)));
-    connect(d->qmlUi,SIGNAL(muteClicked(bool)), d->muteAction, SLOT(setChecked(bool)));
-    //Hold
-    connect(d->qmlUi,SIGNAL(holdClicked()),SLOT(hold()));
-    //Hangup
-    connect(d->qmlUi,SIGNAL(hangupClicked()),SLOT(hangup()));
-
     d->fullScreenAction = new KToggleAction(KIcon("view-fullscreen"),i18nc("@action", "Full Screen"), this);
     d->fullScreenAction->setEnabled(true);
     connect(d->fullScreenAction, SIGNAL(triggered()), SLOT(fullScreen()));
@@ -621,6 +603,20 @@ void CallWindow::setupQmlUi()
 {
     d->qmlUi = new QmlInterface( this );
     setCentralWidget(d->qmlUi);
+
+    //QML-UI <---> Actions
+    //Show dialpad
+    connect(d->qmlUi, SIGNAL(showDialpadClicked(bool)), SLOT(toggleDtmf(bool)));
+    connect(d->showDtmfAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(showDialpadChangeState(bool)));
+    connect(d->qmlUi, SIGNAL(showDialpadClicked(bool)), d->showDtmfAction, SLOT(setChecked(bool)));
+    //Mute <-> Sound activated
+    connect(d->qmlUi,SIGNAL(muteClicked(bool)), SLOT(toggleMute(bool)));
+    connect(d->muteAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(soundChangeState(bool)));
+    connect(d->qmlUi,SIGNAL(muteClicked(bool)), d->muteAction, SLOT(setChecked(bool)));
+    //Hold
+    connect(d->qmlUi,SIGNAL(holdClicked()),SLOT(hold()));
+    //Hangup
+    connect(d->qmlUi,SIGNAL(hangupClicked()),SLOT(hangup()));
 }
 
 /*!This function makes the central QML widget go to full screen. To exit fullScreen mode, press \a Esc.

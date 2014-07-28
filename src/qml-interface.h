@@ -27,6 +27,7 @@
 #ifndef QMLINTERFACE_H
 #define QMLINTERFACE_H
 
+
 //! Works as interface between the QML GUI and CallWindow. \a Ekaitz.
 /*!
  * Manages the exchange of signals and function calls between the CallWindow and QML and sets up and controls the video players.
@@ -42,13 +43,13 @@
  * <em>    hangupClicked(), holdClicked(), muteClicked(), showMyVideoClicked(), showDialpadClicked(), exitFullScreen() </em>
  */
 
-class QmlInterface: public QDeclarativeView{
+class CallWindow;
 
-
+class QmlInterface: public QDeclarativeView {
     Q_OBJECT
 
 public:
-    QmlInterface(QWidget* parent = 0);
+    QmlInterface(CallWindow* parent = 0);
     virtual ~QmlInterface();
 
     void setLabel(const QString name, const QString imageUrl);
@@ -68,12 +69,10 @@ Q_SIGNALS:
     void hangupClicked();
     void holdClicked();
     void muteClicked(bool toggled);
-    void showMyVideoClicked(bool toggled);
     void showDialpadClicked(bool toggled);
 
     //to inside
     void soundChangeState(bool toggled);
-    void showMyVideoChangeState(bool toggled);
     void showDialpadChangeState(bool toggled);
 
 private:

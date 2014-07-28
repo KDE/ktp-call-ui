@@ -16,6 +16,7 @@
  */
 
 #include <KDE/KStandardDirs>
+#include <KActionCollection>
 
 #include <cstdlib>
 #include <QGst/ElementFactory>
@@ -23,6 +24,7 @@
 #include <QGst/Init>
 
 #include "qml-interface.h"
+#include "call-window.h"
 
 struct QmlInterface::Private
 {
@@ -33,7 +35,7 @@ struct QmlInterface::Private
 };
 
 
-QmlInterface::QmlInterface(QWidget* parent): QDeclarativeView(parent), d(new Private)
+QmlInterface::QmlInterface(CallWindow* parent): QDeclarativeView(parent), d(new Private)
 {
     d->surface = new QGst::Ui::GraphicsVideoSurface(this);
     rootContext()->setContextProperty(QLatin1String("videoSurface"), d->surface);
@@ -45,6 +47,9 @@ QmlInterface::QmlInterface(QWidget* parent): QDeclarativeView(parent), d(new Pri
     setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/Main.qml"))));
 
     setResizeMode(QDeclarativeView::SizeRootObjectToView);
+
+    qDebug() << "DAVE " << parent->actionCollection()->action("showMyVideo");
+    rootContext()->setContextProperty("showMyVideoAction", parent->actionCollection()->action("showMyVideo"));
 
     setupSignals();
 }
@@ -92,12 +97,10 @@ void QmlInterface::setupSignals()
     connect(rootObject(), SIGNAL(hangupClicked()), this, SIGNAL(hangupClicked()));
     connect(rootObject(), SIGNAL(holdClicked()), this, SIGNAL(holdClicked()));
     connect(rootObject(), SIGNAL(soundClicked(bool)), this, SIGNAL(muteClicked(bool)));
-    connect(rootObject(), SIGNAL(showMyVideoClicked(bool)), this, SIGNAL(showMyVideoClicked(bool)));
     connect(rootObject(), SIGNAL(showDialpadClicked(bool)), this, SIGNAL(showDialpadClicked(bool)));
 
     //logic->GUI
     connect(this, SIGNAL(soundChangeState(bool)),rootObject(), SIGNAL(soundChangeState(bool)));
-    connect(this, SIGNAL(showMyVideoChangeState(bool)),rootObject(), SIGNAL(showMyVideoChangeState(bool)));
     connect(this, SIGNAL(showDialpadChangeState(bool)),rootObject(), SIGNAL(showDialpadChangeState(bool)));
 }
 

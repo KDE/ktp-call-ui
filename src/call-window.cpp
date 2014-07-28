@@ -368,15 +368,12 @@ void CallWindow::setupActions()
     d->showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
     d->showMyVideoAction->setIcon(KIcon("camera-web"));
     d->showMyVideoAction->setEnabled(true);
-    connect(d->showMyVideoAction, SIGNAL(toggled(bool)), this,SLOT(toggleShowMyVideo(bool)));
-    d->showMyVideoAction->setEnabled(false);
     d->showMyVideoAction->setChecked(true);
     actionCollection()->addAction("showMyVideo", d->showMyVideoAction);
 
     d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);
     d->showDtmfAction->setIcon(KIcon("phone"));
     d->showDtmfAction->setEnabled(false);
-    connect(d->showDtmfAction, SIGNAL(toggled(bool)), SLOT(toggleDtmf(bool)));
     actionCollection()->addAction("showDtmf", d->showDtmfAction);
 
     d->goToSystemTrayAction = new KAction(i18nc("@action", "Hide window"), this);

@@ -354,10 +354,10 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
 
     if (newState == NoVideo) {
         //d->ui.callStackedWidget->setCurrentIndex(0);
-        d->qmlUi->showVideo(false);
+        d->qmlUi->setShowVideo(false);
     } else {
         //d->ui.callStackedWidget->setCurrentIndex(1);
-        d->qmlUi->showVideo(true);
+        d->qmlUi->setShowVideo(true);
     }
 
     d->currentVideoDisplayState = newState;
@@ -517,7 +517,7 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
         d->holdAction->setEnabled(true);
         d->qmlUi->setHoldEnabled(true);
         d->holdAction->setIcon(KIcon("media-playback-start"));
-        d->qmlUi->changeHoldIcon("start");
+        d->qmlUi->setChangeHoldIcon("start");
         d->statusArea->stopDurationTimer();
         break;
 
@@ -531,7 +531,7 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
         d->holdAction->setEnabled(true);
         d->qmlUi->setHoldEnabled(true);
         d->holdAction->setIcon(KIcon("media-playback-pause"));
-        d->qmlUi->changeHoldIcon("pause");
+        d->qmlUi->setChangeHoldIcon("pause");
         d->statusArea->startDurationTimer();
         break;
 

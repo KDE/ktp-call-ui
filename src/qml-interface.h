@@ -53,8 +53,8 @@ public:
     virtual ~QmlInterface();
 
     void setLabel(const QString name, const QString imageUrl);
-    void showVideo(bool show);
-    void changeHoldIcon(QString icon);
+    void setShowVideo(bool show);
+    void setChangeHoldIcon(QString icon);
 
     QGst::ElementPtr getVideoSink();
     QGst::ElementPtr getVideoPreviewSink();

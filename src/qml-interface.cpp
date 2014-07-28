@@ -48,7 +48,6 @@ QmlInterface::QmlInterface(CallWindow* parent): QDeclarativeView(parent), d(new 
 
     setResizeMode(QDeclarativeView::SizeRootObjectToView);
 
-    qDebug() << "DAVE " << parent->actionCollection()->action("showMyVideo");
     rootContext()->setContextProperty("showMyVideoAction", parent->actionCollection()->action("showMyVideo"));
 
     setupSignals();
@@ -68,11 +67,11 @@ QGst::ElementPtr QmlInterface::getVideoPreviewSink()
 {
     return d->surfacePreview->videoSink();
 }
-void QmlInterface::showVideo(bool show)
+void QmlInterface::setShowVideo(bool show)
 {
     QMetaObject::invokeMethod(rootObject(), "showVideo", Q_ARG(QVariant, show));
 }
-void QmlInterface::changeHoldIcon(QString icon)
+void QmlInterface::setChangeHoldIcon(QString icon)
 {
     QMetaObject::invokeMethod(rootObject(), "changeHoldIcon", Q_ARG(QVariant, icon));
 }

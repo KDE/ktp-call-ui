@@ -45,13 +45,11 @@ DtmfQml::~DtmfQml()
 void DtmfQml::onButtonPressed(QString digit)
 {
     int code;
-    if(digit=="#")
-    {
+    if(digit=="#") {
         code=Tp::DTMFEventHash;
-    }else if(digit=="*"){
+    } else if(digit=="*") {
         code=Tp::DTMFEventAsterisk;
-    }
-    else{
+    } else {
         code=digit.toInt();
     }
     Q_EMIT startSendDtmfEvent(static_cast<Tp::DTMFEvent>(code));

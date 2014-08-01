@@ -10,7 +10,7 @@ find_package(KDE4 REQUIRED)
 find_package(TelepathyQt4 REQUIRED)
 find_package(TelepathyQt4Farstream REQUIRED)
 find_package(KTp REQUIRED)
-find_package(QtGStreamer REQUIRED)
+find_package(QtGStreamer 1.0 REQUIRED)
 find_package(Qt4 COMPONENTS QtDeclarative)
 find_package(PkgConfig REQUIRED)
 

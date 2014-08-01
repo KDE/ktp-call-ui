@@ -28,7 +28,7 @@ public:
     explicit DtmfHandler(const Tp::CallChannelPtr & channel, QObject *parent = 0);
     virtual ~DtmfHandler();
 
-    void connectDtmfQml(DtmfQml *dtmfQml);//TODO Ekaitz.
+    void connectDtmfQml(DtmfQml *dtmfQml);
 
 private Q_SLOTS:
     void onStartSendDtmfEvent(Tp::DTMFEvent event);

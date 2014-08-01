@@ -27,8 +27,7 @@ struct DtmfQml::Private
 DtmfQml::DtmfQml(QWidget *parent)
 : QMainWindow(parent), d(new Private)
 {
-    d->view=new QDeclarativeView(this);
-    //d->view->setSource(QUrl::fromLocalFile("/home/kaditx/projects/qmlGui/core/Dtmf.qml")); //This made it run from local files
+    d->view = new QDeclarativeView(this);
     d->view->setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/core/Dtmf.qml"))));
     d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     setFixedSize(d->view->size());

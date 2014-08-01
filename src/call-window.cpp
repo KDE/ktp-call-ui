@@ -325,28 +325,19 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
 
     if (oldState.testFlag(LocalVideoPreview) && !newState.testFlag(LocalVideoPreview)) {
         d->videoContentHandler->unlinkVideoPreviewSink();
-        //d->ui.videoPreviewWidget->setVideoSink(QGst::ElementPtr());
     } else if (!oldState.testFlag(LocalVideoPreview) && newState.testFlag(LocalVideoPreview)) {
-        //QGst::ElementPtr localVideoSink = constructVideoSink();
         QGst::ElementPtr localVideoSink = d->qmlUi->getVideoPreviewSink();
         if (localVideoSink) {
-            //d->ui.videoPreviewWidget->setVideoSink(localVideoSink);
-            //d->videoContentHandler->linkVideoPreviewSink(localVideoSink);
             d->videoContentHandler->linkVideoPreviewSink(localVideoSink );
         }
     }
 
     if (oldState.testFlag(RemoteVideo) && !newState.testFlag(RemoteVideo)) {
         d->videoContentHandler->unlinkRemoteMemberVideoSink(d->remoteVideoContact);
-        //d->ui.videoWidget->setVideoSink(QGst::ElementPtr());
     } else if (!oldState.testFlag(RemoteVideo) && newState.testFlag(RemoteVideo)) {
-        //QGst::ElementPtr remoteVideoSink = constructVideoSink();
         QGst::ElementPtr remoteVideoSink= d->qmlUi->getVideoSink();
         if (remoteVideoSink) {
-            //d->ui.videoWidget->setVideoSink(remoteVideoSink);
-            //d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, remoteVideoSink);
             d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, remoteVideoSink);
-
         }
     }
 

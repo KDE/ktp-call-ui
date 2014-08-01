@@ -7,7 +7,6 @@ set(ktp-call-ui_SRCS
     call-window.cpp
     call-handler.cpp
     dtmf-handler.cpp
-#     dtmf-widget.cpp
     status-area.cpp
     call-manager.cpp
     approver.cpp

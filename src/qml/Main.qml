@@ -40,8 +40,8 @@ Rectangle{
      
     function setLabel(name, imageUrl)
     {
-       label.text= name
-       label.image=imageUrl
+       label.text = name
+       label.image = imageUrl
     }
     function showVideo(show)
     {
@@ -70,7 +70,7 @@ Rectangle{
   
     Label{
       id: label
-      text: "Calling"
+      text: i18n("Calling")
       image: ""
       visible: true
     }

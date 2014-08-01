@@ -42,15 +42,15 @@ DtmfQml::~DtmfQml()
     delete d;
 }
 
-void DtmfQml::onButtonPressed(QString digit)
+void DtmfQml::onButtonPressed(const QString &button)
 {
-    int code;
-    if(digit=="#") {
-        code=Tp::DTMFEventHash;
-    } else if(digit=="*") {
-        code=Tp::DTMFEventAsterisk;
+    Tp::DTMFEvent code;
+    if(button == QLatin1String("#")) {
+        code = Tp::DTMFEventHash;
+    } else if(button == QLatin1String("*")) {
+        code = Tp::DTMFEventAsterisk;
     } else {
-        code=digit.toInt();
+        code = static_cast<Tp::DTMFEvent>(button.toInt());
     }
-    Q_EMIT startSendDtmfEvent(static_cast<Tp::DTMFEvent>(code));
+    Q_EMIT startSendDtmfEvent(code);
 }

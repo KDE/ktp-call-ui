@@ -46,7 +46,7 @@ Q_SIGNALS:
     void stopSendDtmfEvent();
 
 private Q_SLOTS:
-    void onButtonPressed(QString digit);
+    void onButtonPressed(const QString &digit);
 };
 
 #endif //DTMF_QML_H

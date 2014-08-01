@@ -35,7 +35,8 @@ struct QmlInterface::Private
 };
 
 
-QmlInterface::QmlInterface(CallWindow* parent): QDeclarativeView(parent), d(new Private)
+QmlInterface::QmlInterface(CallWindow* parent):
+    QDeclarativeView(parent), d(new Private)
 {
     d->surface = new QGst::Ui::GraphicsVideoSurface(this);
     rootContext()->setContextProperty(QLatin1String("videoSurface"), d->surface);

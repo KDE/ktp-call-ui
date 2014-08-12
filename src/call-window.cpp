@@ -35,7 +35,6 @@
 #include <KToolBar>
 #include <KMessageWidget>
 
-#include <cstdlib>
 #include <QDeclarativeView>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>

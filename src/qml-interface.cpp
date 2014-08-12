@@ -18,7 +18,6 @@
 #include <KDE/KStandardDirs>
 #include <KActionCollection>
 
-#include <cstdlib>
 #include <QGst/ElementFactory>
 #include <QGst/Ui/GraphicsVideoSurface>
 #include <QGst/Init>

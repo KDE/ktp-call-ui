@@ -93,7 +93,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     toolBar()->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     DtmfHandler *handler = new DtmfHandler(d->callChannel, this);
-    d->dtmfQml = new DtmfQml( this );
+    d->dtmfQml = new DtmfQml(this);
     handler->connectDtmfQml(d->dtmfQml);
 
     //TODO handle member joining later
@@ -334,7 +334,7 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
     if (oldState.testFlag(RemoteVideo) && !newState.testFlag(RemoteVideo)) {
         d->videoContentHandler->unlinkRemoteMemberVideoSink(d->remoteVideoContact);
     } else if (!oldState.testFlag(RemoteVideo) && newState.testFlag(RemoteVideo)) {
-        QGst::ElementPtr remoteVideoSink= d->qmlUi->getVideoSink();
+        QGst::ElementPtr remoteVideoSink = d->qmlUi->getVideoSink();
         if (remoteVideoSink) {
             d->videoContentHandler->linkRemoteMemberVideoSink(d->remoteVideoContact, remoteVideoSink);
         }

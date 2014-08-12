@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2014 Ekaitz Zárraga <ekaitz.zarraga@gmail.com>
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 2 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -19,7 +19,7 @@
 import QtQuick 1.1
 
 Item{
-  
+
   id: root
   height: 30; width: 30
   property bool enabled: false
@@ -29,22 +29,22 @@ Item{
   signal buttonClick(bool toggled)
 
   property alias iconSource: icon.source
-  
-  
+
+
   Rectangle{
-  
+
   id: container
   anchors.fill: parent
   color: "transparent"
   opacity: root.enabled ? 1:0.5
-  
+
     Image{
       id: icon
       anchors.centerIn: parent
       smooth: true
       source: ""
     }
- 
+
     Image{
       id: activated
       width: 15; height: 15
@@ -53,7 +53,7 @@ Item{
       source: "/usr/share/icons/oxygen/16x16/actions/application-exit.png"
       visible: false
       state: enabled && checked ? "" : "unchecked"
-      
+
       states: [
 	  State {
 	      name: ""
@@ -65,7 +65,7 @@ Item{
 	  }
       ]
     }
-    
+
       MouseArea{
 	id: area
 	anchors.fill: parent

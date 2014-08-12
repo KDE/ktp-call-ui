@@ -30,7 +30,7 @@ install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui)
 
 install( FILES
         qml/Main.qml
-        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui 
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
 )
 install( FILES
         qml/core/Dtmf.qml
@@ -41,7 +41,7 @@ install( FILES
         qml/core/DtmfButton.qml
         qml/core/Separator.qml
         qml/core/Label.qml
-        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui/core 
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui/core
 )
 
 configure_file(org.freedesktop.Telepathy.Client.KTp.CallUi.service.in

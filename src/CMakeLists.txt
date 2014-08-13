@@ -32,16 +32,9 @@ install( FILES
         qml/Main.qml
         DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
 )
-install( FILES
-        qml/core/Dtmf.qml
-        qml/core/Toolbar.qml
-        qml/core/Tooltip.qml
-        qml/core/Button.qml
-        qml/core/ToggleButton.qml
-        qml/core/DtmfButton.qml
-        qml/core/Separator.qml
-        qml/core/Label.qml
-        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui/core
+install(DIRECTORY
+        qml/core
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
 )
 
 configure_file(org.freedesktop.Telepathy.Client.KTp.CallUi.service.in

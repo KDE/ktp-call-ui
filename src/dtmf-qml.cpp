@@ -45,11 +45,25 @@ DtmfQml::~DtmfQml()
 void DtmfQml::onButtonPressed(const QString &button)
 {
     Tp::DTMFEvent code;
-    if(button == QLatin1String("#")) {
+
+    if (1 != button.length()) {
+        return;
+    }
+
+    if (QChar('#') == button.at(0)) {
         code = Tp::DTMFEventHash;
-    } else if(button == QLatin1String("*")) {
+    } else if (QChar('*') == button.at(0)) {
         code = Tp::DTMFEventAsterisk;
+    } else if (QChar('A') == button.at(0)) {
+        code = Tp::DTMFEventLetterA;
+    } else if (QChar('B') == button.at(0)) {
+        code = Tp::DTMFEventLetterB;
+    } else if (QChar('C') == button.at(0)) {
+        code = Tp::DTMFEventLetterC;
+    } else if (QChar('D') == button.at(0)) {
+        code = Tp::DTMFEventLetterD;
     } else {
+        // should we catch if button is not a digit?
         code = static_cast<Tp::DTMFEvent>(button.toInt());
     }
     Q_EMIT startSendDtmfEvent(code);

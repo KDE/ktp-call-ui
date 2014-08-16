@@ -18,10 +18,7 @@
 #ifndef DTMF_QML_H
 #define DTMF_QML_H
 
-#include <QGraphicsObject>
 #include <QDeclarativeView>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
 #include <QMainWindow>
 #include <TelepathyQt/Constants>
 
@@ -29,7 +26,7 @@
 /*! \sa DtmfHandler, CallWindow::toggleDtmf()
  */
 
-class DtmfQml : public QMainWindow{
+class DtmfQml : public QMainWindow {
     Q_OBJECT
 
 private:

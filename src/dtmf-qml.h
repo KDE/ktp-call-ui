@@ -20,6 +20,7 @@
 
 #include <QDeclarativeView>
 #include <QMainWindow>
+#include <QtGui>
 #include <TelepathyQt/Constants>
 
 //! Manages the GUI of the dialpad. \a Ekaitz

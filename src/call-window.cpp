@@ -23,6 +23,7 @@
 #include "../libktpcall/call-channel-handler.h"
 
 #include <QtGui/QCloseEvent>
+#include <QVBoxLayout>
 
 #include <TelepathyQt/ReferencedHandles>
 #include <TelepathyQt/AvatarData>
@@ -56,6 +57,7 @@ struct CallWindow::Private
     bool callEnded;
 
     QmlInterface *qmlUi;
+    KMessageWidget *errorWidget;
     DtmfQml *dtmfQml;
 
     KToggleAction *showMyVideoAction;
@@ -85,9 +87,9 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
     //create ui
     setupQmlUi();
     d->statusArea = new StatusArea(statusBar());
-    // TODO Ekaitz. (Error widget is deleted)
-    //d->ui.errorWidget->hide();
-    //d->ui.errorWidget->setMessageType(KMessageWidget::Error);
+
+    d->errorWidget->hide();
+    d->errorWidget->setMessageType(KMessageWidget::Error);
     setupGUI(QSize(750, 450), ToolBar | Keys | StatusBar | Create, QLatin1String("callwindowui.rc"));
     setAutoSaveSettings(QLatin1String("CallWindow"), false);
     toolBar()->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -480,8 +482,8 @@ void CallWindow::hold()
 void CallWindow::holdOperationFinished(Tp::PendingOperation* operation)
 {
     if (operation->isError()) {
-        //d->ui.errorWidget->setText(i18nc("@info:error", "There was an error while pausing the call"));
-        //d->ui.errorWidget->animatedShow();
+        d->errorWidget->setText(i18nc("@info:error", "There was an error while pausing the call"));
+        d->errorWidget->animatedShow();
         return;
     }
 }
@@ -586,8 +588,16 @@ void CallWindow::hideEvent(QHideEvent* event)
  */
 void CallWindow::setupQmlUi()
 {
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    QWidget *centralWidget = new QWidget(this);
     d->qmlUi = new QmlInterface( this );
-    setCentralWidget(d->qmlUi);
+    d->errorWidget = new KMessageWidget( this );
+
+    layout->addWidget(d->errorWidget);
+    layout->addWidget(d->qmlUi);
+
+    centralWidget->setLayout(layout);
+    setCentralWidget(centralWidget);
 
     //QML-UI <---> Actions
     //Show dialpad

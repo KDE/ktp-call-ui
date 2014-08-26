@@ -18,6 +18,7 @@
 #define DTMF_HANDLER_H
 
 #include <TelepathyQt/CallChannel>
+#include "dtmf-qml.h"
 class DtmfWidget;
 
 class DtmfHandler : public QObject
@@ -27,7 +28,7 @@ public:
     explicit DtmfHandler(const Tp::CallChannelPtr & channel, QObject *parent = 0);
     virtual ~DtmfHandler();
 
-    void connectDtmfWidget(DtmfWidget *dtmfWidget);
+    void connectDtmfQml(DtmfQml *dtmfQml);
 
 private Q_SLOTS:
     void onStartSendDtmfEvent(Tp::DTMFEvent event);

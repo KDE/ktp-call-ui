@@ -43,15 +43,13 @@ QmlInterface::QmlInterface(CallWindow* parent):
     d->surfacePreview = new QGst::Ui::GraphicsVideoSurface(this);
     rootContext()->setContextProperty(QLatin1String("videoPreviewSurface"), d->surfacePreview);
 
-    //setSource(QUrl::fromLocalFile("/home/kaditx/projects/qmlGui/Main.qml"));  //This made it run from local files
-    setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/Main.qml"))));
-
     setResizeMode(QDeclarativeView::SizeRootObjectToView);
 
     rootContext()->setContextProperty("showMyVideoAction", parent->actionCollection()->action("showMyVideo"));
     rootContext()->setContextProperty("showDtmfAction", parent->actionCollection()->action("showDtmf"));
     rootContext()->setContextProperty("muteAction", parent->actionCollection()->action("mute"));
 
+    setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/Main.qml"))));
     setupSignals();
 }
 

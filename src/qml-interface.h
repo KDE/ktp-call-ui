@@ -48,7 +48,7 @@ class QmlInterface: public QDeclarativeView {
     Q_OBJECT
 
 public:
-    QmlInterface(CallWindow* parent = 0);
+    QmlInterface(CallWindow *parent = 0);
     virtual ~QmlInterface();
 
     void setLabel(const QString name, const QString imageUrl);

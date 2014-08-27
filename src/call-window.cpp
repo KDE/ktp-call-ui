@@ -575,7 +575,7 @@ void CallWindow::showEvent(QShowEvent* event)
 
 void CallWindow::hideEvent(QHideEvent* event)
 {
-    if(isHidden()){
+    if (isHidden()) {
         systemtrayicon->show();
     }
     KXmlGuiWindow::hideEvent(event);
@@ -624,8 +624,7 @@ void CallWindow::setupQmlUi()
  */
 void CallWindow::toggleFullScreen()
 {
-
-    if(d->qmlUi->isFullScreen()){
+    if (d->qmlUi->isFullScreen()) {
         d->qmlUi->setWindowFlags(Qt::Widget);
         setCentralWidget(d->qmlUi);
         d->qmlUi->showNormal();
@@ -639,7 +638,7 @@ void CallWindow::toggleFullScreen()
 
 void CallWindow::exitFullScreen()
 {
-    if(d->qmlUi->isFullScreen()) {
+    if (d->qmlUi->isFullScreen()) {
         // avoid duplicating isFullScreen true branch.
         toggleFullScreen();
     }

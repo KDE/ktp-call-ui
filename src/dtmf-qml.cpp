@@ -25,7 +25,7 @@ struct DtmfQml::Private
 };
 
 DtmfQml::DtmfQml(QWidget *parent)
-: QMainWindow(parent), d(new Private)
+    : QMainWindow(parent), d(new Private)
 {
     d->view = new QDeclarativeView(this);
     d->view->setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/core/Dtmf.qml"))));

@@ -423,10 +423,8 @@ void CallWindow::checkEnableDtmf()
 
 void CallWindow::toggleDtmf(bool checked)
 {
-    if(d->qmlUi->isFullScreen()){
-        toggleFullScreen();
-    } if(checked) {
-        toggleFullScreen();
+    if (checked) {
+        exitFullScreen();
         d->dtmfQml->show();
     } else {
         d->dtmfQml->hide();

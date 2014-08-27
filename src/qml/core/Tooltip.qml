@@ -41,7 +41,7 @@ Item {
 
     Timer {
         id: showTimer
-        interval: 1500
+        interval: 400
         running: tooltip.containsMouse && !tooltip.visible
         onTriggered: {
             tooltip.visible = true;

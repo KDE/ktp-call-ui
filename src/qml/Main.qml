@@ -70,7 +70,7 @@ Rectangle{
 
     Label{
       id: label
-      text: qsTr("Calling")
+      text: i18n("Calling")
       image: ""
       visible: true
     }

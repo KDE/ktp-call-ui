@@ -69,15 +69,15 @@ Rectangle {
             number.color = "white";
             border.color = "white";
             root.scale = 1;
-            root.buttonReleased()
+            root.buttonReleased();
         }
 
         onEntered: {
-            root.opacity = 0.8
+            root.opacity = 0.8;
         }
 
         onExited: {
-            root.opacity = 1
+            root.opacity = 1;
         }
     }
 }

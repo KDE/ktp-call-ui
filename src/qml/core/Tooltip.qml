@@ -43,6 +43,7 @@ Item {
         id: showTimer
         interval: 400
         running: tooltip.containsMouse && !tooltip.visible
+
         onTriggered: {
             tooltip.visible = true;
         }
@@ -52,6 +53,7 @@ Item {
         id: hideTimer
         interval: 100
         running: !tooltip.containsMouse && tooltip.visible
+
         onTriggered: {
             tooltip.visible = false
         }

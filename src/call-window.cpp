@@ -20,6 +20,7 @@
 
 #include "status-area.h"
 #include "dtmf-handler.h"
+#include "dtmf-qml.h"
 #include "../libktpcall/call-channel-handler.h"
 
 #include <QtGui/QCloseEvent>

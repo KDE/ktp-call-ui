@@ -60,7 +60,7 @@ Item {
         }
 
         onEntered: {
-            root.state = ""
+            root.state = "visible"
         }
 
         Timer {
@@ -164,7 +164,7 @@ Item {
 
     states: [
         State {
-            name: ""
+            name: "visible"
             PropertyChanges {
                 target: root
                 height: 60
@@ -181,7 +181,7 @@ Item {
 
     transitions: [
         Transition {
-            from: ""
+            from: "visible"
             to: "hidden"
 
             PropertyAnimation {
@@ -193,7 +193,7 @@ Item {
         },
         Transition {
             from: "hidden"
-            to: ""
+            to: "visible"
 
             PropertyAnimation {
                 target: root

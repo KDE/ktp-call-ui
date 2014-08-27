@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "dtmf-handler.h"
+#include "dtmf-qml.h"
 
 struct DtmfHandler::Private
 {

@@ -18,8 +18,8 @@
 #define DTMF_HANDLER_H
 
 #include <TelepathyQt/CallChannel>
-#include "dtmf-qml.h"
-class DtmfWidget;
+
+class DtmfQml;
 
 class DtmfHandler : public QObject
 {

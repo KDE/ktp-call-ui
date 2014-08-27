@@ -18,21 +18,18 @@
 #ifndef DTMF_QML_H
 #define DTMF_QML_H
 
-#include <QDeclarativeView>
 #include <QMainWindow>
-#include <QtGui>
+#include <QWidget>
+
 #include <TelepathyQt/Constants>
 
 //! Manages the GUI of the dialpad. \a Ekaitz
 /*! \sa DtmfHandler, CallWindow::toggleDtmf()
  */
 
-class DtmfQml : public QMainWindow {
+class DtmfQml : public QMainWindow
+{
     Q_OBJECT
-
-private:
-    struct Private;
-    Private *const d;
 
 public:
     explicit DtmfQml(QWidget *parent = 0);
@@ -44,6 +41,10 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void onButtonPressed(const QString &digit);
+
+private:
+    struct Private;
+    Private *const d;
 };
 
 #endif //DTMF_QML_H

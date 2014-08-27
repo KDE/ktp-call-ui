@@ -140,7 +140,7 @@ Item {
             }
 
             Tooltip {
-                text: qsTr("Show my video")
+                text: qsTr("Show My Video")
             }
         }
 
@@ -157,7 +157,7 @@ Item {
             }
 
             Tooltip {
-                text: qsTr("Show dialpad")
+                text: qsTr("Show Dialpad")
             }
         }
     }

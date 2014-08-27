@@ -61,14 +61,6 @@ public:
 public Q_SLOTS:
     void setHoldEnabled(bool enable);
 
-Q_SIGNALS:
-    //to outside
-    void hangupClicked();
-    void holdClicked();
-
-private:
-    void setupSignals();
-
 private:
     struct Private;
     Private *const d;

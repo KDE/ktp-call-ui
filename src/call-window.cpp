@@ -399,7 +399,7 @@ void CallWindow::setupActions()
 
     d->fullScreenAction = new KToggleAction(KIcon("view-fullscreen"),i18nc("@action", "Full Screen"), this);
     d->fullScreenAction->setEnabled(true);
-    connect(d->fullScreenAction, SIGNAL(triggered()), SLOT(fullScreen()));
+    connect(d->fullScreenAction, SIGNAL(triggered()), SLOT(toggleFullScreen()));
     actionCollection()->addAction("fullScreen", d->fullScreenAction);
 }
 
@@ -424,9 +424,9 @@ void CallWindow::checkEnableDtmf()
 void CallWindow::toggleDtmf(bool checked)
 {
     if(d->qmlUi->isFullScreen()){
-        fullScreen();
+        toggleFullScreen();
     } if(checked) {
-        fullScreen();
+        toggleFullScreen();
         d->dtmfQml->show();
     } else {
         d->dtmfQml->hide();
@@ -599,40 +599,50 @@ void CallWindow::setupQmlUi()
     centralWidget->setLayout(layout);
     setCentralWidget(centralWidget);
 
+    // grab root object so we can access QML signals.
+    QObject *root = d->qmlUi->rootObject();
+
     //QML-UI <---> Actions
     //Show dialpad
-    connect(d->qmlUi, SIGNAL(showDialpadClicked(bool)), SLOT(toggleDtmf(bool)));
+    connect(root, SIGNAL(showDialpadClicked(bool)), SLOT(toggleDtmf(bool)));
     connect(d->showDtmfAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(showDialpadChangeState(bool)));
-    connect(d->qmlUi, SIGNAL(showDialpadClicked(bool)), d->showDtmfAction, SLOT(setChecked(bool)));
+    connect(root, SIGNAL(showDialpadClicked(bool)), d->showDtmfAction, SLOT(setChecked(bool)));
     //Mute <-> Sound activated
-    connect(d->qmlUi,SIGNAL(muteClicked(bool)), SLOT(toggleMute(bool)));
+    connect(root,SIGNAL(muteClicked(bool)), SLOT(toggleMute(bool)));
     connect(d->muteAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(soundChangeState(bool)));
-    connect(d->qmlUi,SIGNAL(muteClicked(bool)), d->muteAction, SLOT(setChecked(bool)));
+    connect(root,SIGNAL(muteClicked(bool)), d->muteAction, SLOT(setChecked(bool)));
     //Hold
-    connect(d->qmlUi,SIGNAL(holdClicked()),SLOT(hold()));
+    connect(root,SIGNAL(holdClicked()),SLOT(hold()));
     //Hangup
-    connect(d->qmlUi,SIGNAL(hangupClicked()),SLOT(hangup()));
+    connect(root,SIGNAL(hangupClicked()),SLOT(hangup()));
+    //Exit FullScreen
+    connect(root,SIGNAL(exitFullScreen()),SLOT(exitFullScreen()));
 }
 
 /*!This function makes the central QML widget go to full screen. To exit fullScreen mode, press \a Esc.
  * \a Ekaitz.
  * \sa QmlInterface::exitFullScreen(), hideWithSystemTray(), showWithSystemTray().
  */
-void CallWindow::fullScreen()
+void CallWindow::toggleFullScreen()
 {
 
     if(d->qmlUi->isFullScreen()){
-        disconnect(d->qmlUi, SIGNAL(exitFullScreen()),this, SLOT(fullScreen()));
         d->qmlUi->setWindowFlags(Qt::Widget);
         setCentralWidget(d->qmlUi);
         d->qmlUi->showNormal();
         show();
-    }
-    else{
-        connect(d->qmlUi, SIGNAL(exitFullScreen()), SLOT(fullScreen()));
+    } else {
         d->qmlUi->setWindowFlags(Qt::Window);
         d->qmlUi->showFullScreen();
         hide();
+    }
+}
+
+void CallWindow::exitFullScreen()
+{
+    if(d->qmlUi->isFullScreen()) {
+        // avoid duplicating isFullScreen true branch.
+        toggleFullScreen();
     }
 }
 

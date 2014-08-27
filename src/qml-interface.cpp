@@ -50,7 +50,6 @@ QmlInterface::QmlInterface(CallWindow* parent):
     rootContext()->setContextProperty("muteAction", parent->actionCollection()->action("mute"));
 
     setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/Main.qml"))));
-    setupSignals();
 }
 
 void QmlInterface::setLabel(const QString name, const QString imageUrl)
@@ -79,13 +78,6 @@ void QmlInterface::setChangeHoldIcon(QString icon)
 void QmlInterface::setHoldEnabled(bool enable)
 {
     QMetaObject::invokeMethod(rootObject(), "setHoldEnabled", Q_ARG(QVariant, enable));
-}
-
-void QmlInterface::setupSignals()
-{
-    //GUI->logic
-    connect(rootObject(), SIGNAL(hangupClicked()), this, SIGNAL(hangupClicked()));
-    connect(rootObject(), SIGNAL(holdClicked()), this, SIGNAL(holdClicked()));
 }
 
 QmlInterface::~QmlInterface()

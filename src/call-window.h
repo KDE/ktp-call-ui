@@ -74,7 +74,8 @@ private Q_SLOTS:
     void holdOperationFinished(Tp::PendingOperation *operation);
     void onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason);
 
-    void fullScreen();
+    void toggleFullScreen();
+    void exitFullScreen();
 
 
 protected:

@@ -21,18 +21,21 @@ import "core"
 
 Rectangle{
 
-  id: root
-  height: 450; width: 750
-  color: "black"
+    id: root
+    height: 450; width: 750
+    color: "black"
 
-  //SIGNALS to outside
-     signal hangupClicked()
-     signal holdClicked()
-     signal exitFullScreen()
+    //SIGNALS to outside
+    signal showDialpadClicked (bool checked)
+    signal showDialpadChangeState (bool checked)
+    signal hangupClicked()
+    signal holdClicked()
+    signal muteClicked (bool checked)
+    signal exitFullScreen()
 
-     focus: true
-     Keys.enabled: true
-     Keys.onEscapePressed: {exitFullScreen()}
+    focus: true
+    Keys.enabled: true
+    Keys.onEscapePressed: root.exitFullScreen();
 
     function changeHoldIcon(icon){
        toolbar.changeHoldIcon(icon)

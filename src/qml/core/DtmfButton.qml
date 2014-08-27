@@ -17,42 +17,67 @@
 
 import QtQuick 1.1
 
-Rectangle{
-  id: root
-  signal buttonClick()
-  signal buttonPressed()
-  signal buttonReleased()
+Rectangle {
+    id: root
+    height: 50
+    width: 55
 
-  property alias number: number.text
+    signal buttonClick()
+    signal buttonPressed()
+    signal buttonReleased()
 
-  smooth: true
-  radius: 10
+    property alias number: number.text
 
-  height: 50; width: 55
-  border.width: 1
-  border.color: "white"
+    smooth: true
+    radius: 10
 
-  gradient: Gradient {
-         GradientStop {position: 0.0; color: "grey" }
-         GradientStop {position: 0.33; color: "black" }
-         GradientStop {position: 1.0; color: "dimgrey" }
+    border.width: 1
+    border.color: "white"
+
+    gradient: Gradient {
+        GradientStop {position: 0.0; color: "grey" }
+        GradientStop {position: 0.33; color: "black" }
+        GradientStop {position: 1.0; color: "dimgrey" }
     }
 
-    Text{
-      id: number
-      anchors.centerIn: parent
-      text:""
-      font.pixelSize : 20
-      color:"white"
+    Text {
+        id: number
+        anchors.centerIn: parent
+
+        text: ""
+        font.pixelSize: 20
+        color: "white"
     }
-    MouseArea{
-      id: mouse
-      anchors.fill: parent
-      hoverEnabled : true
-      onClicked: root.buttonClick();
-      onPressed: {number.color="white"; border.color="grey"; root.scale=0.92; root.buttonPressed()}
-      onReleased: {number.color="white"; border.color="white"; root.scale=1; root.buttonReleased()}
-      onEntered: {root.opacity=0.8}
-      onExited: {root.opacity=1}
+
+    MouseArea {
+        id: mouse
+        anchors.fill: parent
+
+        hoverEnabled: true
+        onClicked: {
+            root.buttonClick();
+        }
+
+        onPressed: {
+            number.color = "white";
+            border.color = "grey";
+            root.scale = 0.92;
+            root.buttonPressed();
+        }
+
+        onReleased: {
+            number.color = "white";
+            border.color = "white";
+            root.scale = 1;
+            root.buttonReleased()
+        }
+
+        onEntered: {
+            root.opacity = 0.8
+        }
+
+        onExited: {
+            root.opacity = 1
+        }
     }
 }

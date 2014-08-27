@@ -17,47 +17,71 @@
 
 import QtQuick 1.1
 
-Item{
+Item {
+    id: root
+    height: 30
+    width: 30
 
-  id: root
-  height: 30; width: 30
-  signal buttonClick()
-  property alias iconSource: icon.source
-  property bool enabled: false
-  property alias containsMouse: area.containsMouse
+    signal buttonClick()
 
-  function setEnabled(enable)
-  {
-    root.enabled=enable
-    if(enable){
-      container.opacity=1
-    }else{
-      container.opacity=0.5
+    property alias iconSource: icon.source
+    property bool enabled: false
+    property alias containsMouse: area.containsMouse
+
+    function setEnabled(enable) {
+        root.enabled = enable;
+        if (enable) {
+            container.opacity = 1;
+        } else {
+            container.opacity = 0.5;
+        }
     }
-  }
 
-  Rectangle{
+    Rectangle {
+        id: container
+        anchors.fill: parent
+        color: "transparent"
+        opacity: root.enabled ? 1 : 0.5
 
-  id: container
-  anchors.fill: parent
-  color: "transparent"
-  opacity: root.enabled ? 1:0.5
+        Image {
+            id: icon
+            anchors.centerIn: parent
+            source: ""
+            smooth: true
+        }
 
-    Image{
-      id: icon
-      anchors.centerIn: parent
-      source: ""
-      smooth: true
+        MouseArea {
+            id: area
+            anchors.fill: parent
+            hoverEnabled : true
+
+            onClicked: {
+                if (root.enabled) {
+                    root.buttonClick();
+                }
+            }
+
+            onPressed: {
+                if (root.enabled) {
+                    icon.scale = 0.9;
+                }
+            }
+
+            onReleased: {
+                icon.scale = 1.0;
+            }
+
+            onEntered: {
+                if (root.enabled) {
+                    container.opacity = 0.7;
+                }
+            }
+
+            onExited: {
+                if (root.enabled) {
+                    container.opacity = 1;
+                }
+            }
+        }
     }
-    MouseArea{
-      id: area
-      anchors.fill: parent
-      hoverEnabled : true
-      onClicked: {if(root.enabled){root.buttonClick()}}
-      onPressed: {if(root.enabled){icon.scale = 0.9}}
-      onReleased: {icon.scale = 1.0}
-      onEntered: {if(root.enabled){container.opacity=0.7}}
-      onExited: {if(root.enabled){container.opacity=1}}
-    }
-  }
 }

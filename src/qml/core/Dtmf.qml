@@ -17,80 +17,86 @@
 
 import QtQuick 1.1
 
-Rectangle{
+Rectangle {
+    id: root
 
-  id: root
+    height: all.height
+    width: numpad.width
+    color: "black"
 
-  height: all.height
-  width:numpad.width
-  color: "black"
+    signal click(string number)
+    signal press(string number)
+    signal release(string number)
 
-  signal click(string number)
-  signal press(string number)
-  signal release(string number)
+    onClick: dialed.text = dialed.text + number
 
-  onClick: dialed.text=dialed.text+number
+    Column {
+        id:all
+        spacing: 10
 
-  Column{
-    id:all
-    spacing: 10
+        Rectangle {
+            width: numpad.width
+            height: 30
+            color: "transparent"
 
-    Rectangle{
-      width: numpad.width
-      height: 30
-      color: "transparent"
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
 
-	Rectangle{
-	  radius: 6
-	  smooth: true
-	  anchors.top: parent.top
-	  anchors.topMargin: 5
-	  anchors.right: parent.right
-	  anchors.rightMargin: 5
-	  anchors.left: parent.left
-	  anchors.leftMargin: 5
-	  anchors.bottom: parent.bottom
+                    topMargin: 5
+                    leftMargin: 5
+                    rightMargin: 5
+                }
 
+                border {
+                    width: 3
+                    color: "white"
+                }
 
+                radius: 6
+                smooth: true
+                color: "black"
 
-	  border.width: 3
-	  border.color: "white"
-	  color: "black"
+                TextInput {
+                    id: dialed
+                    height: 30
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
 
-	TextInput{
-	  id: dialed
-	  color: "white"
-	  height: 30
-	  anchors.left: parent.left
-	  anchors.leftMargin: 20
-	  anchors.top: parent.top
-	  anchors.topMargin: 7
+                        topMargin: 7
+                        leftMargin: 20
+                        rightMargin: 20
+                    }
 
-	  anchors.right: parent.right
-	  anchors.rightMargin: 20
+                    color: "white"
+                    readOnly: true
 
-      readOnly: true
+                }
+            }
+        }
 
-	}
-      }
+        Grid {
+            id: numpad
+            columns: 3
+            spacing: 1
+
+            DtmfButton {number:"1"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"2"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"3"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"4"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"5"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"6"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"7"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"8"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"9"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"*"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"0"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+            DtmfButton {number:"#"; onButtonClick: root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
+        }
     }
-  Grid{
-    id: numpad
-    columns: 3
-    spacing: 1
-    DtmfButton{number:"1"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"2"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"3"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"4"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"5"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"6"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"7"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"8"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"9"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"*"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"0"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-    DtmfButton{number:"#"; onButtonClick:root.click(number); onButtonPressed: root.press(number); onButtonReleased: root.release(number)}
-  }
-  }
-
 }

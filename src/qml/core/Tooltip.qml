@@ -17,35 +17,43 @@
 
 import QtQuick 1.1
 
-Item{
+Item {
+    id: tooltip
+    width: label.width
+    height: label.height
 
-  id: tooltip
-  property alias text: label.text
-  property bool containsMouse: parent.containsMouse
-  visible: false
-
-  anchors.horizontalCenter: parent.horizontalCenter
-  anchors.top: parent.bottom
-
-  width: label.width
-  height: label.height
-
-  Text{
-    id: label
-    font.pointSize: 7
-    color: "white"
-    text: "This is a tooltip"
-  }
-    Timer {
-        id:showTimer
-        interval: 1500
-        running: (tooltip.containsMouse && !tooltip.visible)
-        onTriggered: tooltip.visible=true
+    anchors {
+        top: parent.bottom
+        horizontalCenter: parent.horizontalCenter
     }
+
+    visible: false
+
+    property alias text: label.text
+    property bool containsMouse: parent.containsMouse
+
+    Text {
+        id: label
+        font.pointSize: 7
+        color: "white"
+        text: "This is a tooltip"
+    }
+
     Timer {
-        id:hideTimer
+        id: showTimer
+        interval: 1500
+        running: tooltip.containsMouse && !tooltip.visible
+        onTriggered: {
+            tooltip.visible = true;
+        }
+    }
+
+    Timer {
+        id: hideTimer
         interval: 100
-        running: (!tooltip.containsMouse &&  tooltip.visible)
-        onTriggered: tooltip.visible=false
+        running: !tooltip.containsMouse && tooltip.visible
+        onTriggered: {
+            tooltip.visible = false
+        }
     }
 }

@@ -17,23 +17,26 @@
 
 import QtQuick 1.1
 
-Item{
-  id: root
-  width:10; height:30
-  Rectangle{
-  width:10
-  height:30
-  color: "transparent"
+Item {
+    id: root
+    width: 10
+    height: 30
 
-      Rectangle{
-      width: 3
-      height: 20
-      color: "black"
-      radius: 1
-      anchors.centerIn: parent
-      border.width: 1
-      border.color: "dimgrey"
-      opacity: 0.7
+    Rectangle {
+        width: 10
+        height: 30
+        color: "transparent"
+
+        Rectangle {
+            width: 3
+            height: 20
+            anchors.centerIn: parent
+
+            color: "black"
+            radius: 1
+            border.width: 1
+            border.color: "dimgrey"
+            opacity: 0.7
+        }
     }
-  }
 }

@@ -17,29 +17,32 @@
 
 import QtQuick 1.1
 
-Column{
-  id: label
-  anchors.centerIn: parent
-  property alias text: name.text
-  property alias image: avatar.source
-  spacing: 30
+Column {
+    id: label
+    anchors.centerIn: parent
 
-  Image{
-    id: avatar
-    height: 90
-    width: 90
-    source: ""
-    fillMode: Image.PreserveAspectFit
-  }
-  Item{
-    height: 30
-    width: 90
-    Text{
-      id: name
-      text: ""
-      color: "white"
-      anchors.centerIn: parent
+    property alias text: name.text
+    property alias image: avatar.source
+
+    spacing: 30
+
+    Image {
+        id: avatar
+        height: 90
+        width: 90
+        source: ""
+        fillMode: Image.PreserveAspectFit
     }
-  }
 
+    Item {
+        height: 30
+        width: 90
+
+        Text {
+            id: name
+            text: ""
+            color: "white"
+            anchors.centerIn: parent
+        }
+    }
 }

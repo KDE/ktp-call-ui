@@ -18,74 +18,95 @@
 
 import QtQuick 1.1
 
-Item{
+Item {
+    id: root
+    height: 30
+    width: 30
 
-  id: root
-  height: 30; width: 30
-  property bool enabled: false
-  property alias containsMouse: area.containsMouse
-  property bool checked: false
+    signal buttonClick(bool toggled)
 
-  signal buttonClick(bool toggled)
+    property bool enabled: false
+    property alias containsMouse: area.containsMouse
+    property bool checked: false
 
-  property alias iconSource: icon.source
+    property alias iconSource: icon.source
 
+    Rectangle {
+        id: container
+        anchors.fill: parent
+        color: "transparent"
+        opacity: root.enabled ? 1 : 0.5
 
-  Rectangle{
+        Image {
+            id: icon
+            anchors.centerIn: parent
+            source: ""
+            smooth: true
+        }
 
-  id: container
-  anchors.fill: parent
-  color: "transparent"
-  opacity: root.enabled ? 1:0.5
+        Image {
+            id: activated
+            width: 15
+            height: 15
 
-    Image{
-      id: icon
-      anchors.centerIn: parent
-      smooth: true
-      source: ""
-    }
+            anchors {
+                right: parent.right
+                bottom: parent.bottom
+            }
+            // FIXME: noooooooooooo!
+            source: "/usr/share/icons/oxygen/16x16/actions/application-exit.png"
+            visible: false
+            state: enabled && checked ? "" : "unchecked"
 
-    Image{
-      id: activated
-      width: 15; height: 15
-      anchors.right: parent.right
-      anchors.bottom: parent.bottom
-      source: "/usr/share/icons/oxygen/16x16/actions/application-exit.png"
-      visible: false
-      state: enabled && checked ? "" : "unchecked"
+            states: [
+                State {
+                    name: ""
+                    PropertyChanges {target: activated; visible: false}
+                    },
+                State {
+                    name: "unchecked"
+                    PropertyChanges {target: activated; visible: true}
+                }
+            ]
+        }
 
-      states: [
-	  State {
-	      name: ""
-	      PropertyChanges {target: activated; visible: false}
-	      },
-	  State {
-	      name: "unchecked"
-	      PropertyChanges {target: activated; visible: true}
-	  }
-      ]
-    }
+        MouseArea {
+            id: area
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: {
+                if (root.enabled) {
+                    if (activated.state == "") {
+                        root.buttonClick(false);
+                        root.activate(false);
+                    } else {
+                        root.buttonClick(true)
+                        root.activate(true)
+                    }
+                }
+            }
 
-      MouseArea{
-	id: area
-	anchors.fill: parent
-	hoverEnabled : true
-	onClicked:{
-	  if(root.enabled){
-	      if (activated.state == ""){
-		root.buttonClick(false)
-		root.activate(false)
-	      }
-	      else{
-		root.buttonClick(true)
-		root.activate(true)
-	      }
-	  }
-	}
-	onPressed: {if(root.enabled){icon.scale = 0.9}}
-	onReleased: {icon.scale = 1.0}
-	onEntered: {if(root.enabled){container.opacity=0.7}}
-	onExited: {if(root.enabled){container.opacity=1}}
-      }
+            onPressed: {
+                if (root.enabled) {
+                    icon.scale = 0.9;
+                }
+            }
+
+            onReleased: {
+                icon.scale = 1.0;
+            }
+
+            onEntered: {
+                if (root.enabled) {
+                    container.opacity = 0.7;
+                }
+            }
+
+            onExited: {
+                if (root.enabled) {
+                    container.opacity = 1
+                }
+            }
+        }
     }
 }

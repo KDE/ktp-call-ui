@@ -52,7 +52,7 @@ QmlInterface::QmlInterface(CallWindow *parent)
     setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/Main.qml"))));
 }
 
-void QmlInterface::setLabel(const QString name, const QString imageUrl)
+void QmlInterface::setLabel(const QString &name, const QString &imageUrl)
 {
     QMetaObject::invokeMethod(rootObject(), "setLabel", Q_ARG(QVariant, name), Q_ARG(QVariant, imageUrl));
 }
@@ -70,7 +70,7 @@ void QmlInterface::setShowVideo(bool show)
 {
     QMetaObject::invokeMethod(rootObject(), "showVideo", Q_ARG(QVariant, show));
 }
-void QmlInterface::setChangeHoldIcon(QString icon)
+void QmlInterface::setChangeHoldIcon(const QString &icon)
 {
     QMetaObject::invokeMethod(rootObject(), "changeHoldIcon", Q_ARG(QVariant, icon));
 }

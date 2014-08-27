@@ -51,9 +51,9 @@ public:
     QmlInterface(CallWindow *parent = 0);
     virtual ~QmlInterface();
 
-    void setLabel(const QString name, const QString imageUrl);
+    void setLabel(const QString &name, const QString &imageUrl);
     void setShowVideo(bool show);
-    void setChangeHoldIcon(QString icon);
+    void setChangeHoldIcon(const QString &icon);
 
     QGst::ElementPtr getVideoSink();
     QGst::ElementPtr getVideoPreviewSink();

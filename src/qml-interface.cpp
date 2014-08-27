@@ -22,6 +22,9 @@
 #include <QGst/Ui/GraphicsVideoSurface>
 #include <QGst/Init>
 
+#include <QDeclarativeContext>
+#include <QGraphicsObject>
+
 #include "qml-interface.h"
 #include "call-window.h"
 

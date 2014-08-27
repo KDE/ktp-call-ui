@@ -14,10 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include <KDE/KStandardDirs>
 
-#include <KLocalizedString>
 #include "dtmf-qml.h"
+
+#include <QGraphicsObject>
+#include <QDeclarativeView>
+
+#include <KStandardDirs>
+#include <KLocalizedString>
 
 struct DtmfQml::Private
 {

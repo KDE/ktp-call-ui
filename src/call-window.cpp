@@ -23,8 +23,9 @@
 #include "dtmf-qml.h"
 #include "../libktpcall/call-channel-handler.h"
 
-#include <QtGui/QCloseEvent>
+#include <QCloseEvent>
 #include <QVBoxLayout>
+#include <QGraphicsObject>
 
 #include <TelepathyQt/ReferencedHandles>
 #include <TelepathyQt/AvatarData>

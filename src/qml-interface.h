@@ -16,12 +16,7 @@
  */
 
 #include <QDeclarativeView>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QGraphicsObject>
 #include <QGst/ElementFactory>
-#include <QGst/Ui/GraphicsVideoSurface>
-#include <QGst/Init>
 
 #ifndef QMLINTERFACE_H
 #define QMLINTERFACE_H

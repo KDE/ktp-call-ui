@@ -28,18 +28,26 @@
 #include "qml-interface.h"
 #include "call-window.h"
 
+#include <kdeclarative.h>
+
 struct QmlInterface::Private
 {
     /*! Manages the video preview player*/
     QGst::Ui::GraphicsVideoSurface *surfacePreview;
     /*! Manages the main video player*/
     QGst::Ui::GraphicsVideoSurface *surface;
+
+    KDeclarative kd;
 };
 
 
 QmlInterface::QmlInterface(CallWindow *parent)
     : QDeclarativeView(parent), d(new Private)
 {
+    d->kd.setDeclarativeEngine(engine());
+    d->kd.initialize();
+    d->kd.setupBindings();
+
     d->surface = new QGst::Ui::GraphicsVideoSurface(this);
     rootContext()->setContextProperty(QLatin1String("videoSurface"), d->surface);
 

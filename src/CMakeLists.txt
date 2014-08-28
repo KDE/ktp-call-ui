@@ -18,6 +18,7 @@ set(ktp-call-ui_SRCS
 kde4_add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
 target_link_libraries(ktp-call-ui
     ${KDE4_KDEUI_LIBS}
+    ${KDECLARATIVE_LIBRARIES}
     ${TELEPATHY_QT4_LIBRARIES}
     ${KTP_LIBRARIES}
     ${QTGSTREAMER_UI_LIBRARIES}

@@ -53,8 +53,7 @@ Item {
                 right: parent.right
                 bottom: parent.bottom
             }
-            // FIXME: noooooooooooo!
-            source: "/usr/share/icons/oxygen/16x16/actions/application-exit.png"
+            source: "image://icon/application-exit.png"
             visible: false
             state: enabled && checked ? "" : "unchecked"
 

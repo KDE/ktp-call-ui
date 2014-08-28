@@ -23,15 +23,21 @@
 #include <KStandardDirs>
 #include <KLocalizedString>
 
+#include <kdeclarative.h>
+
 struct DtmfQml::Private
 {
     QDeclarativeView *view;
+    KDeclarative kd;
 };
 
 DtmfQml::DtmfQml(QWidget *parent)
     : QMainWindow(parent), d(new Private)
 {
     d->view = new QDeclarativeView(this);
+    d->kd.setDeclarativeEngine(d->view->engine());
+    d->kd.initialize();
+    d->kd.setupBindings();
     d->view->setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/core/Dtmf.qml"))));
     d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     setFixedSize(d->view->size());

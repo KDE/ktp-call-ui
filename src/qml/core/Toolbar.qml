@@ -34,9 +34,9 @@ Item {
 
     function changeHoldIcon(icon) {
         if (icon == "start") {
-            hold.iconSource= "/usr/share/icons/oxygen/32x32/actions/media-playback-start.png"
+            hold.iconSource= "image://icon/media-playback-start.png"
         } else {
-            hold.iconSource= "/usr/share/icons/oxygen/32x32/actions/media-playback-pause.png"
+            hold.iconSource= "image://icon//media-playback-pause.png"
         }
     }
 
@@ -86,7 +86,7 @@ Item {
 
         Button {
             id: hangup
-            iconSource: "/usr/share/icons/oxygen/32x32/actions/call-stop.png"
+            iconSource: "image://icon/call-stop.png"
             enabled: true
 
             onButtonClick: {
@@ -100,7 +100,7 @@ Item {
 
         Button {
             id: hold
-            iconSource: "/usr/share/icons/oxygen/32x32/actions/media-playback-pause.png"
+            iconSource: "image://icon/media-playback-pause.png"
             enabled: false
 
             onButtonClick: {
@@ -116,7 +116,7 @@ Item {
 
         ToggleButton {
             id: sound
-            iconSource: "/usr/share/icons/oxygen/32x32/status/audio-volume-medium.png"
+            iconSource: "image://icon/audio-volume-medium.png"
             enabled: muteAction.enabled
             checked: muteAction.checked
 
@@ -131,7 +131,7 @@ Item {
 
         ToggleButton {
             id: showMyVideo
-            iconSource: "/usr/share/icons/oxygen/32x32/devices/camera-web.png"
+            iconSource: "image://icon/camera-web.png"
             enabled: showMyVideoAction.enabled
             checked: showMyVideoAction.checked
 
@@ -148,7 +148,7 @@ Item {
 
         ToggleButton {
             id: showDialpad
-            iconSource: "/usr/share/icons/oxygen/32x32/devices/phone.png"
+            iconSource: "image://icon/phone.png"
             enabled: showDtmfAction.enabled
             checked: showDtmfAction.checked
 

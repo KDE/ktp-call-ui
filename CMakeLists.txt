@@ -13,6 +13,7 @@ find_package(KTp REQUIRED)
 find_package(QtGStreamer 1.0 REQUIRED)
 find_package(Qt4 COMPONENTS QtDeclarative)
 find_package(PkgConfig REQUIRED)
+find_package(KDeclarative REQUIRED)
 
 include_directories(
     ${KDE4_INCLUDES}

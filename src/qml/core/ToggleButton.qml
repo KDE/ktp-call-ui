@@ -55,11 +55,11 @@ Item {
             }
             source: "image://icon/application-exit.png"
             visible: false
-            state: enabled && checked ? "" : "unchecked"
+            state: enabled && checked ? "checked" : "unchecked"
 
             states: [
                 State {
-                    name: ""
+                    name: "checked"
                     PropertyChanges {target: activated; visible: false}
                     },
                 State {
@@ -75,7 +75,7 @@ Item {
             hoverEnabled: true
             onClicked: {
                 if (root.enabled) {
-                    if (activated.state == "") {
+                    if (activated.state == "checked") {
                         root.buttonClick(false);
                         root.activate(false);
                     } else {

@@ -626,11 +626,13 @@ void CallWindow::setupQmlUi()
 void CallWindow::toggleFullScreen()
 {
     if (d->qmlUi->isFullScreen()) {
+        d->fullScreenAction->setChecked(false);
         d->qmlUi->setWindowFlags(Qt::Widget);
         setCentralWidget(d->qmlUi);
         d->qmlUi->showNormal();
         show();
     } else {
+        d->fullScreenAction->setChecked(true);
         d->qmlUi->setWindowFlags(Qt::Window);
         d->qmlUi->showFullScreen();
         hide();

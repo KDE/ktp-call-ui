@@ -94,7 +94,7 @@ Item {
             }
 
             Tooltip {
-                text: qsTr("Hangup")
+                text: i18n("Hangup")
             }
         }
 
@@ -108,7 +108,7 @@ Item {
             }
 
             Tooltip {
-                text: qsTr("Hold")
+                text: i18n("Hold")
             }
         }
 
@@ -125,7 +125,7 @@ Item {
             }
 
             Tooltip {
-                text: qsTr("Mute")
+                text: i18n("Mute")
             }
         }
 
@@ -140,7 +140,7 @@ Item {
             }
 
             Tooltip {
-                text: qsTr("Show My Video")
+                text: i18n("Show My Video")
             }
         }
 
@@ -157,7 +157,7 @@ Item {
             }
 
             Tooltip {
-                text: qsTr("Show Dialpad")
+                text: i18n("Show Dialpad")
             }
         }
     }

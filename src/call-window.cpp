@@ -263,6 +263,9 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
                 SLOT(onRemoteVideoSendingStateChanged(Tp::ContactPtr,bool)));
 
         d->statusArea->showVideoStatusIcon(true);
+        d->showMyVideoAction->setEnabled(true);
+        // would there be a good way of saving the users preference between runs?
+        d->showMyVideoAction->setChecked(true);
     }
 }
 
@@ -359,8 +362,8 @@ void CallWindow::setupActions()
 {
     d->showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
     d->showMyVideoAction->setIcon(KIcon("camera-web"));
-    d->showMyVideoAction->setEnabled(true);
-    d->showMyVideoAction->setChecked(true);
+    d->showMyVideoAction->setEnabled(false);
+    d->showMyVideoAction->setChecked(false);
     actionCollection()->addAction("showMyVideo", d->showMyVideoAction);
 
     d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);

@@ -17,7 +17,7 @@
 #include "main-window.h"
 #include "../version.h"
 
-#include <KAboutData>
+#include <K4AboutData>
 #include <KCmdLineArgs>
 #include <KLocalizedString>
 #include <KUniqueApplication>
@@ -26,9 +26,9 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData aboutData("ktp-dialout-ui", "ktp-call-ui", ki18n("KDE Telepathy Call Ui"),
+    K4AboutData aboutData("ktp-dialout-ui", "ktp-call-ui", ki18n("KDE Telepathy Call Ui"),
                           KTP_CALL_UI_VERSION,
-                          ki18n("VoIP client for KDE"), KAboutData::License_GPL,
+                          ki18n("VoIP client for KDE"), K4AboutData::License_GPL,
                           ki18n("(C) 2009-2012, George Kiagiadakis\n"
                                 "(C) 2010-2011, Collabora Ltd."));
     aboutData.setProgramIconName("internet-telephony");

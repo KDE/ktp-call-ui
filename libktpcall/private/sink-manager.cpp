@@ -103,7 +103,7 @@ void SinkManager::handleNewSinkPadAsync(uint contactHandle)
     QMutexLocker l(&m_mutex);
 
     BaseSinkController *ctrl = m_controllersWaitingForContact.value(contactHandle);
-    if (KDE_ISUNLIKELY(!ctrl)) {
+    if (Q_UNLIKELY(!ctrl)) {
         //just in case the pad was unlinked before we reached this slot
         kDebug() << "Not handling new pad. The pad was unlinked too early.";
         return;
@@ -125,14 +125,14 @@ void SinkManager::onPendingContactsFinished(Tp::PendingOperation *op)
 
     uint contactHandle = pc->property("ktpcall_contact_handle").toUInt();
     BaseSinkController *ctrl = m_controllersWaitingForContact.value(contactHandle);
-    if (KDE_ISUNLIKELY(!ctrl)) {
+    if (Q_UNLIKELY(!ctrl)) {
         // just in case the pad was unlinked before we reached this slot
         kDebug() << "Not handling new pad. The pad was unlinked too early.";
         return;
     }
 
     // this can't really fail because the contact is already known
-    if (KDE_ISUNLIKELY(pc->isError())) {
+    if (Q_UNLIKELY(pc->isError())) {
         kError() << "Failed to fetch contact for handle" << contactHandle
                  << op->errorName() << op->errorMessage();
         m_controllersWaitingForContact.remove(contactHandle);
@@ -157,7 +157,7 @@ void SinkManager::onPadUnlinked(const QGst::PadPtr & srcPad)
 
     BaseSinkController *ctrl = m_controllers.value(srcPad);
 
-    if (KDE_ISUNLIKELY(!ctrl)) {
+    if (Q_UNLIKELY(!ctrl)) {
         //just in case unlinkAllPads() locked the mutex first...
         kDebug() << "Looks like unlinkAllPads() wins...";
         return;

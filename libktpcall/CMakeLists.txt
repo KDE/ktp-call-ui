@@ -23,13 +23,12 @@ set(libktpcall_SRCS
     private/video-sink-bin.cpp
 )
 
-kde4_add_library(ktpcall STATIC ${libktpcall_SRCS})
+add_library(ktpcall STATIC ${libktpcall_SRCS})
 target_link_libraries(ktpcall
-    ${KDE4_KDECORE_LIBS}
-    ${KDE4_PHONON_LIBRARY}
-    ${QT_QTDBUS_LIBRARY}
+    Qt5::DBus
     ${QTGSTREAMER_LIBRARIES}
-    ${TELEPATHY_QT4_LIBRARIES}
+    ${TELEPATHY_QT5_LIBRARIES}
+    KF5::KDELibs4Support
     qtf
 )
 

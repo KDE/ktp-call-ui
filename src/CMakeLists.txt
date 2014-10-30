@@ -14,13 +14,12 @@ set(ktp-call-ui_SRCS
     systemtray-icon.cpp
 )
 
-kde4_add_ui_files(ktp-call-ui_SRCS call-window.ui dtmf-widget.ui)
-kde4_add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
+qt5_wrap_ui(ktp-call-ui_SRCS call-window.ui dtmf-widget.ui)
+add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
 target_link_libraries(ktp-call-ui
-    ${KDE4_KDEUI_LIBS}
-    ${TELEPATHY_QT4_LIBRARIES}
-    ${KTP_LIBRARIES}
     ${QTGSTREAMER_UI_LIBRARIES}
+    KTp::CommonInternals
+    KF5::KDELibs4Support
     ktpcall
 )
 

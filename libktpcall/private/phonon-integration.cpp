@@ -85,7 +85,7 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readDevices(Phonon::ObjectDes
     QDBusReply<bool> phononLoaded = kded.call(QLatin1String("loadModule"), QLatin1String("phononserver"));
 
     if(!phononLoaded) {
-        kDebug() << "Could not load phononserver!!";
+        qWarning() << "Could not load phononserver!!";
         return QList<Phonon::DeviceAccessList>();
     }
 
@@ -110,7 +110,7 @@ static inline R dbusCall(QDBusInterface & interface, const QString & method, int
     R r;
     QDBusReply<QByteArray> reply = interface.call(method, argument);
     if (!reply.isValid()) {
-        kDebug() << reply.error();
+        qWarning() << "error calling dbus" << method << reply.error();
         return r;
     }
 
@@ -126,10 +126,8 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readAudioDevices(Phonon::Obje
 
     QList<int> indices = dbusCall< QList<int> >(s_priv->phononServer,
                                                 QLatin1String("audioDevicesIndexes"), type);
-    kDebug() << "got audio device indices" << indices << "for type" << type;
 
     indices = sortDevicesByCategoryPriority(type, category, indices);
-    kDebug() << "sorted audio devices indices" << indices << "for category" << category;
 
     for (int i=0; i < indices.size(); ++i) {
         QHash<QByteArray, QVariant> properties =
@@ -165,7 +163,6 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readVideoDevices(Phonon::Obje
     kDebug() << "got video device indices" << indices << "for type" << type;
 
     indices = sortDevicesByCategoryPriority(type, category, indices);
-    kDebug() << "sorted video devices indices" << indices << "for category" << category;
 
     for (int i=0; i < indices.size(); ++i) {
         QHash<QByteArray, QVariant> properties =

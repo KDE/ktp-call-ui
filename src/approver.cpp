@@ -44,8 +44,7 @@ Approver::Approver(const Tp::CallChannelPtr & channel, QObject *parent)
 
     //notification
     m_notification = new KNotification("incoming_call");
-    KAboutData aboutData("ktelepathy",0,KLocalizedString(),0);
-    m_notification.data()->setComponentData(KComponentData(aboutData));
+    m_notification.data()->setComponentName("ktelepathy");
     m_notification.data()->setTitle(title);
     m_notification.data()->setText(message);
 

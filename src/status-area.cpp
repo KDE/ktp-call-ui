@@ -19,13 +19,13 @@
 #include <KIcon>
 #include <KDebug>
 
-StatusArea::StatusArea(KStatusBar *statusBar)
+StatusArea::StatusArea(QStatusBar *statusBar)
     : QObject(statusBar), m_statusBar(statusBar)
 {
     connect(&m_callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 
     m_callDuration.setHMS(0, 0, 0);
-    m_statusBar->insertPermanentItem(m_callDuration.toString(), 1);
+    m_statusBar->showMessage(m_callDuration.toString(), 0);
 
     m_statusLabel = new QLabel;
     m_statusBar->addWidget(m_statusLabel);
@@ -54,7 +54,7 @@ void StatusArea::setMessage(MessageType type, const QString& message)
 void StatusArea::onCallDurationTimerTimeout()
 {
     m_callDuration = m_callDuration.addSecs(1);
-    m_statusBar->changeItem(m_callDuration.toString(), 1);
+    m_statusBar->showMessage(m_callDuration.toString(), 0);
 }
 
 void StatusArea::showAudioStatusIcon(bool show)

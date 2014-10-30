@@ -17,7 +17,7 @@
 #ifndef DTMF_WIDGET_H
 #define DTMF_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <TelepathyQt/Constants>
 
 class DtmfWidget : public QWidget

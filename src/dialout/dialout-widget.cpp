@@ -31,9 +31,11 @@
 #include <TelepathyQt/AndFilter>
 #include <TelepathyQt/OrFilter>
 
-
 #include <KMessageBox>
 #include <KDebug>
+#include <KLocalizedString>
+#include <KGlobal>
+#include <KConfigGroup>
 
 #include <KTp/actions.h>
 #include <KTp/contact-factory.h>

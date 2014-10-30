@@ -23,7 +23,7 @@
 #include "dtmf-handler.h"
 #include "../libktpcall/call-channel-handler.h"
 
-#include <QtGui/QCloseEvent>
+#include <QCloseEvent>
 
 #include <TelepathyQt/ReferencedHandles>
 #include <TelepathyQt/AvatarData>
@@ -32,9 +32,11 @@
 #include <KDebug>
 #include <KLocalizedString>
 #include <KToggleAction>
+#include <KAction>
 #include <KActionCollection>
 #include <KToolBar>
 #include <KMessageWidget>
+#include <KGuiItem>
 
 #include <QGst/ElementFactory>
 
@@ -385,13 +387,13 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
 void CallWindow::setupActions()
 {
     d->showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
-    d->showMyVideoAction->setIcon(KIcon("camera-web"));
+    d->showMyVideoAction->setIcon(QIcon::fromTheme("camera-web"));
     d->showMyVideoAction->setEnabled(true);
     connect(d->showMyVideoAction, SIGNAL(toggled(bool)), this,SLOT(toggleShowMyVideo(bool)));
     actionCollection()->addAction("showMyVideo", d->showMyVideoAction);
 
     d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);
-    d->showDtmfAction->setIcon(KIcon("phone"));
+    d->showDtmfAction->setIcon(QIcon::fromTheme("phone"));
     d->showDtmfAction->setEnabled(false);
     connect(d->showDtmfAction, SIGNAL(toggled(bool)), SLOT(toggleDtmf(bool)));
     actionCollection()->addAction("showDtmf", d->showDtmfAction);
@@ -407,23 +409,23 @@ void CallWindow::setupActions()
 
     //TODO implement this feature
     d->sendVideoAction = new KToggleAction(i18nc("@action", "Send video"), this);
-    d->sendVideoAction->setIcon(KIcon("webcamsend"));
+    d->sendVideoAction->setIcon(QIcon::fromTheme("webcamsend"));
     d->sendVideoAction->setEnabled(false);
     actionCollection()->addAction("sendVideo", d->sendVideoAction);
 
-    d->muteAction = new KToggleAction(KIcon("audio-volume-medium"), i18nc("@action", "Mute"), this);
-    d->muteAction->setCheckedState(KGuiItem(i18nc("@action", "Mute"), KIcon("audio-volume-muted")));
+    d->muteAction = new KToggleAction(QIcon::fromTheme("audio-volume-medium"), i18nc("@action", "Mute"), this);
+    d->muteAction->setCheckedState(KGuiItem(i18nc("@action", "Mute"), QIcon::fromTheme("audio-volume-muted")));
     d->muteAction->setEnabled(false); //will be enabled later
     connect(d->muteAction, SIGNAL(toggled(bool)), SLOT(toggleMute(bool)));
     actionCollection()->addAction("mute", d->muteAction);
 
     d->holdAction = new KAction(i18nc("@action", "Hold"), this);
-    d->holdAction->setIcon(KIcon("media-playback-pause"));
+    d->holdAction->setIcon(QIcon::fromTheme("media-playback-pause"));
     d->holdAction->setEnabled(false); //will be enabled later
     connect(d->holdAction, SIGNAL(triggered()), SLOT(hold()));
     actionCollection()->addAction("hold", d->holdAction);
 
-    d->hangupAction = new KAction(KIcon("call-stop"), i18nc("@action", "Hangup"), this);
+    d->hangupAction = new KAction(QIcon::fromTheme("call-stop"), i18nc("@action", "Hangup"), this);
     connect(d->hangupAction, SIGNAL(triggered()), SLOT(hangup()));
     actionCollection()->addAction("hangup", d->hangupAction);
 }
@@ -520,7 +522,7 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
             d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Unknown error"));
         }
         d->holdAction->setEnabled(true);
-        d->holdAction->setIcon(KIcon("media-playback-start"));
+        d->holdAction->setIcon(QIcon::fromTheme("media-playback-start"));
         d->statusArea->stopDurationTimer();
         break;
 
@@ -532,7 +534,7 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
             d->statusArea->setMessage(StatusArea::Error, i18nc("@info:error", "Unknown error"));
         }
         d->holdAction->setEnabled(true);
-        d->holdAction->setIcon(KIcon("media-playback-pause"));
+        d->holdAction->setIcon(QIcon::fromTheme("media-playback-pause"));
         d->statusArea->startDurationTimer();
         break;
 

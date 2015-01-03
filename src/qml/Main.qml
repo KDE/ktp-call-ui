@@ -19,7 +19,7 @@ import QtQuick 1.1
 import QtGStreamer 1.0
 import "core"
 
-Rectangle{
+Rectangle {
     id: root
     height: 450
     width: 750
@@ -37,7 +37,7 @@ Rectangle{
     Keys.enabled: true
     Keys.onEscapePressed: root.exitFullScreen();
 
-    function changeHoldIcon(icon){
+    function changeHoldIcon(icon) {
        toolbar.changeHoldIcon(icon);
     }
 
@@ -82,7 +82,7 @@ Rectangle{
             visible: true
         }
 
-        VideoItem{
+        VideoItem {
             id: videoWidget
             anchors.fill: parent
 
@@ -114,7 +114,7 @@ Rectangle{
         }
     }
 
-    Toolbar{
+    Toolbar {
         id: toolbar
         width: parent.width
 

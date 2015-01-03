@@ -40,7 +40,6 @@ Item {
         }
     }
 
-
     Rectangle {
         id: background
         anchors.fill: parent

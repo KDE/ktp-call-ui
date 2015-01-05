@@ -36,7 +36,7 @@ Item {
         if (icon == "start") {
             hold.iconSource= "image://icon/media-playback-start.png"
         } else {
-            hold.iconSource= "image://icon//media-playback-pause.png"
+            hold.iconSource= "image://icon/media-playback-pause.png"
         }
     }
 

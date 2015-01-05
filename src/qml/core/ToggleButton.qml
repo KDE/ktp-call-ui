@@ -76,11 +76,11 @@ Item {
             onClicked: {
                 if (root.enabled) {
                     if (activated.state == "checked") {
-                        root.buttonClick(false);
-                        root.activate(false);
+                        root.buttonClick(false)
+                        root.checked = false
                     } else {
                         root.buttonClick(true)
-                        root.activate(true)
+                        root.checked = true
                     }
                 }
             }

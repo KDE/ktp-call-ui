@@ -237,12 +237,15 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 
         checkEnableDtmf();
 
+        // grab root object so we can access QML signals.
+        QObject *root = d->qmlUi->rootObject();
+
         VolumeController *vol = audioContentHandler->inputVolumeControl();
         d->muteAction->setEnabled(vol->volumeControlSupported());
         connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
                 d->muteAction, SLOT(setEnabled(bool)));
         connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
-                d->qmlUi, SLOT(setSoundEnabled(bool)));
+                root, SLOT(setSoundEnabled(bool)));
         d->muteAction->setChecked(vol->isMuted());
         connect(vol, SIGNAL(mutedChanged(bool)), d->muteAction, SLOT(setChecked(bool)));
         d->muteAction->setProperty("volumeController", QVariant::fromValue<QObject*>(vol));
@@ -369,6 +372,7 @@ void CallWindow::setupActions()
     d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);
     d->showDtmfAction->setIcon(KIcon("phone"));
     d->showDtmfAction->setEnabled(false);
+    connect(d->showDtmfAction, SIGNAL(toggled(bool)), SLOT(toggleDtmf(bool)));
     actionCollection()->addAction("showDtmf", d->showDtmfAction);
 
     d->goToSystemTrayAction = new KAction(i18nc("@action", "Hide window"), this);
@@ -608,11 +612,11 @@ void CallWindow::setupQmlUi()
     //QML-UI <---> Actions
     //Show dialpad
     connect(root, SIGNAL(showDialpadClicked(bool)), SLOT(toggleDtmf(bool)));
-    connect(d->showDtmfAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(showDialpadChangeState(bool)));
+    connect(d->showDtmfAction, SIGNAL(toggled(bool)), root, SIGNAL(showDialpadChangeState(bool)));
     connect(root, SIGNAL(showDialpadClicked(bool)), d->showDtmfAction, SLOT(setChecked(bool)));
     //Mute <-> Sound activated
     connect(root,SIGNAL(muteClicked(bool)), SLOT(toggleMute(bool)));
-    connect(d->muteAction, SIGNAL(toggled(bool)), d->qmlUi, SIGNAL(soundChangeState(bool)));
+    connect(d->muteAction, SIGNAL(toggled(bool)), root, SIGNAL(muteClicked(bool)));
     connect(root,SIGNAL(muteClicked(bool)), d->muteAction, SLOT(setChecked(bool)));
     //Hold
     connect(root,SIGNAL(holdClicked()),SLOT(hold()));

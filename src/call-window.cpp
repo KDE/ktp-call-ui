@@ -415,8 +415,11 @@ void CallWindow::setupActions()
 void CallWindow::checkEnableDtmf()
 {
     bool dtmfSupported = false;
+    Tp::Client::CallContentInterfaceDTMFInterface *dtmfInterface = 0;
     Q_FOREACH(const Tp::CallContentPtr & content, d->callChannel->contentsForType(Tp::MediaStreamTypeAudio)) {
-        if (content->supportsDTMF()) {
+        dtmfInterface = content->interface<Tp::Client::CallContentInterfaceDTMFInterface>();
+        if (dtmfInterface) {
+            kDebug() << "Does supportDTMF work? " << content->supportsDTMF() << dtmfInterface;
             dtmfSupported = true;
             break;
         }

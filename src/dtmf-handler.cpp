@@ -42,14 +42,22 @@ void DtmfHandler::connectDtmfQml(DtmfQml *dtmfQml)
 
 void DtmfHandler::onStartSendDtmfEvent(Tp::DTMFEvent event)
 {
+    Tp::Client::CallContentInterfaceDTMFInterface *dtmfInterface = 0;
     Q_FOREACH(const Tp::CallContentPtr & content, d->channel->contentsForType(Tp::MediaStreamTypeAudio)) {
-        content->startDTMFTone(event);
+        dtmfInterface = content->interface<Tp::Client::CallContentInterfaceDTMFInterface>();
+        if (dtmfInterface) {
+            dtmfInterface->StartTone(event);
+        }
     }
 }
 
 void DtmfHandler::onStopSendDtmfEvent()
 {
+    Tp::Client::CallContentInterfaceDTMFInterface *dtmfInterface = 0;
     Q_FOREACH(const Tp::CallContentPtr & content, d->channel->contentsForType(Tp::MediaStreamTypeAudio)) {
-        content->stopDTMFTone();
+        dtmfInterface = content->interface<Tp::Client::CallContentInterfaceDTMFInterface>();
+        if (dtmfInterface) {
+            dtmfInterface->StopTone();
+        }
     }
 }

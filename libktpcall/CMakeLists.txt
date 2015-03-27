@@ -12,6 +12,7 @@ set(libktpcall_SRCS
     call-channel-handler.cpp
     call-content-handler.cpp
     volume-controller.cpp
+    libktpcall_debug.cpp
 
     private/device-element-factory.cpp
     private/phonon-integration.cpp

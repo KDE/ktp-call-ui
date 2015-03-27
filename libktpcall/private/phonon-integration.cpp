@@ -23,10 +23,10 @@
     License along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "phonon-integration.h"
+#include "../libktpcall_debug.h"
 #include <QtCore/QSettings>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
-#include <KDebug>
 #include <KGlobal>
 
 Q_DECLARE_METATYPE(QList<int>)
@@ -138,7 +138,7 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readAudioDevices(Phonon::Obje
         if (hideAdvancedDevices()) {
             const QVariant var = properties.value("isAdvanced");
             if (var.isValid() && var.toBool()) {
-                kDebug() << "hiding device" << indices.at(i)
+                qCDebug(LIBKTPCALL) << "hiding device" << indices.at(i)
                          << "because it is advanced and HideAdvancedDevices is specified";
                 continue;
             }
@@ -146,7 +146,7 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readAudioDevices(Phonon::Obje
 
         QVariant accessList = properties.value("deviceAccessList");
         if (accessList.isValid()) {
-            kDebug() << "appending device access list for device" << indices.at(i);
+            qCDebug(LIBKTPCALL) << "appending device access list for device" << indices.at(i);
             list.append(accessList.value<Phonon::DeviceAccessList>());
         }
     }
@@ -160,7 +160,7 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readVideoDevices(Phonon::Obje
 
     QList<int> indices = dbusCall< QList<int> >(s_priv->phononServer,
                                                 QLatin1String("videoDevicesIndexes"), type);
-    kDebug() << "got video device indices" << indices << "for type" << type;
+    qCDebug(LIBKTPCALL) << "got video device indices" << indices << "for type" << type;
 
     indices = sortDevicesByCategoryPriority(type, category, indices);
 
@@ -173,7 +173,7 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readVideoDevices(Phonon::Obje
         if (hideAdvancedDevices()) {
             const QVariant var = properties.value("isAdvanced");
             if (var.isValid() && var.toBool()) {
-                kDebug() << "hiding device" << indices.at(i)
+                qCDebug(LIBKTPCALL) << "hiding device" << indices.at(i)
                          << "because it is advanced and HideAdvancedDevices is specified";
                 continue;
             }
@@ -181,7 +181,7 @@ QList<Phonon::DeviceAccessList> PhononIntegration::readVideoDevices(Phonon::Obje
 
         QVariant accessList = properties.value("deviceAccessList");
         if (accessList.isValid()) {
-            kDebug() << "appending device access list for device" << indices.at(i);
+            qCDebug(LIBKTPCALL) << "appending device access list for device" << indices.at(i);
             list.append(accessList.value<Phonon::DeviceAccessList>());
         }
     }

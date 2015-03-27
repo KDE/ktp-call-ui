@@ -22,6 +22,7 @@
 #include "dtmf-handler.h"
 #include "dtmf-qml.h"
 #include "../libktpcall/call-channel-handler.h"
+#include "ktp_call_ui_debug.h"
 
 #include <QCloseEvent>
 #include <QVBoxLayout>
@@ -31,7 +32,6 @@
 #include <TelepathyQt/AvatarData>
 #include <TelepathyQt/Contact>
 
-#include <KDebug>
 #include <KLocalizedString>
 #include <KToggleAction>
 #include <QAction>
@@ -116,7 +116,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
 
 CallWindow::~CallWindow()
 {
-    kDebug() << "Deleting CallWindow";
+    qCDebug(KTP_CALL_UI) << "Deleting CallWindow";
     delete d;
 }
 
@@ -234,7 +234,7 @@ void CallWindow::setStatus(Status status, const Tp::CallStateReason & reason)
 
 void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 {
-    kDebug() << "Content added:" << contentHandler->callContent()->name();
+    qCDebug(KTP_CALL_UI) << "Content added:" << contentHandler->callContent()->name();
 
     if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
         AudioContentHandler *audioContentHandler = qobject_cast<AudioContentHandler*>(contentHandler);
@@ -258,7 +258,7 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
         d->statusArea->showAudioStatusIcon(true);
     } else {
         if (d->videoContentHandler) {
-            kError() << "Multiple video contents are not supported";
+            qCCritical(KTP_CALL_UI) << "Multiple video contents are not supported";
             return;
         }
 
@@ -279,7 +279,7 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 
 void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
 {
-    kDebug() << "Content removed:" << contentHandler->callContent()->name();
+    qCDebug(KTP_CALL_UI) << "Content removed:" << contentHandler->callContent()->name();
 
     if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
         AudioContentHandler *audioContentHandler = qobject_cast<AudioContentHandler*>(contentHandler);
@@ -304,7 +304,7 @@ void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
 
 void CallWindow::onLocalVideoSendingStateChanged(bool sending)
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
 
     if (sending) {
         changeVideoDisplayState(d->currentVideoDisplayState | LocalVideoPreview);
@@ -315,10 +315,10 @@ void CallWindow::onLocalVideoSendingStateChanged(bool sending)
 
 void CallWindow::onRemoteVideoSendingStateChanged(const Tp::ContactPtr & contact, bool sending)
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
 
     if (d->remoteVideoContact && d->remoteVideoContact != contact) {
-        kError() << "Multiple participants are not supported";
+        qCCritical(KTP_CALL_UI) << "Multiple participants are not supported";
         return;
     }
 
@@ -424,13 +424,13 @@ void CallWindow::checkEnableDtmf()
     Q_FOREACH(const Tp::CallContentPtr & content, d->callChannel->contentsForType(Tp::MediaStreamTypeAudio)) {
         dtmfInterface = content->interface<Tp::Client::CallContentInterfaceDTMFInterface>();
         if (dtmfInterface) {
-            kDebug() << "Does supportDTMF work? " << content->supportsDTMF() << dtmfInterface;
+            qCDebug(KTP_CALL_UI) << "Does supportDTMF work? " << content->supportsDTMF() << dtmfInterface;
             dtmfSupported = true;
             break;
         }
     }
 
-    kDebug() << "DTMF supported:" << dtmfSupported;
+    qCDebug(KTP_CALL_UI) << "DTMF supported:" << dtmfSupported;
     d->showDtmfAction->setEnabled(dtmfSupported);
 
     if (!dtmfSupported) {
@@ -462,7 +462,7 @@ void CallWindow::toggleMute(bool checked)
 
 void CallWindow::hangup()
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
     d->callChannel->hangup();
 }
 
@@ -470,7 +470,7 @@ void CallWindow::closeEvent(QCloseEvent *event)
 {
     systemtrayicon->setActivateNext(false);
     if (!d->callEnded) {
-        kDebug() << "Ignoring close event";
+        qCDebug(KTP_CALL_UI) << "Ignoring close event";
         hangup();
         event->ignore();
     } else {
@@ -486,7 +486,7 @@ void CallWindow::hold()
     } else if (d->callChannel.data()->localHoldState() == Tp::LocalHoldStateUnheld) {
         holdRequest = d->callChannel->requestHold(true);
     } else {
-        kDebug() << "Call is currently being held, please wait before trying again!";
+        qCDebug(KTP_CALL_UI) << "Call is currently being held, please wait before trying again!";
         return;
     }
 
@@ -505,7 +505,7 @@ void CallWindow::holdOperationFinished(Tp::PendingOperation* operation)
 
 void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason)
 {
-    kDebug() << "Hold status changed" << state << " " << reason;
+    qCDebug(KTP_CALL_UI) << "Hold status changed" << state << " " << reason;
 
     switch (state) {
     case Tp::LocalHoldStateHeld:

@@ -13,6 +13,7 @@ set(ktp-call-ui_SRCS
     systemtray-icon.cpp
     qml-interface.cpp
     dtmf-qml.cpp
+    ktp_call_ui_debug.cpp
 )
 
 add_executable(ktp-call-ui ${ktp-call-ui_SRCS})

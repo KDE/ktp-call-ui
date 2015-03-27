@@ -16,11 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "status-area.h"
+#include "ktp_call_ui_debug.h"
 
 #include <KIconLoader>
 
 #include <QIcon>
-#include <KDebug>
 
 StatusArea::StatusArea(QStatusBar *statusBar)
     : QObject(statusBar), m_statusBar(statusBar)
@@ -49,7 +49,7 @@ void StatusArea::setMessage(MessageType type, const QString& message)
     if (type == Status) {
         m_statusLabel->setText(message);
     } else {
-        kDebug() << "ERROR message:" << message;
+        qCDebug(KTP_CALL_UI) << "ERROR message:" << message;
         //TODO handle error messages
     }
 }

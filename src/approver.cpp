@@ -16,10 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "approver.h"
+#include "ktp_call_ui_debug.h"
+
 #include <KNotification>
 #include <KStatusNotifierItem>
 #include <KLocale>
-#include <KDebug>
 #include <KAboutData>
 #include <KActionCollection>
 #include <TelepathyQt/AvatarData>
@@ -30,7 +31,7 @@
 Approver::Approver(const Tp::CallChannelPtr & channel, QObject *parent)
     : QObject(parent)
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
 
     Tp::ContactPtr sender = channel->initiatorContact();
     QString message;
@@ -86,7 +87,7 @@ Approver::Approver(const Tp::CallChannelPtr & channel, QObject *parent)
 
 Approver::~Approver()
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
 
     //destroy the notification
     if (m_notification) {

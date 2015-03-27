@@ -2,6 +2,7 @@ add_executable(configuration_test
     configuration_test.cpp
     ../private/device-element-factory.cpp
     ../private/phonon-integration.cpp
+    ../libktpcall_debug.cpp
 )
 target_link_libraries(configuration_test
     ${PHONON_LIBRARY}

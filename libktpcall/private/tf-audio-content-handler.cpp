@@ -20,12 +20,11 @@
 #include "sink-controllers.h"
 #include "device-element-factory.h"
 #include "../volume-controller.h"
+#include "libktpcall_debug.h"
 
 #include <QGlib/Error>
 #include <QGst/ElementFactory>
 #include <QGst/GhostPad>
-
-#include <KDebug>
 
 namespace KTpCallPrivate {
 
@@ -77,7 +76,7 @@ bool TfAudioContentHandler::startSending()
 {
     QGst::ElementPtr src = DeviceElementFactory::makeAudioCaptureElement();
     if (!src) {
-        kDebug() << "Could not initialize audio capture device";
+        qCDebug(LIBKTPCALL) << "Could not initialize audio capture device";
         return false;
     }
 
@@ -127,7 +126,7 @@ void TfAudioContentHandler::refSink()
     if (m_sinkRefCount++ == 0) {
         m_sink = DeviceElementFactory::makeAudioOutputElement();
         if (!m_sink) {
-            kWarning() << "Failed to create audio sink. Using fakesink. "
+            qCWarning(LIBKTPCALL) << "Failed to create audio sink. Using fakesink. "
                         "You will need to restart the call to get audio output.";
             m_sink = QGst::ElementFactory::make("fakesink");
             m_sink->setProperty("sync", false);
@@ -142,7 +141,7 @@ void TfAudioContentHandler::refSink()
 
         m_outputAdder = QGst::ElementFactory::make("liveadder");
         if (!m_outputAdder) {
-            kWarning() << "Failed to create liveadder. Using adder. This may cause trouble...";
+            qCWarning(LIBKTPCALL) << "Failed to create liveadder. Using adder. This may cause trouble...";
             m_outputAdder = QGst::ElementFactory::make("adder");
         }
 
@@ -208,7 +207,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
     try {
         bin = QGst::Bin::fromDescription(binDescription, QGst::Bin::NoGhost);
     } catch (const QGlib::Error & err) {
-        kWarning() << "Failed to create audio source bin" << err;
+        qCWarning(LIBKTPCALL) << "Failed to create audio source bin" << err;
         return false;
     }
 
@@ -217,7 +216,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
             QString(QLatin1String("input_bin_first_element_%1")).arg(id).toAscii());
     bin->add(src);
     if (!src->link(firstElement)) {
-        kWarning() << "Failed to link audiosrc to audio src bin";
+        qCWarning(LIBKTPCALL) << "Failed to link audiosrc to audio src bin";
         return false;
     }
 
@@ -231,7 +230,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
     // add queue and src pad
     QGst::ElementPtr queue = QGst::ElementFactory::make("queue");
     if (!queue) {
-        kWarning() << "Failed to load the 'queue' gst element";
+        qCWarning(LIBKTPCALL) << "Failed to load the 'queue' gst element";
         return false;
     }
     bin->add(queue);
@@ -239,7 +238,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
     QGst::ElementPtr tee = bin->getElementByName(
             QString(QLatin1String("input_tee_%1")).arg(id).toAscii());
     if (tee->getRequestPad("src_%u")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
-        kWarning() << "Failed to link tee ! queue";
+        qCWarning(LIBKTPCALL) << "Failed to link tee ! queue";
         return false;
     }
 

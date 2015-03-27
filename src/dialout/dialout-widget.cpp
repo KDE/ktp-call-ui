@@ -17,6 +17,7 @@
 
 #include "dialout-widget.h"
 #include "ui_dialout-widget.h"
+#include "../ktp_call_ui_debug.h"
 
 #include <TelepathyQt/AccountManager>
 #include <TelepathyQt/AccountSet>
@@ -32,7 +33,6 @@
 #include <TelepathyQt/OrFilter>
 
 #include <KMessageBox>
-#include <KDebug>
 #include <KLocalizedString>
 #include <KConfigGroup>
 #include <KSharedConfig>
@@ -96,7 +96,7 @@ DialoutWidget::~DialoutWidget()
 void DialoutWidget::onAccountManagerReady(Tp::PendingOperation* op)
 {
     if (op->isError()) {
-        kDebug() << "AM failed to become ready" << op->errorName() << op->errorMessage();
+        qCDebug(KTP_CALL_UI) << "AM failed to become ready" << op->errorName() << op->errorMessage();
         d->ui->messageLabel->setText(i18n("Error: Failed to load accounts"));
         return;
     }
@@ -174,7 +174,7 @@ void DialoutWidget::onPendingContactFinished(Tp::PendingOperation *op)
     Q_ASSERT(pc);
 
     if (pc->isError()) {
-        kDebug() << "Error getting contact:" << pc->errorName() << pc->errorMessage();
+        qCDebug(KTP_CALL_UI) << "Error getting contact:" << pc->errorName() << pc->errorMessage();
     }
 
     if (pc == d->pendingContact && !pc->isError() && pc->contacts().size() > 0) {
@@ -202,7 +202,7 @@ void DialoutWidget::on_videoCallButton_clicked()
 void DialoutWidget::onPendingChannelRequestFinished(Tp::PendingOperation *op)
 {
     if (op->isError()) {
-        kDebug() << "Failed to start Call channel:" << op->errorName() << op->errorMessage();
+        qCDebug(KTP_CALL_UI) << "Failed to start Call channel:" << op->errorName() << op->errorMessage();
         KMessageBox::sorry(this, i18n("Failed to start call."));
     }
 }

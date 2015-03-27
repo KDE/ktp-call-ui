@@ -4,6 +4,7 @@ set(ktp-dialout-ui_SRCS
     main.cpp
     dialout-widget.cpp
     main-window.cpp
+    ../ktp_call_ui_debug.cpp
 )
 
 qt5_wrap_ui(ktp-dialout-ui_SRCS dialout-widget.ui)

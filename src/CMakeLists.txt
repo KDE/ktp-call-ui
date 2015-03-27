@@ -29,7 +29,7 @@ target_link_libraries(ktp-call-ui
 )
 
 install(TARGETS ktp-call-ui DESTINATION ${LIBEXEC_INSTALL_DIR})
-install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui)
+install(FILES callwindowui.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/ktp-call-ui)
 
 install( FILES
         qml/Main.qml

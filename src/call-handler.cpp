@@ -38,7 +38,7 @@ static inline Tp::AbstractClientHandler::Capabilities capabilities()
 
     //transport methods - farstream supports them all
     caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/ice"));
-    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/galk-p2p"));
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/gtalk-p2p"));
     caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/shm"));
 
     //significant codecs

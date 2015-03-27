@@ -104,6 +104,7 @@ Rectangle {
         }
 
         border.width: 2
+        color: "black"
         border.color: "dimgray"
         visible: showMyVideoAction.checked
 

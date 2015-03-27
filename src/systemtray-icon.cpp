@@ -17,8 +17,6 @@
 
 #include "systemtray-icon.h"
 
-
-
 SystemTrayIcon::SystemTrayIcon(QObject *parent)
 : KStatusNotifierItem(parent)
 {

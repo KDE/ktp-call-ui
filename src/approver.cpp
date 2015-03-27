@@ -22,9 +22,10 @@
 #include <KDebug>
 #include <KAboutData>
 #include <KActionCollection>
-#include <KMenu>
 #include <TelepathyQt/AvatarData>
 #include <TelepathyQt/Contact>
+
+#include <QMenu>
 
 Approver::Approver(const Tp::CallChannelPtr & channel, QObject *parent)
     : QObject(parent)

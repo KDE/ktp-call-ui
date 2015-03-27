@@ -19,7 +19,7 @@
 #define SYSTEMTRAYICON
 
 #include <KStatusNotifierItem>
-#include <KMenu>
+#include <QMenu>
 #include <KLocalizedString>
 
 class SystemTrayIcon : public KStatusNotifierItem

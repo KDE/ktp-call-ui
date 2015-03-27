@@ -556,8 +556,8 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
 
 void CallWindow::setupSystemTray()
 {
-    KMenu *trayIconMenu=new KMenu(this);
-    systemtrayicon=new SystemTrayIcon(this);
+    QMenu *trayIconMenu = new QMenu(this);
+    systemtrayicon = new SystemTrayIcon(this);
 
     //Save the title
     trayIconMenu->setTitle(windowTitle());

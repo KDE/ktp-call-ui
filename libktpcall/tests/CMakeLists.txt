@@ -7,6 +7,6 @@ add_executable(configuration_test
 target_link_libraries(configuration_test
     ${PHONON_LIBRARY}
     Qt5::DBus
+    KF5::ConfigCore
     ${QTGSTREAMER_LIBRARIES}
-    KF5::KDELibs4Support
 )

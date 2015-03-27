@@ -114,11 +114,11 @@ VideoSinkController::~VideoSinkController()
 
 QGst::PadPtr VideoSinkController::requestSrcPad()
 {
-    QString newPadName = QString("src%1").arg(m_padNameCounter);
+    QString newPadName = QStringLiteral("src%1").arg(m_padNameCounter);
     m_padNameCounter++;
 
     QGst::PadPtr teeSrcPad = m_tee->getRequestPad("src_%u");
-    QGst::PadPtr ghostSrcPad = QGst::GhostPad::create(teeSrcPad, newPadName.toAscii());
+    QGst::PadPtr ghostSrcPad = QGst::GhostPad::create(teeSrcPad, newPadName.toLatin1());
 
     ghostSrcPad->setActive(true);
     m_bin->addPad(ghostSrcPad);

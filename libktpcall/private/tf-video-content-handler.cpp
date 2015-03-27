@@ -54,7 +54,7 @@ void TfVideoContentHandler::linkVideoPreviewSink(const QGst::ElementPtr & sink)
 
     QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
     QString teeName = QString(QLatin1String("input_tee_%1")).arg(id);
-    QGst::ElementPtr tee = m_srcBin->getElementByName(teeName.toAscii());
+    QGst::ElementPtr tee = m_srcBin->getElementByName(teeName.toLatin1());
 
     QGst::PadPtr srcPad = tee->getRequestPad("src_%u");
     m_videoPreviewBin = new VideoSinkBin(sink);
@@ -71,7 +71,7 @@ void TfVideoContentHandler::unlinkVideoPreviewSink()
 
         QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
         QString teeName = QString(QLatin1String("input_tee_%1")).arg(id);
-        QGst::ElementPtr tee = m_srcBin->getElementByName(teeName.toAscii());
+        QGst::ElementPtr tee = m_srcBin->getElementByName(teeName.toLatin1());
 
         QGst::PadPtr sinkPad = m_videoPreviewBin->bin()->getStaticPad("sink");
         QGst::PadPtr srcPad = sinkPad->peer();
@@ -264,7 +264,7 @@ void TfVideoContentHandler::onRestartSource()
 
         QString id = tfContent()->property("object-path").toString().section(QLatin1Char('/'), -1);
         QString capsfilterName = QString(QLatin1String("input_capsfilter_%1")).arg(id);
-        QGst::ElementPtr capsfilter = m_srcBin->getElementByName(capsfilterName.toAscii());
+        QGst::ElementPtr capsfilter = m_srcBin->getElementByName(capsfilterName.toLatin1());
 
         //stop src bin
         m_srcBin->setStateLocked(true);

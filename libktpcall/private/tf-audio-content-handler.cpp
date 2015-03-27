@@ -213,7 +213,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     // add the source
     QGst::ElementPtr firstElement = bin->getElementByName(
-            QString(QLatin1String("input_bin_first_element_%1")).arg(id).toAscii());
+            QStringLiteral("input_bin_first_element_%1").arg(id).toLatin1());
     bin->add(src);
     if (!src->link(firstElement)) {
         qCWarning(LIBKTPCALL) << "Failed to link audiosrc to audio src bin";
@@ -222,7 +222,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     // keep the volume element
     QGst::ElementPtr volume = bin->getElementByName(
-            QString(QLatin1String("input_volume_%1")).arg(id).toAscii());
+            QString(QLatin1String("input_volume_%1")).arg(id).toLatin1());
     m_inputVolumeController->setElement(volume.dynamicCast<QGst::StreamVolume>());
 
     // TODO level controller
@@ -236,7 +236,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
     bin->add(queue);
 
     QGst::ElementPtr tee = bin->getElementByName(
-            QString(QLatin1String("input_tee_%1")).arg(id).toAscii());
+            QStringLiteral("input_tee_%1").arg(id).toLatin1());
     if (tee->getRequestPad("src_%u")->link(queue->getStaticPad("sink")) != QGst::PadLinkOk) {
         qCWarning(LIBKTPCALL) << "Failed to link tee ! queue";
         return false;

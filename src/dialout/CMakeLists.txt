@@ -13,8 +13,8 @@ target_link_libraries(ktp-dialout-ui
     KTp::CommonInternals
     KTp::Models
     KTp::Widgets
+    KF5::I18n
     KF5::XmlGui
-    KF5::KDELibs4Support
 )
 
 install(TARGETS ktp-dialout-ui DESTINATION ${BIN_INSTALL_DIR})

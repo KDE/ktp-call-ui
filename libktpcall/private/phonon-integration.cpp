@@ -27,7 +27,6 @@
 #include <QtCore/QSettings>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>
-#include <KGlobal>
 
 Q_DECLARE_METATYPE(QList<int>)
 
@@ -72,7 +71,7 @@ struct PhononIntegrationPrivate
     QDBusInterface phononServer;
 };
 
-K_GLOBAL_STATIC(PhononIntegrationPrivate, s_priv);
+Q_GLOBAL_STATIC(PhononIntegrationPrivate, s_priv);
 
 
 QList<Phonon::DeviceAccessList> PhononIntegration::readDevices(Phonon::ObjectDescriptionType type,

@@ -26,8 +26,8 @@ struct CallManager::Private
 {
     Tp::CallChannelPtr callChannel;
     CallChannelHandler *channelHandler;
-    QWeakPointer<CallWindow> callWindow;
-    QWeakPointer<Approver> approver;
+    QPointer<CallWindow> callWindow;
+    QPointer<Approver> approver;
 };
 
 CallManager::CallManager(const Tp::CallChannelPtr & callChannel, QObject *parent)

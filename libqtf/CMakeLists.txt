@@ -18,7 +18,7 @@ add_definitions(
     -DGST_DISABLE_LOADSAVE
 )
 
-kde4_add_library(qtf STATIC qtf.cpp)
+add_library(qtf STATIC qtf.cpp)
 
 target_link_libraries(qtf
     ${QTGSTREAMER_LIBRARIES}

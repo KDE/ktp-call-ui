@@ -30,7 +30,7 @@ target_link_libraries(ktpcall
     Qt5::DBus
     ${QTGSTREAMER_LIBRARIES}
     ${TELEPATHY_QT5_LIBRARIES}
-    KF5::KDELibs4Support
+    KF5::ConfigCore
     qtf
 )
 

@@ -20,8 +20,8 @@
 #include <QGraphicsObject>
 #include <QQuickView>
 #include <QQuickItem>
+#include <QStandardPaths>
 
-#include <KStandardDirs>
 #include <KLocalizedString>
 #include <KDeclarative/KDeclarative>
 
@@ -38,7 +38,7 @@ DtmfQml::DtmfQml(QWidget *parent)
     d->view = new QQuickView();
     d->kd.setDeclarativeEngine(d->view->engine());
     d->kd.setupBindings();
-    d->view->setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/core/Dtmf.qml"))));
+    d->view->setSource(QUrl(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("ktp-call-ui/core/Dtmf.qml"))));
     d->view->setResizeMode(QQuickView::SizeRootObjectToView);
     d->viewContainer = QWidget::createWindowContainer(d->view, this);
     setFixedSize(d->view->size());

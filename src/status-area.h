@@ -21,7 +21,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
-#include <QtCore/QWeakPointer>
+#include <QtCore/QPointer>
 #include <QLabel>
 #include <QStatusBar>
 
@@ -48,8 +48,8 @@ private:
     QTime m_callDuration;
     QTimer m_callDurationTimer;
     QLabel *m_statusLabel;
-    QWeakPointer<QWidget> m_audioStatusIcon;
-    QWeakPointer<QWidget> m_videoStatusIcon;
+    QPointer<QWidget> m_audioStatusIcon;
+    QPointer<QWidget> m_videoStatusIcon;
 };
 
 #endif // STATUS_AREA_H

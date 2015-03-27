@@ -20,7 +20,7 @@
 
 #include <KNotification>
 #include <KStatusNotifierItem>
-#include <KLocale>
+#include <KLocalizedString>
 #include <KAboutData>
 #include <KActionCollection>
 #include <TelepathyQt/AvatarData>

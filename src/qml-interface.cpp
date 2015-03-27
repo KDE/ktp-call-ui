@@ -15,7 +15,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <KDE/KStandardDirs>
 #include <KActionCollection>
 #include <KDeclarative/KDeclarative>
 
@@ -26,6 +25,7 @@
 #include <QQmlContext>
 #include <QQuickItem>
 #include <QGraphicsObject>
+#include <QStandardPaths>
 
 #include "qml-interface.h"
 #include "call-window.h"
@@ -66,7 +66,7 @@ QmlInterface::QmlInterface(CallWindow *parent)
     rootContext()->setContextProperty("showDtmfAction", parent->actionCollection()->action("showDtmf"));
     rootContext()->setContextProperty("muteAction", parent->actionCollection()->action("mute"));
 
-    setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/Main.qml"))));
+    setSource(QUrl(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QLatin1String("ktp-call-ui/Main.qml"))));
 }
 
 void QmlInterface::setLabel(const QString &name, const QString &imageUrl)

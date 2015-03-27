@@ -21,7 +21,8 @@
 #include <QGst/Bin>
 #include <QGst/ElementFactory>
 #include <QGst/Structure>
-#include <KConfig>
+
+#include <KSharedConfig>
 #include <KConfigGroup>
 
 namespace KTpCallPrivate {

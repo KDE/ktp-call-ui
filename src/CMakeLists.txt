@@ -21,6 +21,7 @@ target_link_libraries(ktp-call-ui
     KTp::CommonInternals
     KF5::KDELibs4Support
     KF5::Declarative
+    KF5::IconThemes
     Qt5::Quick
     Qt5::Qml
     ktpcall

@@ -8,7 +8,7 @@ set(IS_KTP_INTERNAL_MODULE TRUE)
 find_package(ECM 1.3.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-find_package(KF5 REQUIRED COMPONENTS Declarative KCMUtils KDELibs4Support)
+find_package(KF5 REQUIRED COMPONENTS Declarative IconThemes KCMUtils KDELibs4Support)
 find_package(Qt5 REQUIRED COMPONENTS Quick Qml WebKitWidgets)
 find_package(KTp REQUIRED)
 find_package(TelepathyQt5 REQUIRED)

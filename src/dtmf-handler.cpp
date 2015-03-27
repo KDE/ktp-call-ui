@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "dtmf-handler.h"
-#include "dtmf-widget.h"
+#include "dtmf-qml.h"
 
 struct DtmfHandler::Private
 {
@@ -33,24 +33,31 @@ DtmfHandler::~DtmfHandler()
     delete d;
 }
 
-void DtmfHandler::connectDtmfWidget(DtmfWidget *dtmfWidget)
+//! Connects the GUI of the \a Dialpad with the internal logic of \a DtmfHandler. \a Ekaitz
+void DtmfHandler::connectDtmfQml(DtmfQml *dtmfQml)
 {
-    connect(dtmfWidget, SIGNAL(startSendDtmfEvent(Tp::DTMFEvent)),
-            SLOT(onStartSendDtmfEvent(Tp::DTMFEvent)));
-    connect(dtmfWidget, SIGNAL(stopSendDtmfEvent()),
-            SLOT(onStopSendDtmfEvent()));
+    connect(dtmfQml, SIGNAL(startSendDtmfEvent(Tp::DTMFEvent)), SLOT(onStartSendDtmfEvent(Tp::DTMFEvent)));
+    connect(dtmfQml, SIGNAL(stopSendDtmfEvent()), SLOT(onStopSendDtmfEvent()));
 }
 
 void DtmfHandler::onStartSendDtmfEvent(Tp::DTMFEvent event)
 {
+    Tp::Client::CallContentInterfaceDTMFInterface *dtmfInterface = 0;
     Q_FOREACH(const Tp::CallContentPtr & content, d->channel->contentsForType(Tp::MediaStreamTypeAudio)) {
-        content->startDTMFTone(event);
+        dtmfInterface = content->interface<Tp::Client::CallContentInterfaceDTMFInterface>();
+        if (dtmfInterface) {
+            dtmfInterface->StartTone(event);
+        }
     }
 }
 
 void DtmfHandler::onStopSendDtmfEvent()
 {
+    Tp::Client::CallContentInterfaceDTMFInterface *dtmfInterface = 0;
     Q_FOREACH(const Tp::CallContentPtr & content, d->channel->contentsForType(Tp::MediaStreamTypeAudio)) {
-        content->stopDTMFTone();
+        dtmfInterface = content->interface<Tp::Client::CallContentInterfaceDTMFInterface>();
+        if (dtmfInterface) {
+            dtmfInterface->StopTone();
+        }
     }
 }

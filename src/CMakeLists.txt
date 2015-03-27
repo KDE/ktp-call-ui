@@ -7,14 +7,14 @@ set(ktp-call-ui_SRCS
     call-window.cpp
     call-handler.cpp
     dtmf-handler.cpp
-    dtmf-widget.cpp
     status-area.cpp
     call-manager.cpp
     approver.cpp
     systemtray-icon.cpp
+    qml-interface.cpp
+    dtmf-qml.cpp
 )
 
-qt5_wrap_ui(ktp-call-ui_SRCS call-window.ui dtmf-widget.ui)
 add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
 target_link_libraries(ktp-call-ui
     ${QTGSTREAMER_UI_LIBRARIES}
@@ -25,6 +25,15 @@ target_link_libraries(ktp-call-ui
 
 install(TARGETS ktp-call-ui DESTINATION ${LIBEXEC_INSTALL_DIR})
 install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui)
+
+install( FILES
+        qml/Main.qml
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
+)
+install(DIRECTORY
+        qml/core
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
+)
 
 configure_file(org.freedesktop.Telepathy.Client.KTp.CallUi.service.in
                 org.freedesktop.Telepathy.Client.KTp.CallUi.service)

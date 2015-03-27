@@ -110,6 +110,7 @@ Rectangle {
         VideoItem {
             id: videoPreviewWidget
             anchors.fill: parent
+            anchors.margins: 2
             surface: videoPreviewSurface
         }
     }

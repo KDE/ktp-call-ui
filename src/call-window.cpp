@@ -34,7 +34,7 @@
 #include <KDebug>
 #include <KLocalizedString>
 #include <KToggleAction>
-#include <KAction>
+#include <QAction>
 #include <KActionCollection>
 #include <KToolBar>
 #include <KMessageWidget>
@@ -71,10 +71,10 @@ struct CallWindow::Private
     KToggleAction *showDtmfAction;
     KToggleAction *sendVideoAction;
     KToggleAction *muteAction;
-    KAction *holdAction;
-    KAction *hangupAction;
-    KAction *goToSystemTrayAction;
-    KAction *restoreAction;
+    QAction *holdAction;
+    QAction *hangupAction;
+    QAction *goToSystemTrayAction;
+    QAction *restoreAction;
     KToggleAction *fullScreenAction;
 
     VideoDisplayFlags currentVideoDisplayState;
@@ -380,12 +380,12 @@ void CallWindow::setupActions()
     connect(d->showDtmfAction, SIGNAL(toggled(bool)), SLOT(toggleDtmf(bool)));
     actionCollection()->addAction("showDtmf", d->showDtmfAction);
 
-    d->goToSystemTrayAction = new KAction(i18nc("@action", "Hide window"), this);
+    d->goToSystemTrayAction = new QAction(i18nc("@action", "Hide window"), this);
     d->goToSystemTrayAction->setEnabled(true);
     connect(d->goToSystemTrayAction, SIGNAL(triggered(bool)), this, SLOT(hide()));
     actionCollection()->addAction("goToSystemTray", d->goToSystemTrayAction);
 
-    d->restoreAction= new KAction(i18nc("@action", "Restore window"), this);
+    d->restoreAction= new QAction(i18nc("@action", "Restore window"), this);
     d->restoreAction->setEnabled(true);
     connect(d->restoreAction, SIGNAL(triggered(bool)), this, SLOT(show()));
 
@@ -401,13 +401,13 @@ void CallWindow::setupActions()
     connect(d->muteAction, SIGNAL(toggled(bool)), SLOT(toggleMute(bool)));
     actionCollection()->addAction("mute", d->muteAction);
 
-    d->holdAction = new KAction(i18nc("@action", "Hold"), this);
+    d->holdAction = new QAction(i18nc("@action", "Hold"), this);
     d->holdAction->setIcon(QIcon::fromTheme("media-playback-pause"));
     d->holdAction->setEnabled(false); //will be enabled later
     connect(d->holdAction, SIGNAL(triggered()), SLOT(hold()));
     actionCollection()->addAction("hold", d->holdAction);
 
-    d->hangupAction = new KAction(QIcon::fromTheme("call-stop"), i18nc("@action", "Hangup"), this);
+    d->hangupAction = new QAction(QIcon::fromTheme("call-stop"), i18nc("@action", "Hangup"), this);
     connect(d->hangupAction, SIGNAL(triggered()), SLOT(hangup()));
     actionCollection()->addAction("hangup", d->hangupAction);
 

@@ -17,9 +17,12 @@ set(ktp-call-ui_SRCS
 
 add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
 target_link_libraries(ktp-call-ui
-    ${QTGSTREAMER_UI_LIBRARIES}
+    ${QTGSTREAMER_QUICK_LIBRARY}
     KTp::CommonInternals
     KF5::KDELibs4Support
+    KF5::Declarative
+    Qt5::Quick
+    Qt5::Qml
     ktpcall
 )
 

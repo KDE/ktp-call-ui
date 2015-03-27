@@ -40,9 +40,10 @@
 #include <KMessageWidget>
 #include <KGuiItem>
 
-#include <QDeclarativeView>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
+#include <QQuickView>
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QQuickItem>
 #include <QGst/ElementFactory>
 #include <QGst/Ui/GraphicsVideoSurface>
 #include <QGst/Init>
@@ -60,7 +61,9 @@ struct CallWindow::Private
     StatusArea *statusArea;
     bool callEnded;
 
+    QVBoxLayout *layout;
     QmlInterface *qmlUi;
+    QWidget *qmlUiContainer;
     KMessageWidget *errorWidget;
     DtmfQml *dtmfQml;
 
@@ -408,7 +411,7 @@ void CallWindow::setupActions()
     connect(d->hangupAction, SIGNAL(triggered()), SLOT(hangup()));
     actionCollection()->addAction("hangup", d->hangupAction);
 
-    d->fullScreenAction = new KToggleAction(KIcon("view-fullscreen"),i18nc("@action", "Full Screen"), this);
+    d->fullScreenAction = new KToggleAction(QIcon::fromTheme("view-fullscreen"),i18nc("@action", "Full Screen"), this);
     d->fullScreenAction->setEnabled(true);
     connect(d->fullScreenAction, SIGNAL(triggered()), SLOT(toggleFullScreen()));
     actionCollection()->addAction("fullScreen", d->fullScreenAction);
@@ -600,15 +603,17 @@ void CallWindow::hideEvent(QHideEvent* event)
  */
 void CallWindow::setupQmlUi()
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    d->layout = new QVBoxLayout(this);
     QWidget *centralWidget = new QWidget(this);
     d->qmlUi = new QmlInterface( this );
     d->errorWidget = new KMessageWidget( this );
 
-    layout->addWidget(d->errorWidget);
-    layout->addWidget(d->qmlUi);
+    d->qmlUiContainer = QWidget::createWindowContainer(d->qmlUi);
 
-    centralWidget->setLayout(layout);
+    d->layout->addWidget(d->errorWidget);
+    d->layout->addWidget(d->qmlUiContainer);
+
+    centralWidget->setLayout(d->layout);
     setCentralWidget(centralWidget);
 
     // grab root object so we can access QML signals.
@@ -637,23 +642,23 @@ void CallWindow::setupQmlUi()
  */
 void CallWindow::toggleFullScreen()
 {
-    if (d->qmlUi->isFullScreen()) {
+    if (d->qmlUiContainer->isFullScreen()) {
         d->fullScreenAction->setChecked(false);
-        d->qmlUi->setWindowFlags(Qt::Widget);
-        setCentralWidget(d->qmlUi);
-        d->qmlUi->showNormal();
+        d->qmlUiContainer->showNormal();
+        d->layout->addWidget(d->qmlUiContainer);
         show();
     } else {
         d->fullScreenAction->setChecked(true);
-        d->qmlUi->setWindowFlags(Qt::Window);
-        d->qmlUi->showFullScreen();
+        d->layout->removeWidget(d->qmlUiContainer);
+        d->qmlUiContainer->setParent(0);
+        d->qmlUiContainer->showFullScreen();
         hide();
     }
 }
 
 void CallWindow::exitFullScreen()
 {
-    if (d->qmlUi->isFullScreen()) {
+    if (d->qmlUiContainer->isFullScreen()) {
         // avoid duplicating isFullScreen true branch.
         toggleFullScreen();
     }

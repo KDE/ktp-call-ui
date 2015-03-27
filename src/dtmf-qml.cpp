@@ -18,31 +18,32 @@
 #include "dtmf-qml.h"
 
 #include <QGraphicsObject>
-#include <QDeclarativeView>
+#include <QQuickView>
+#include <QQuickItem>
 
 #include <KStandardDirs>
 #include <KLocalizedString>
-
-#include <kdeclarative.h>
+#include <KDeclarative/KDeclarative>
 
 struct DtmfQml::Private
 {
-    QDeclarativeView *view;
-    KDeclarative kd;
+    QQuickView *view;
+    QWidget *viewContainer;
+    KDeclarative::KDeclarative kd;
 };
 
 DtmfQml::DtmfQml(QWidget *parent)
     : QMainWindow(parent), d(new Private)
 {
-    d->view = new QDeclarativeView(this);
+    d->view = new QQuickView();
     d->kd.setDeclarativeEngine(d->view->engine());
-    d->kd.initialize();
     d->kd.setupBindings();
     d->view->setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/core/Dtmf.qml"))));
-    d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    d->view->setResizeMode(QQuickView::SizeRootObjectToView);
+    d->viewContainer = QWidget::createWindowContainer(d->view, this);
     setFixedSize(d->view->size());
     setWindowTitle( i18n("Dialpad"));
-    setCentralWidget(d->view);
+    setCentralWidget(d->viewContainer);
     connect(d->view->rootObject(), SIGNAL(release(QString)), this, SIGNAL(stopSendDtmfEvent()));
     connect(d->view->rootObject(), SIGNAL(press(QString)), this, SLOT(onButtonPressed(QString)));
 }

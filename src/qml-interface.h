@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDeclarativeView>
+#include <QQuickView>
 #include <QGst/ElementFactory>
 
 #ifndef QMLINTERFACE_H
@@ -39,7 +39,7 @@
 
 class CallWindow;
 
-class QmlInterface: public QDeclarativeView {
+class QmlInterface: public QQuickView {
     Q_OBJECT
 
 public:

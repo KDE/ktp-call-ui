@@ -23,7 +23,6 @@
 #include <KDebug>
 #include <KConfig>
 #include <KConfigGroup>
-#include <KGlobal>
 
 namespace KTpCallPrivate {
 
@@ -200,7 +199,7 @@ QGst::ElementPtr DeviceElementFactory::tryElement(const char *name, const QStrin
 QGst::ElementPtr DeviceElementFactory::tryOverrideForKey(const char *keyName)
 {
     QGst::ElementPtr element;
-    const KConfigGroup configGroup = KGlobal::config()->group("GStreamer");
+    const KConfigGroup configGroup = KSharedConfig::openConfig()->group("GStreamer");
 
     if (configGroup.hasKey(keyName)) {
         QString binDescription = configGroup.readEntry(keyName);

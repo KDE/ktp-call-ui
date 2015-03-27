@@ -34,8 +34,8 @@
 #include <KMessageBox>
 #include <KDebug>
 #include <KLocalizedString>
-#include <KGlobal>
 #include <KConfigGroup>
+#include <KSharedConfig>
 
 #include <KTp/actions.h>
 #include <KTp/contact-factory.h>
@@ -86,7 +86,7 @@ DialoutWidget::~DialoutWidget()
 {
     Tp::AccountPtr account = d->ui->accountComboBox->currentAccount();
     if (account) {
-        KGlobal::config()->group("DialoutWidget").writeEntry("LastSelectedAccount", account->uniqueIdentifier());
+        KSharedConfig::openConfig()->group("DialoutWidget").writeEntry("LastSelectedAccount", account->uniqueIdentifier());
     }
 
     delete d->ui;
@@ -128,7 +128,7 @@ void DialoutWidget::onAccountManagerReady(Tp::PendingOperation* op)
                                       "you are online and that the accounts that you have "
                                       "configured support audio and/or video calls"));
 
-    QString lastAccount = KGlobal::config()->group("DialoutWidget").readEntry("LastSelectedAccount");
+    QString lastAccount = KSharedConfig::openConfig()->group("DialoutWidget").readEntry("LastSelectedAccount");
     d->ui->accountComboBox->setCurrentAccount(lastAccount);
 }
 

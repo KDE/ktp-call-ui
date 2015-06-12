@@ -9,7 +9,7 @@ find_package(ECM 1.3.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 find_package(KF5 REQUIRED COMPONENTS Config Declarative IconThemes I18n Notifications XmlGui KCMUtils)
-find_package(Qt5 REQUIRED COMPONENTS Quick Qml WebKitWidgets)
+find_package(Qt5 REQUIRED COMPONENTS Quick Qml)
 find_package(KTp REQUIRED)
 find_package(TelepathyQt5 REQUIRED)
 find_package(TelepathyQt5Farstream REQUIRED)

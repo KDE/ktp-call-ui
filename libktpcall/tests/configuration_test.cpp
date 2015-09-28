@@ -19,7 +19,6 @@
 #include <QtCore/QCoreApplication>
 #include <QGst/Init>
 #include <QGst/Element>
-#include <KDebug>
 
 using namespace KTpCallPrivate;
 
@@ -31,21 +30,21 @@ int main(int argc, char *argv[])
     QGst::init();
     QGst::ElementPtr element = DeviceElementFactory::makeAudioOutputElement();
     if (!element) {
-        kDebug() << "Could not make audio output element";
+        qDebug() << "Could not make audio output element";
     } else {
         element->setState(QGst::StateNull);
     }
 
     element = DeviceElementFactory::makeAudioCaptureElement();
     if (!element) {
-        kDebug() << "Could not make audio capture element";
+        qDebug() << "Could not make audio capture element";
     } else {
         element->setState(QGst::StateNull);
     }
 
     element = DeviceElementFactory::makeVideoCaptureElement();
     if (!element) {
-        kDebug() << "Could not make video capture element";
+        qDebug() << "Could not make video capture element";
     } else {
         element->setState(QGst::StateNull);
     }

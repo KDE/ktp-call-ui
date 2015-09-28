@@ -16,16 +16,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "status-area.h"
-#include <KIcon>
-#include <KDebug>
+#include "ktp_call_ui_debug.h"
 
-StatusArea::StatusArea(KStatusBar *statusBar)
+#include <KIconLoader>
+
+#include <QIcon>
+
+StatusArea::StatusArea(QStatusBar *statusBar)
     : QObject(statusBar), m_statusBar(statusBar)
 {
     connect(&m_callDurationTimer, SIGNAL(timeout()), SLOT(onCallDurationTimerTimeout()));
 
     m_callDuration.setHMS(0, 0, 0);
-    m_statusBar->insertPermanentItem(m_callDuration.toString(), 1);
+    m_statusBar->showMessage(m_callDuration.toString(), 0);
 
     m_statusLabel = new QLabel;
     m_statusBar->addWidget(m_statusLabel);
@@ -46,7 +49,7 @@ void StatusArea::setMessage(MessageType type, const QString& message)
     if (type == Status) {
         m_statusLabel->setText(message);
     } else {
-        kDebug() << "ERROR message:" << message;
+        qCDebug(KTP_CALL_UI) << "ERROR message:" << message;
         //TODO handle error messages
     }
 }
@@ -54,7 +57,7 @@ void StatusArea::setMessage(MessageType type, const QString& message)
 void StatusArea::onCallDurationTimerTimeout()
 {
     m_callDuration = m_callDuration.addSecs(1);
-    m_statusBar->changeItem(m_callDuration.toString(), 1);
+    m_statusBar->showMessage(m_callDuration.toString(), 0);
 }
 
 void StatusArea::showAudioStatusIcon(bool show)
@@ -62,7 +65,7 @@ void StatusArea::showAudioStatusIcon(bool show)
     if (show) {
         if (!m_audioStatusIcon) {
             QLabel *label = new QLabel;
-            label->setPixmap(KIcon("audio-headset").pixmap(16));
+            label->setPixmap(QIcon::fromTheme("audio-headset").pixmap(IconSize(KIconLoader::Small)));
             m_audioStatusIcon = label;
             m_statusBar->insertPermanentWidget(1, m_audioStatusIcon.data());
         } else {
@@ -81,7 +84,7 @@ void StatusArea::showVideoStatusIcon(bool show)
     if (show) {
         if (!m_videoStatusIcon) {
             QLabel *label = new QLabel;
-            label->setPixmap(KIcon("camera-web").pixmap(16));
+            label->setPixmap(QIcon::fromTheme("camera-web").pixmap(IconSize(KIconLoader::Small)));
             m_videoStatusIcon = label;
             m_statusBar->insertPermanentWidget(1, m_videoStatusIcon.data());
         } else {

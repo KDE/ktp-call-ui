@@ -1,11 +1,12 @@
-kde4_add_executable(configuration_test
+add_executable(configuration_test
     configuration_test.cpp
     ../private/device-element-factory.cpp
     ../private/phonon-integration.cpp
+    ../libktpcall_debug.cpp
 )
 target_link_libraries(configuration_test
-    ${KDE4_KDECORE_LIBS}
-    ${KDE4_PHONON_LIBRARY}
-    ${QT_QTDBUS_LIBRARY}
+    ${PHONON_LIBRARY}
+    Qt5::DBus
+    KF5::ConfigCore
     ${QTGSTREAMER_LIBRARIES}
 )

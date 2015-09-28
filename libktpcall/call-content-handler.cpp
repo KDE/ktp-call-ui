@@ -22,8 +22,6 @@
 #include "private/tf-video-content-handler.h"
 #include "private/sink-controllers.h"
 
-#include <KDebug>
-
 using namespace KTpCallPrivate;
 
 //BEGIN CallContentHandler

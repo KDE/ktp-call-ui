@@ -3,6 +3,8 @@ pkg_check_modules(FARSTREAM REQUIRED farstream-0.2)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
         ${FARSTREAM_INCLUDE_DIRS}
+        ${TELEPATHY_QT5_INCLUDE_DIR}
+        ${PHONON_INCLUDE_DIR}
 )
 
 #####
@@ -11,6 +13,7 @@ set(libktpcall_SRCS
     call-channel-handler.cpp
     call-content-handler.cpp
     volume-controller.cpp
+    libktpcall_debug.cpp
 
     private/device-element-factory.cpp
     private/phonon-integration.cpp
@@ -23,13 +26,12 @@ set(libktpcall_SRCS
     private/video-sink-bin.cpp
 )
 
-kde4_add_library(ktpcall STATIC ${libktpcall_SRCS})
+add_library(ktpcall STATIC ${libktpcall_SRCS})
 target_link_libraries(ktpcall
-    ${KDE4_KDECORE_LIBS}
-    ${KDE4_PHONON_LIBRARY}
-    ${QT_QTDBUS_LIBRARY}
+    Qt5::DBus
     ${QTGSTREAMER_LIBRARIES}
-    ${TELEPATHY_QT4_LIBRARIES}
+    ${TELEPATHY_QT5_LIBRARIES}
+    KF5::ConfigCore
     qtf
 )
 

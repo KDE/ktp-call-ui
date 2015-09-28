@@ -1,35 +1,42 @@
 project(ktp-call-ui)
 
+cmake_minimum_required(VERSION 2.8.12)
+if (POLICY CMP0063)
+  cmake_policy(SET CMP0063 NEW)
+endif()
+
 set(KTP_CALL_UI_VERSION "0.8.80")
 set(IS_KTP_INTERNAL_MODULE TRUE)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
-cmake_policy(SET CMP0002 OLD)
+find_package(ECM 1.3.0 REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-find_package(KDE4 REQUIRED)
-find_package(TelepathyQt4 REQUIRED)
-find_package(TelepathyQt4Farstream REQUIRED)
+find_package(KF5 REQUIRED COMPONENTS Config Declarative IconThemes I18n Notifications XmlGui KCMUtils)
+find_package(Qt5 REQUIRED COMPONENTS Quick Qml)
 find_package(KTp REQUIRED)
-find_package(QtGStreamer 1.0 REQUIRED)
-find_package(Qt4 COMPONENTS QtDeclarative)
+find_package(TelepathyQt5 REQUIRED)
+find_package(TelepathyQt5Farstream REQUIRED)
+find_package(KTp REQUIRED)
+find_package(Qt5GStreamer REQUIRED)
+find_package(Phonon4Qt5 REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_package(KDeclarative REQUIRED)
 
-include_directories(
-    ${KDE4_INCLUDES}
-    ${TELEPATHY_QT4_INCLUDE_DIR}
-    ${KTP_INCLUDE_DIR}
-    ${QTGSTREAMER_INCLUDES}
-    ${QTGSTREAMER_UI_LIBRARIES}
-)
-add_definitions(
-    ${KDE4_DEFINITIONS}
-    ${QTGSTREAMER_DEFINITIONS}
-)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTGSTREAMER_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
+include_directories( ${QTGSTREAMER_INCLUDES} )
+add_definitions( ${QTGSTREAMER_DEFINITIONS} )
+
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(KDECompilerSettings)
+include(ECMSetupVersion)
+include(FeatureSummary)
+
+kde_enable_exceptions()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QTGSTREAMER_FLAGS}")
 
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/version.h @ONLY)
 
 add_subdirectory(libqtf)
 add_subdirectory(libktpcall)
 add_subdirectory(src)
+
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

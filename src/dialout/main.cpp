@@ -18,40 +18,44 @@
 #include "../version.h"
 
 #include <KAboutData>
-#include <KCmdLineArgs>
 #include <KLocalizedString>
-#include <KUniqueApplication>
+
+#include <QApplication>
 
 #include <TelepathyQt/Types>
 
 int main(int argc, char **argv)
 {
-    KAboutData aboutData("ktp-dialout-ui", "ktp-call-ui", ki18n("KDE Telepathy Call Ui"),
-                          KTP_CALL_UI_VERSION,
-                          ki18n("VoIP client for KDE"), KAboutData::License_GPL,
-                          ki18n("(C) 2009-2012, George Kiagiadakis\n"
-                                "(C) 2010-2011, Collabora Ltd."));
-    aboutData.setProgramIconName("internet-telephony");
-    aboutData.addAuthor(ki18nc("@info:credit", "George Kiagiadakis"), KLocalizedString(),
+    KAboutData aboutData("ktp-dialout-ui", i18n("KDE Telepathy Dialout Ui"),
+                        KTP_CALL_UI_VERSION,
+                        i18n("VoIP client for KDE"), KAboutLicense::GPL,
+                        i18n("(C) 2009-2012, George Kiagiadakis\n"
+                             "(C) 2010-2011, Collabora Ltd."));
+    aboutData.addAuthor(i18nc("@info:credit", "George Kiagiadakis"), QString(),
                          "kiagiadakis.george@gmail.com");
     aboutData.setProductName("telepathy/call-ui"); //set the correct name for bug reporting
+    KAboutData::setApplicationData(aboutData);
 
+    QApplication app(argc, argv);
 
-    KCmdLineArgs::init(argc, argv, &aboutData);
+    app.setWindowIcon(QIcon::fromTheme("internet-telephony"));
 
-    KCmdLineOptions options;
-    options.add("+[number]", ki18n("The number to call"));
+    QCommandLineParser parser;
+    parser.addVersionOption();
+    parser.addHelpOption();
+    aboutData.setupCommandLine(&parser);
 
-    KCmdLineArgs::addCmdLineOptions(options);
-    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
+    parser.addPositionalArgument("+[number]", i18n("The number to call"));
 
-    KUniqueApplication app;
+    parser.process(app);
+    aboutData.processCommandLine(&parser);
+    const QStringList args = parser.positionalArguments();
 
     Tp::registerTypes();
 
     MainWindow *mw;
-    if(args->count()) {
-        mw = new MainWindow(args->arg(0));
+    if (args.count()) {
+        mw = new MainWindow(args[0]);
     } else {
         mw = new MainWindow();
     }

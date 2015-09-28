@@ -17,13 +17,13 @@
 */
 #include "device-element-factory.h"
 #include "phonon-integration.h"
+#include "../libktpcall_debug.h"
 #include <QGst/Bin>
 #include <QGst/ElementFactory>
 #include <QGst/Structure>
-#include <KDebug>
-#include <KConfig>
+
+#include <KSharedConfig>
 #include <KConfigGroup>
-#include <KGlobal>
 
 namespace KTpCallPrivate {
 
@@ -176,7 +176,7 @@ QGst::ElementPtr DeviceElementFactory::tryElement(const char *name, const QStrin
 {
     QGst::ElementPtr element = QGst::ElementFactory::make(name);
     if (!element) {
-        kDebug() << "Could not make element" << name;
+        qCDebug(LIBKTPCALL) << "Could not make element" << name;
         return element;
     }
 
@@ -184,39 +184,39 @@ QGst::ElementPtr DeviceElementFactory::tryElement(const char *name, const QStrin
         try {
             element->setProperty("device", device);
         } catch (const std::logic_error & error) {
-            kDebug() << "FIXME: Element" << name << "doesn't support string device property";
+            qCDebug(LIBKTPCALL) << "FIXME: Element" << name << "doesn't support string device property";
         }
     }
 
     if (!element->setState(QGst::StateReady)) {
-        kDebug() << "Element" << name << "with device string" << device << "doesn't want to become ready";
+        qCDebug(LIBKTPCALL) << "Element" << name << "with device string" << device << "doesn't want to become ready";
         return QGst::ElementPtr();
     }
 
-    kDebug() << "Using element" << name << "with device string" << device;
+    qCDebug(LIBKTPCALL) << "Using element" << name << "with device string" << device;
     return element;
 }
 
 QGst::ElementPtr DeviceElementFactory::tryOverrideForKey(const char *keyName)
 {
     QGst::ElementPtr element;
-    const KConfigGroup configGroup = KGlobal::config()->group("GStreamer");
+    const KConfigGroup configGroup = KSharedConfig::openConfig()->group("GStreamer");
 
     if (configGroup.hasKey(keyName)) {
         QString binDescription = configGroup.readEntry(keyName);
         element = QGst::Bin::fromDescription(binDescription);
 
         if (!element) {
-            kDebug() << "Could not construct bin" << binDescription;
+            qCDebug(LIBKTPCALL) << "Could not construct bin" << binDescription;
             return element;
         }
 
         if (!element->setState(QGst::StateReady)) {
-            kDebug() << "Custom bin" << binDescription << "doesn't want to become ready";
+            qCDebug(LIBKTPCALL) << "Custom bin" << binDescription << "doesn't want to become ready";
             return QGst::ElementPtr();
         }
 
-        kDebug() << "Using custom bin" << binDescription;
+        qCDebug(LIBKTPCALL) << "Using custom bin" << binDescription;
     }
 
     return element;

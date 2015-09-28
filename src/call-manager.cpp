@@ -18,16 +18,16 @@
 #include "call-window.h"
 #include "approver.h"
 #include "../libktpcall/call-channel-handler.h"
+#include "ktp_call_ui_debug.h"
 
-#include <KDebug>
 #include <KTp/telepathy-handler-application.h>
 
 struct CallManager::Private
 {
     Tp::CallChannelPtr callChannel;
     CallChannelHandler *channelHandler;
-    QWeakPointer<CallWindow> callWindow;
-    QWeakPointer<Approver> approver;
+    QPointer<CallWindow> callWindow;
+    QPointer<Approver> approver;
 };
 
 CallManager::CallManager(const Tp::CallChannelPtr & callChannel, QObject *parent)
@@ -55,7 +55,7 @@ CallManager::CallManager(const Tp::CallChannelPtr & callChannel, QObject *parent
 
 CallManager::~CallManager()
 {
-    kDebug() << "Deleting CallManager";
+    qCDebug(KTP_CALL_UI) << "Deleting CallManager";
 
     //delete the window just in case CallManager was deleted
     //before the channel entered CallStateEnded
@@ -67,7 +67,7 @@ CallManager::~CallManager()
 
 void CallManager::onCallStateChanged(Tp::CallState state)
 {
-    kDebug() << "new call state:" << state;
+    qCDebug(KTP_CALL_UI) << "new call state:" << state;
 
     switch (state) {
     case Tp::CallStatePendingInitiator:
@@ -80,7 +80,7 @@ void CallManager::onCallStateChanged(Tp::CallState state)
             ensureCallWindow();
             d->callWindow.data()->setStatus(CallWindow::StatusConnecting);
         } else {
-            kDebug() << "Call is initialising";
+            qCDebug(KTP_CALL_UI) << "Call is initialising";
         }
         break;
     case Tp::CallStateInitialised:
@@ -133,7 +133,7 @@ void CallManager::onCallStateChanged(Tp::CallState state)
             connect(d->callWindow.data(), SIGNAL(destroyed()), d->channelHandler, SLOT(shutdown()));
         } else {
             //missed the call
-            kDebug() << "missed call";
+            qCDebug(KTP_CALL_UI) << "missed call";
             delete d->approver.data();
             d->channelHandler->shutdown();
         }

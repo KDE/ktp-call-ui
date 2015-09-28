@@ -13,21 +13,34 @@ set(ktp-call-ui_SRCS
     systemtray-icon.cpp
     qml-interface.cpp
     dtmf-qml.cpp
+    ktp_call_ui_debug.cpp
 )
 
-kde4_add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
+add_executable(ktp-call-ui ${ktp-call-ui_SRCS})
 target_link_libraries(ktp-call-ui
-    ${KDE4_KDEUI_LIBS}
-    ${KDECLARATIVE_LIBRARIES}
-    ${TELEPATHY_QT4_LIBRARIES}
-    ${KTP_LIBRARIES}
-    ${QTGSTREAMER_UI_LIBRARIES}
-    ${QT_QTDECLARATIVE_LIBRARY}
+    ${QTGSTREAMER_QUICK_LIBRARY}
+    KTp::CommonInternals
+    KF5::Declarative
+    KF5::I18n
+    KF5::IconThemes
+    KF5::Notifications
+    KF5::XmlGui
+    Qt5::Quick
+    Qt5::Qml
     ktpcall
 )
 
 install(TARGETS ktp-call-ui DESTINATION ${LIBEXEC_INSTALL_DIR})
-install(FILES callwindowui.rc DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui)
+install(FILES callwindowui.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/ktp-call-ui)
+
+install( FILES
+        qml/Main.qml
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
+)
+install(DIRECTORY
+        qml/core
+        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
+)
 
 install( FILES
         qml/Main.qml

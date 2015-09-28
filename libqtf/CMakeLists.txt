@@ -9,7 +9,7 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${TP_FARSTREAM_INCLUDE_DIRS}
     ${FARSTREAM_INCLUDE_DIRS}
-    ${TELEPATHY_QT4_FARSTREAM_INCLUDE_DIR}
+    ${TELEPATHY_QT5_FARSTREAM_INCLUDE_DIR}
 )
 
 add_definitions(
@@ -18,11 +18,11 @@ add_definitions(
     -DGST_DISABLE_LOADSAVE
 )
 
-kde4_add_library(qtf STATIC qtf.cpp)
+add_library(qtf STATIC qtf.cpp)
 
 target_link_libraries(qtf
     ${QTGSTREAMER_LIBRARIES}
     ${TP_FARSTREAM_LDFLAGS}
     ${FARSTREAM_LDFLAGS}
-    ${TELEPATHY_QT4_FARSTREAM_LIBRARIES}
+    ${TELEPATHY_QT5_FARSTREAM_LIBRARIES}
 )

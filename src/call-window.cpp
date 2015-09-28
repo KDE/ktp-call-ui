@@ -22,6 +22,7 @@
 #include "dtmf-handler.h"
 #include "dtmf-qml.h"
 #include "../libktpcall/call-channel-handler.h"
+#include "ktp_call_ui_debug.h"
 
 #include <QCloseEvent>
 #include <QVBoxLayout>
@@ -31,16 +32,18 @@
 #include <TelepathyQt/AvatarData>
 #include <TelepathyQt/Contact>
 
-#include <KDebug>
 #include <KLocalizedString>
 #include <KToggleAction>
+#include <QAction>
 #include <KActionCollection>
 #include <KToolBar>
 #include <KMessageWidget>
+#include <KGuiItem>
 
-#include <QDeclarativeView>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
+#include <QQuickView>
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QQuickItem>
 #include <QGst/ElementFactory>
 #include <QGst/Ui/GraphicsVideoSurface>
 #include <QGst/Init>
@@ -58,7 +61,9 @@ struct CallWindow::Private
     StatusArea *statusArea;
     bool callEnded;
 
+    QVBoxLayout *layout;
     QmlInterface *qmlUi;
+    QWidget *qmlUiContainer;
     KMessageWidget *errorWidget;
     DtmfQml *dtmfQml;
 
@@ -66,10 +71,10 @@ struct CallWindow::Private
     KToggleAction *showDtmfAction;
     KToggleAction *sendVideoAction;
     KToggleAction *muteAction;
-    KAction *holdAction;
-    KAction *hangupAction;
-    KAction *goToSystemTrayAction;
-    KAction *restoreAction;
+    QAction *holdAction;
+    QAction *hangupAction;
+    QAction *goToSystemTrayAction;
+    QAction *restoreAction;
     KToggleAction *fullScreenAction;
 
     VideoDisplayFlags currentVideoDisplayState;
@@ -111,7 +116,7 @@ CallWindow::CallWindow(const Tp::CallChannelPtr & callChannel)
 
 CallWindow::~CallWindow()
 {
-    kDebug() << "Deleting CallWindow";
+    qCDebug(KTP_CALL_UI) << "Deleting CallWindow";
     delete d;
 }
 
@@ -229,7 +234,7 @@ void CallWindow::setStatus(Status status, const Tp::CallStateReason & reason)
 
 void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 {
-    kDebug() << "Content added:" << contentHandler->callContent()->name();
+    qCDebug(KTP_CALL_UI) << "Content added:" << contentHandler->callContent()->name();
 
     if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
         AudioContentHandler *audioContentHandler = qobject_cast<AudioContentHandler*>(contentHandler);
@@ -253,7 +258,7 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
         d->statusArea->showAudioStatusIcon(true);
     } else {
         if (d->videoContentHandler) {
-            kError() << "Multiple video contents are not supported";
+            qCCritical(KTP_CALL_UI) << "Multiple video contents are not supported";
             return;
         }
 
@@ -274,7 +279,7 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 
 void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
 {
-    kDebug() << "Content removed:" << contentHandler->callContent()->name();
+    qCDebug(KTP_CALL_UI) << "Content removed:" << contentHandler->callContent()->name();
 
     if (contentHandler->callContent()->type() == Tp::MediaStreamTypeAudio) {
         AudioContentHandler *audioContentHandler = qobject_cast<AudioContentHandler*>(contentHandler);
@@ -299,7 +304,7 @@ void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
 
 void CallWindow::onLocalVideoSendingStateChanged(bool sending)
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
 
     if (sending) {
         changeVideoDisplayState(d->currentVideoDisplayState | LocalVideoPreview);
@@ -310,10 +315,10 @@ void CallWindow::onLocalVideoSendingStateChanged(bool sending)
 
 void CallWindow::onRemoteVideoSendingStateChanged(const Tp::ContactPtr & contact, bool sending)
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
 
     if (d->remoteVideoContact && d->remoteVideoContact != contact) {
-        kError() << "Multiple participants are not supported";
+        qCCritical(KTP_CALL_UI) << "Multiple participants are not supported";
         return;
     }
 
@@ -364,49 +369,49 @@ void CallWindow::changeVideoDisplayState(VideoDisplayFlags newState)
 void CallWindow::setupActions()
 {
     d->showMyVideoAction = new KToggleAction(i18nc("@action", "Show my video"), this);
-    d->showMyVideoAction->setIcon(KIcon("camera-web"));
+    d->showMyVideoAction->setIcon(QIcon::fromTheme("camera-web"));
     d->showMyVideoAction->setEnabled(false);
     d->showMyVideoAction->setChecked(false);
     actionCollection()->addAction("showMyVideo", d->showMyVideoAction);
 
     d->showDtmfAction = new KToggleAction(i18nc("@action", "Show dialpad"), this);
-    d->showDtmfAction->setIcon(KIcon("phone"));
+    d->showDtmfAction->setIcon(QIcon::fromTheme("phone"));
     d->showDtmfAction->setEnabled(false);
     connect(d->showDtmfAction, SIGNAL(toggled(bool)), SLOT(toggleDtmf(bool)));
     actionCollection()->addAction("showDtmf", d->showDtmfAction);
 
-    d->goToSystemTrayAction = new KAction(i18nc("@action", "Hide window"), this);
+    d->goToSystemTrayAction = new QAction(i18nc("@action", "Hide window"), this);
     d->goToSystemTrayAction->setEnabled(true);
     connect(d->goToSystemTrayAction, SIGNAL(triggered(bool)), this, SLOT(hide()));
     actionCollection()->addAction("goToSystemTray", d->goToSystemTrayAction);
 
-    d->restoreAction= new KAction(i18nc("@action", "Restore window"), this);
+    d->restoreAction= new QAction(i18nc("@action", "Restore window"), this);
     d->restoreAction->setEnabled(true);
     connect(d->restoreAction, SIGNAL(triggered(bool)), this, SLOT(show()));
 
     //TODO implement this feature
     d->sendVideoAction = new KToggleAction(i18nc("@action", "Send video"), this);
-    d->sendVideoAction->setIcon(KIcon("webcamsend"));
+    d->sendVideoAction->setIcon(QIcon::fromTheme("webcamsend"));
     d->sendVideoAction->setEnabled(false);
     actionCollection()->addAction("sendVideo", d->sendVideoAction);
 
-    d->muteAction = new KToggleAction(KIcon("audio-volume-medium"), i18nc("@action", "Mute"), this);
-    d->muteAction->setCheckedState(KGuiItem(i18nc("@action", "Mute"), KIcon("audio-volume-muted")));
+    d->muteAction = new KToggleAction(QIcon::fromTheme("audio-volume-medium"), i18nc("@action", "Mute"), this);
+    d->muteAction->setCheckedState(KGuiItem(i18nc("@action", "Mute"), QIcon::fromTheme("audio-volume-muted")));
     d->muteAction->setEnabled(false); //will be enabled later
     connect(d->muteAction, SIGNAL(toggled(bool)), SLOT(toggleMute(bool)));
     actionCollection()->addAction("mute", d->muteAction);
 
-    d->holdAction = new KAction(i18nc("@action", "Hold"), this);
-    d->holdAction->setIcon(KIcon("media-playback-pause"));
+    d->holdAction = new QAction(i18nc("@action", "Hold"), this);
+    d->holdAction->setIcon(QIcon::fromTheme("media-playback-pause"));
     d->holdAction->setEnabled(false); //will be enabled later
     connect(d->holdAction, SIGNAL(triggered()), SLOT(hold()));
     actionCollection()->addAction("hold", d->holdAction);
 
-    d->hangupAction = new KAction(KIcon("call-stop"), i18nc("@action", "Hangup"), this);
+    d->hangupAction = new QAction(QIcon::fromTheme("call-stop"), i18nc("@action", "Hangup"), this);
     connect(d->hangupAction, SIGNAL(triggered()), SLOT(hangup()));
     actionCollection()->addAction("hangup", d->hangupAction);
 
-    d->fullScreenAction = new KToggleAction(KIcon("view-fullscreen"),i18nc("@action", "Full Screen"), this);
+    d->fullScreenAction = new KToggleAction(QIcon::fromTheme("view-fullscreen"),i18nc("@action", "Full Screen"), this);
     d->fullScreenAction->setEnabled(true);
     connect(d->fullScreenAction, SIGNAL(triggered()), SLOT(toggleFullScreen()));
     actionCollection()->addAction("fullScreen", d->fullScreenAction);
@@ -419,13 +424,13 @@ void CallWindow::checkEnableDtmf()
     Q_FOREACH(const Tp::CallContentPtr & content, d->callChannel->contentsForType(Tp::MediaStreamTypeAudio)) {
         dtmfInterface = content->interface<Tp::Client::CallContentInterfaceDTMFInterface>();
         if (dtmfInterface) {
-            kDebug() << "Does supportDTMF work? " << content->supportsDTMF() << dtmfInterface;
+            qCDebug(KTP_CALL_UI) << "Does supportDTMF work? " << content->supportsDTMF() << dtmfInterface;
             dtmfSupported = true;
             break;
         }
     }
 
-    kDebug() << "DTMF supported:" << dtmfSupported;
+    qCDebug(KTP_CALL_UI) << "DTMF supported:" << dtmfSupported;
     d->showDtmfAction->setEnabled(dtmfSupported);
 
     if (!dtmfSupported) {
@@ -457,7 +462,7 @@ void CallWindow::toggleMute(bool checked)
 
 void CallWindow::hangup()
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
     d->callChannel->hangup();
 }
 
@@ -465,7 +470,7 @@ void CallWindow::closeEvent(QCloseEvent *event)
 {
     systemtrayicon->setActivateNext(false);
     if (!d->callEnded) {
-        kDebug() << "Ignoring close event";
+        qCDebug(KTP_CALL_UI) << "Ignoring close event";
         hangup();
         event->ignore();
     } else {
@@ -481,7 +486,7 @@ void CallWindow::hold()
     } else if (d->callChannel.data()->localHoldState() == Tp::LocalHoldStateUnheld) {
         holdRequest = d->callChannel->requestHold(true);
     } else {
-        kDebug() << "Call is currently being held, please wait before trying again!";
+        qCDebug(KTP_CALL_UI) << "Call is currently being held, please wait before trying again!";
         return;
     }
 
@@ -500,7 +505,7 @@ void CallWindow::holdOperationFinished(Tp::PendingOperation* operation)
 
 void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStateReason reason)
 {
-    kDebug() << "Hold status changed" << state << " " << reason;
+    qCDebug(KTP_CALL_UI) << "Hold status changed" << state << " " << reason;
 
     switch (state) {
     case Tp::LocalHoldStateHeld:
@@ -513,7 +518,7 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
         }
         d->holdAction->setEnabled(true);
         d->qmlUi->setHoldEnabled(true);
-        d->holdAction->setIcon(KIcon("media-playback-start"));
+        d->holdAction->setIcon(QIcon::fromTheme("media-playback-start"));
         d->qmlUi->setChangeHoldIcon("start");
         d->statusArea->stopDurationTimer();
         break;
@@ -527,7 +532,7 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
         }
         d->holdAction->setEnabled(true);
         d->qmlUi->setHoldEnabled(true);
-        d->holdAction->setIcon(KIcon("media-playback-pause"));
+        d->holdAction->setIcon(QIcon::fromTheme("media-playback-pause"));
         d->qmlUi->setChangeHoldIcon("pause");
         d->statusArea->startDurationTimer();
         break;
@@ -551,8 +556,8 @@ void CallWindow::onHoldStatusChanged(Tp::LocalHoldState state, Tp::LocalHoldStat
 
 void CallWindow::setupSystemTray()
 {
-    KMenu *trayIconMenu=new KMenu(this);
-    systemtrayicon=new SystemTrayIcon(this);
+    QMenu *trayIconMenu = new QMenu(this);
+    systemtrayicon = new SystemTrayIcon(this);
 
     //Save the title
     trayIconMenu->setTitle(windowTitle());
@@ -598,15 +603,17 @@ void CallWindow::hideEvent(QHideEvent* event)
  */
 void CallWindow::setupQmlUi()
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    d->layout = new QVBoxLayout(this);
     QWidget *centralWidget = new QWidget(this);
     d->qmlUi = new QmlInterface( this );
     d->errorWidget = new KMessageWidget( this );
 
-    layout->addWidget(d->errorWidget);
-    layout->addWidget(d->qmlUi);
+    d->qmlUiContainer = QWidget::createWindowContainer(d->qmlUi);
 
-    centralWidget->setLayout(layout);
+    d->layout->addWidget(d->errorWidget);
+    d->layout->addWidget(d->qmlUiContainer);
+
+    centralWidget->setLayout(d->layout);
     setCentralWidget(centralWidget);
 
     // grab root object so we can access QML signals.
@@ -635,25 +642,24 @@ void CallWindow::setupQmlUi()
  */
 void CallWindow::toggleFullScreen()
 {
-    if (d->qmlUi->isFullScreen()) {
+    if (d->qmlUiContainer->isFullScreen()) {
         d->fullScreenAction->setChecked(false);
-        d->qmlUi->setWindowFlags(Qt::Widget);
-        setCentralWidget(d->qmlUi);
-        d->qmlUi->showNormal();
+        d->qmlUiContainer->showNormal();
+        d->layout->addWidget(d->qmlUiContainer);
         show();
     } else {
         d->fullScreenAction->setChecked(true);
-        d->qmlUi->setWindowFlags(Qt::Window);
-        d->qmlUi->showFullScreen();
+        d->layout->removeWidget(d->qmlUiContainer);
+        d->qmlUiContainer->setParent(0);
+        d->qmlUiContainer->showFullScreen();
         hide();
     }
 }
 
 void CallWindow::exitFullScreen()
 {
-    if (d->qmlUi->isFullScreen()) {
+    if (d->qmlUiContainer->isFullScreen()) {
         // avoid duplicating isFullScreen true branch.
         toggleFullScreen();
     }
 }
-

@@ -44,7 +44,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="KLineEdit" name="uriLineEdit">
+          <widget class="QLineEdit" name="uriLineEdit">
            <property name="showClearButton" stdset="0">
             <bool>true</bool>
            </property>
@@ -109,11 +109,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>KLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>klineedit.h</header>
-  </customwidget>
   <customwidget>
    <class>KTp::AccountsComboBox</class>
    <extends>QComboBox</extends>

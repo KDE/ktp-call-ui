@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 1.1
+import QtQuick 2.0
 import QtGStreamer 1.0
 import "core"
 
@@ -104,12 +104,14 @@ Rectangle {
         }
 
         border.width: 2
+        color: "black"
         border.color: "dimgray"
         visible: showMyVideoAction.checked
 
         VideoItem {
             id: videoPreviewWidget
             anchors.fill: parent
+            anchors.margins: 2
             surface: videoPreviewSurface
         }
     }

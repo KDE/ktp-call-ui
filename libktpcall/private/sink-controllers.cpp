@@ -16,10 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "sink-controllers.h"
+#include "libktpcall_debug.h"
 #include <QGst/ElementFactory>
 #include <QGst/Pipeline>
 #include <QGst/GhostPad>
-#include <KDebug>
 
 namespace KTpCallPrivate {
 
@@ -114,11 +114,11 @@ VideoSinkController::~VideoSinkController()
 
 QGst::PadPtr VideoSinkController::requestSrcPad()
 {
-    QString newPadName = QString("src%1").arg(m_padNameCounter);
+    QString newPadName = QStringLiteral("src%1").arg(m_padNameCounter);
     m_padNameCounter++;
 
     QGst::PadPtr teeSrcPad = m_tee->getRequestPad("src_%u");
-    QGst::PadPtr ghostSrcPad = QGst::GhostPad::create(teeSrcPad, newPadName.toAscii());
+    QGst::PadPtr ghostSrcPad = QGst::GhostPad::create(teeSrcPad, newPadName.toLatin1());
 
     ghostSrcPad->setActive(true);
     m_bin->addPad(ghostSrcPad);
@@ -142,7 +142,7 @@ void VideoSinkController::linkVideoSink(const QGst::ElementPtr & sink)
     //anything about this content's src pad, so nobody can possibly link
     //a video sink before the bin is created.
     Q_ASSERT(m_bin);
-    kDebug();
+    qCDebug(LIBKTPCALL);
 
     QGst::PadPtr srcPad = m_tee->getRequestPad("src_%u");
     m_videoSinkBin = new VideoSinkBin(sink);
@@ -160,7 +160,7 @@ void VideoSinkController::unlinkVideoSink()
     QMutexLocker l(&m_videoSinkMutex);
 
     if (m_videoSinkBin) {
-        kDebug();
+        qCDebug(LIBKTPCALL);
 
         QGst::PadPtr sinkPad = m_videoSinkBin->bin()->getStaticPad("sink");
         QGst::PadPtr srcPad = sinkPad->peer();

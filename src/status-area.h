@@ -21,9 +21,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
-#include <QtCore/QWeakPointer>
-#include <QtGui/QLabel>
-#include <KStatusBar>
+#include <QtCore/QPointer>
+#include <QLabel>
+#include <QStatusBar>
 
 class StatusArea : public QObject
 {
@@ -31,7 +31,7 @@ class StatusArea : public QObject
 public:
     enum MessageType { Status, Error };
 
-    StatusArea(KStatusBar *statusBar);
+    StatusArea(QStatusBar* statusBar);
 
 public Q_SLOTS:
     void startDurationTimer();
@@ -44,12 +44,12 @@ private Q_SLOTS:
     void onCallDurationTimerTimeout();
 
 private:
-    KStatusBar *m_statusBar;
+    QStatusBar *m_statusBar;
     QTime m_callDuration;
     QTimer m_callDurationTimer;
     QLabel *m_statusLabel;
-    QWeakPointer<QWidget> m_audioStatusIcon;
-    QWeakPointer<QWidget> m_videoStatusIcon;
+    QPointer<QWidget> m_audioStatusIcon;
+    QPointer<QWidget> m_videoStatusIcon;
 };
 
 #endif // STATUS_AREA_H

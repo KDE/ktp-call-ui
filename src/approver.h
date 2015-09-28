@@ -36,7 +36,7 @@ Q_SIGNALS:
     void channelRejected();
 
 private:
-    QWeakPointer<KNotification> m_notification;
+    QPointer<KNotification> m_notification;
     KStatusNotifierItem *m_notifierItem;
 };
 

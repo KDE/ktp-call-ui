@@ -19,8 +19,9 @@
 #include "call-handler.h"
 #include "version.h"
 
+#include <QIcon>
+
 #include <KAboutData>
-#include <KCmdLineArgs>
 #include <KLocalizedString>
 
 #include <TelepathyQt/Types>
@@ -34,19 +35,17 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData aboutData("ktp-call-ui", 0, ki18n("KDE Telepathy Call Ui"),
+    KTp::TelepathyHandlerApplication app(argc, argv);
+    KAboutData aboutData("ktp-call-ui", i18n("KDE Telepathy Call Ui"),
                           KTP_CALL_UI_VERSION,
-                          ki18n("VoIP client for KDE"), KAboutData::License_GPL,
-                          ki18n("(C) 2009-2012, George Kiagiadakis\n"
+                          i18n("VoIP client for KDE"), KAboutLicense::GPL,
+                          i18n("(C) 2009-2012, George Kiagiadakis\n"
                                 "(C) 2010-2011, Collabora Ltd."));
-    aboutData.setProgramIconName("internet-telephony");
-    aboutData.addAuthor(ki18nc("@info:credit", "George Kiagiadakis"), KLocalizedString(),
+    aboutData.addAuthor(i18nc("@info:credit", "George Kiagiadakis"), QString(),
                          "kiagiadakis.george@gmail.com");
     aboutData.setProductName("telepathy/call-ui"); //set the correct name for bug reporting
-
-    KCmdLineArgs::init(argc, argv, &aboutData);
-
-    KTp::TelepathyHandlerApplication app;
+    KAboutData::setApplicationData(aboutData);
+    app.setWindowIcon(QIcon::fromTheme("internet-telephony"));
 
     Tp::AccountFactoryPtr accountFactory = Tp::AccountFactory::create(
         QDBusConnection::sessionBus(),
@@ -75,13 +74,13 @@ int main(int argc, char **argv)
                        << Tp::Contact::FeatureAvatarData
     );
 
-    KGlobal::ref(); //do not allow the KMainWindow destructor to shut us down
+    app.setQuitOnLastWindowClosed(true);
 
     Tp::ClientRegistrarPtr registrar =
         Tp::ClientRegistrar::create(accountFactory, connectionFactory,
                                     channelFactory, contactFactory);
 
-    Tp::SharedPtr<CallHandler> callHandler = Tp::SharedPtr<CallHandler>(new CallHandler());
+    Tp::SharedPtr<CallHandler> callHandler(new CallHandler());
     registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(callHandler), "KTp.CallUi");
 
     return app.exec();

@@ -15,52 +15,58 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <KDE/KStandardDirs>
 #include <KActionCollection>
+#include <KDeclarative/KDeclarative>
 
 #include <QGst/ElementFactory>
-#include <QGst/Ui/GraphicsVideoSurface>
+#include <QGst/Quick/VideoSurface>
 #include <QGst/Init>
 
-#include <QDeclarativeContext>
+#include <QQmlContext>
+#include <QQuickItem>
 #include <QGraphicsObject>
+#include <QStandardPaths>
 
 #include "qml-interface.h"
 #include "call-window.h"
 
-#include <kdeclarative.h>
-
 struct QmlInterface::Private
 {
     /*! Manages the video preview player*/
-    QGst::Ui::GraphicsVideoSurface *surfacePreview;
+    QGst::Quick::VideoSurface *surfacePreview;
     /*! Manages the main video player*/
-    QGst::Ui::GraphicsVideoSurface *surface;
+    QGst::Quick::VideoSurface *surface;
 
-    KDeclarative kd;
+    QGst::ElementPtr videoSink;
+    QGst::ElementPtr previewVideoSink;
+
+    KDeclarative::KDeclarative kd;
 };
 
 
 QmlInterface::QmlInterface(CallWindow *parent)
-    : QDeclarativeView(parent), d(new Private)
+    : QQuickView(), d(new Private)
 {
     d->kd.setDeclarativeEngine(engine());
-    d->kd.initialize();
     d->kd.setupBindings();
 
-    d->surface = new QGst::Ui::GraphicsVideoSurface(this);
+    d->surface = new QGst::Quick::VideoSurface();
     rootContext()->setContextProperty(QLatin1String("videoSurface"), d->surface);
 
-    d->surfacePreview = new QGst::Ui::GraphicsVideoSurface(this);
+    d->surfacePreview = new QGst::Quick::VideoSurface();
     rootContext()->setContextProperty(QLatin1String("videoPreviewSurface"), d->surfacePreview);
 
-    setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    /* Store the video sinks here. Otherwise, no image is shown... */
+    d->videoSink = d->surface->videoSink();
+    d->previewVideoSink = d->surfacePreview->videoSink();
+
+    setResizeMode(QQuickView::SizeRootObjectToView);
 
     rootContext()->setContextProperty("showMyVideoAction", parent->actionCollection()->action("showMyVideo"));
     rootContext()->setContextProperty("showDtmfAction", parent->actionCollection()->action("showDtmf"));
     rootContext()->setContextProperty("muteAction", parent->actionCollection()->action("mute"));
 
-    setSource(QUrl(KStandardDirs::locate("data", QLatin1String("ktp-call-ui/Main.qml"))));
+    setSource(QUrl(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QLatin1String("ktp-call-ui/Main.qml"))));
 }
 
 void QmlInterface::setLabel(const QString &name, const QString &imageUrl)
@@ -70,12 +76,12 @@ void QmlInterface::setLabel(const QString &name, const QString &imageUrl)
 
 QGst::ElementPtr QmlInterface::getVideoSink()
 {
-    return d->surface->videoSink();
+    return d->videoSink;
 }
 
 QGst::ElementPtr QmlInterface::getVideoPreviewSink()
 {
-    return d->surfacePreview->videoSink();
+    return d->previewVideoSink;
 }
 void QmlInterface::setShowVideo(bool show)
 {

@@ -16,7 +16,8 @@
 */
 #include "call-handler.h"
 #include "call-manager.h"
-#include <KDebug>
+#include "ktp_call_ui_debug.h"
+
 #include <TelepathyQt/CallChannel>
 #include <TelepathyQt/ChannelClassSpec>
 
@@ -37,7 +38,7 @@ static inline Tp::AbstractClientHandler::Capabilities capabilities()
 
     //transport methods - farstream supports them all
     caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/ice"));
-    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/galk-p2p"));
+    caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/gtalk-p2p"));
     caps.setToken(TP_QT_IFACE_CHANNEL_TYPE_CALL + QLatin1String("/shm"));
 
     //significant codecs
@@ -49,7 +50,7 @@ static inline Tp::AbstractClientHandler::Capabilities capabilities()
 CallHandler::CallHandler()
     : Tp::AbstractClientHandler(channelClassSpecList(), capabilities())
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
 }
 
 CallHandler::~CallHandler()
@@ -69,7 +70,7 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
                                  const QDateTime & userActionTime,
                                  const Tp::AbstractClientHandler::HandlerInfo & handlerInfo)
 {
-    kDebug();
+    qCDebug(KTP_CALL_UI);
     Q_UNUSED(account);
     Q_UNUSED(connection);
     Q_UNUSED(requestsSatisfied);
@@ -79,14 +80,14 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
     Q_FOREACH(const Tp::ChannelPtr & channel, channels) {
         Tp::CallChannelPtr callChannel = Tp::CallChannelPtr::qObjectCast(channel);
         if (!callChannel) {
-            kDebug() << "Channel is not a Call channel. Ignoring";
+            qCDebug(KTP_CALL_UI) << "Channel is not a Call channel. Ignoring";
             continue;
         }
         //check if any call manager is already handling this channel
-	if (!handledCallChannels.contains(callChannel)) {
-	    handledCallChannels.append(callChannel);
-	    CallManager *manager = new CallManager(callChannel, this);
-	}
+        if (!handledCallChannels.contains(callChannel)) {
+            handledCallChannels.append(callChannel);
+            new CallManager(callChannel, this);
+        }
     }
 
     context->setFinished();

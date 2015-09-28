@@ -22,7 +22,7 @@
 #include "private/tf-audio-content-handler.h"
 #include "private/tf-video-content-handler.h"
 
-#include <KDebug>
+#include "libktpcall_debug.h"
 
 using namespace KTpCallPrivate;
 
@@ -115,6 +115,6 @@ void CallChannelHandler::_k_onContentRemoved(TfContentHandler *tfContentHandler)
         Q_EMIT contentRemoved(callContentHandler);
         delete callContentHandler;
     } else {
-        kWarning() << "Unknown content removed";
+        qCWarning(LIBKTPCALL) << "Unknown content removed";
     }
 }

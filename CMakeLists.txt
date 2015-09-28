@@ -37,3 +37,5 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/version.h @ONLY)
 add_subdirectory(libqtf)
 add_subdirectory(libktpcall)
 add_subdirectory(src)
+
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

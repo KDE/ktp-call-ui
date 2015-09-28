@@ -1,6 +1,9 @@
 project(ktp-call-ui)
 
 cmake_minimum_required(VERSION 2.8.12)
+if (POLICY CMP0063)
+  cmake_policy(SET CMP0063 NEW)
+endif()
 
 set(KTP_CALL_UI_VERSION "0.8.80")
 set(IS_KTP_INTERNAL_MODULE TRUE)

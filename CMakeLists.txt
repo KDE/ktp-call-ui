@@ -18,6 +18,7 @@ find_package(TelepathyQt5 REQUIRED)
 find_package(TelepathyQt5Farstream REQUIRED)
 find_package(KTp REQUIRED)
 find_package(Qt5GStreamer REQUIRED)
+find_package(Phonon4Qt5 REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 include_directories( ${QTGSTREAMER_INCLUDES} )

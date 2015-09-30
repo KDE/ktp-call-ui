@@ -42,15 +42,6 @@ install(DIRECTORY
         DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
 )
 
-install( FILES
-        qml/Main.qml
-        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
-)
-install(DIRECTORY
-        qml/core
-        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
-)
-
 configure_file(org.freedesktop.Telepathy.Client.KTp.CallUi.service.in
                 org.freedesktop.Telepathy.Client.KTp.CallUi.service)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.Client.KTp.CallUi.service

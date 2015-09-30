@@ -242,15 +242,10 @@ void CallWindow::onContentAdded(CallContentHandler *contentHandler)
 
         checkEnableDtmf();
 
-        // grab root object so we can access QML signals.
-        QObject *root = d->qmlUi->rootObject();
-
         VolumeController *vol = audioContentHandler->inputVolumeControl();
         d->muteAction->setEnabled(vol->volumeControlSupported());
         connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
                 d->muteAction, SLOT(setEnabled(bool)));
-        connect(vol, SIGNAL(volumeControlSupportedChanged(bool)),
-                root, SLOT(setSoundEnabled(bool)));
         d->muteAction->setChecked(vol->isMuted());
         connect(vol, SIGNAL(mutedChanged(bool)), d->muteAction, SLOT(setChecked(bool)));
         d->muteAction->setProperty("volumeController", QVariant::fromValue<QObject*>(vol));

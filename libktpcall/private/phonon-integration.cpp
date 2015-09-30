@@ -24,6 +24,7 @@
 */
 #include "phonon-integration.h"
 #include "../libktpcall_debug.h"
+#include <QtCore/QDataStream>
 #include <QtCore/QSettings>
 #include <QtDBus/QDBusInterface>
 #include <QtDBus/QDBusReply>

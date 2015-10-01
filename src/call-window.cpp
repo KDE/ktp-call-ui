@@ -299,7 +299,7 @@ void CallWindow::onContentRemoved(CallContentHandler *contentHandler)
 
 void CallWindow::onLocalVideoSendingStateChanged(bool sending)
 {
-    qCDebug(KTP_CALL_UI);
+    qCDebug(KTP_CALL_UI) << "onLocalVideoSendingStateChanged";
 
     if (sending) {
         changeVideoDisplayState(d->currentVideoDisplayState | LocalVideoPreview);
@@ -310,7 +310,7 @@ void CallWindow::onLocalVideoSendingStateChanged(bool sending)
 
 void CallWindow::onRemoteVideoSendingStateChanged(const Tp::ContactPtr & contact, bool sending)
 {
-    qCDebug(KTP_CALL_UI);
+    qCDebug(KTP_CALL_UI) << "onRemoteVideoSendingStateChanged";
 
     if (d->remoteVideoContact && d->remoteVideoContact != contact) {
         qCCritical(KTP_CALL_UI) << "Multiple participants are not supported";
@@ -457,7 +457,7 @@ void CallWindow::toggleMute(bool checked)
 
 void CallWindow::hangup()
 {
-    qCDebug(KTP_CALL_UI);
+    qCDebug(KTP_CALL_UI) << "CallWindow::hangup";
     d->callChannel->hangup();
 }
 

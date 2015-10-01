@@ -79,6 +79,7 @@ QList<CallContentHandler*> CallChannelHandler::contents() const
 
 void CallChannelHandler::shutdown()
 {
+    qCDebug(LIBKTPCALL) << "CallChannelHandler::shutdown";
     d->channelHandler->shutdown();
 }
 

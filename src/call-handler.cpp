@@ -50,7 +50,7 @@ static inline Tp::AbstractClientHandler::Capabilities capabilities()
 CallHandler::CallHandler()
     : Tp::AbstractClientHandler(channelClassSpecList(), capabilities())
 {
-    qCDebug(KTP_CALL_UI);
+    qCDebug(KTP_CALL_UI) << "CallHandler::CallHandler";
 }
 
 CallHandler::~CallHandler()
@@ -70,7 +70,7 @@ void CallHandler::handleChannels(const Tp::MethodInvocationContextPtr<> & contex
                                  const QDateTime & userActionTime,
                                  const Tp::AbstractClientHandler::HandlerInfo & handlerInfo)
 {
-    qCDebug(KTP_CALL_UI);
+    qCDebug(KTP_CALL_UI) << "CallHandler::handleChannels";
     Q_UNUSED(account);
     Q_UNUSED(connection);
     Q_UNUSED(requestsSatisfied);

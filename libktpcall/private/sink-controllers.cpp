@@ -38,7 +38,19 @@ void BaseSinkController::initFromMainThread(const Tp::ContactPtr & contact)
 void BaseSinkController::releaseFromStreamingThread(const QGst::PipelinePtr & pipeline)
 {
     m_bin->setState(QGst::StateNull);
-    pipeline->remove(m_bin);
+
+    // In GStreamer 1.6 it seems like the m_bin was removed from the
+    // pipeline during onPadUnlink, additionally 1.6 gives a warning
+    // when trying to remove an already removed bin.
+    // So, only remove the bin if still has a parent.
+    QGst::ObjectPtr parent = m_bin->parent();
+    if (!parent.isNull()) {
+        pipeline->remove(m_bin);
+    } else {
+      // Since we're no longer attached to the pipeline
+      // we need some place to make sure the pipeline is stopped
+      pipeline->setState(QGst::StateNull);
+    }
     m_bin.clear();
 }
 
@@ -77,6 +89,9 @@ void AudioSinkController::initFromStreamingThread(const QGst::PadPtr & srcPad,
     );
 
     pipeline->add(m_bin);
+    qCDebug(LIBKTPCALL) << "add" << m_bin->name()
+                        << "to" << pipeline->name();
+
     m_bin->syncStateWithParent();
 
     m_bin->getStaticPad("src")->link(m_adderRequestPad);

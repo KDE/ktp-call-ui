@@ -128,7 +128,9 @@ void TfVideoContentHandler::stopSending()
         m_srcBin->setStateLocked(true);
         m_srcBin->setState(QGst::StateNull);
         m_srcBin->getStaticPad("src")->unlink(tfContent()->property("sink-pad").get<QGst::PadPtr>());
-        channelHandler()->pipeline()->remove(m_srcBin);
+        if (channelHandler()->pipeline()) {
+            channelHandler()->pipeline()->remove(m_srcBin);
+        }
         m_srcBin.clear();
     }
 }

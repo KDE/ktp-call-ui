@@ -118,7 +118,7 @@ void TfChannelHandler::onCallChannelInvalidated()
 
 void TfChannelHandler::onTfChannelClosed()
 {
-    qCDebug(LIBKTPCALL) << "TfChannel closed";
+    qCDebug(LIBKTPCALL) << "TfChannel closed" << m_pipeline->name();
 
     Q_ASSERT(m_pipeline);
     m_pipeline->bus()->removeSignalWatch();
@@ -162,7 +162,10 @@ void TfChannelHandler::onFsConferenceAdded(const QGst::ElementPtr & conference)
 void TfChannelHandler::onFsConferenceRemoved(const QGst::ElementPtr & conference)
 {
     qCDebug(LIBKTPCALL) << "Removing fsconference from the pipeline";
-    m_pipeline->remove(conference);
+    // Only unlink if the pipeline is still valid.
+    if (m_pipeline) {
+        m_pipeline->remove(conference);
+    }
     conference->setState(QGst::StateNull);
 }
 

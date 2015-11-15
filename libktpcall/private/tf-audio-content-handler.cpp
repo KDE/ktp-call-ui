@@ -101,7 +101,10 @@ void TfAudioContentHandler::stopSending()
         m_srcBin->setStateLocked(true);
         m_srcBin->setState(QGst::StateNull);
         m_srcBin->getStaticPad("src")->unlink(tfContent()->property("sink-pad").get<QGst::PadPtr>());
-        channelHandler()->pipeline()->remove(m_srcBin);
+        // FIXME: Why hasn't channelHandler been notified that m_srcBin has already been removed?
+        if (channelHandler()->pipeline()) {
+            channelHandler()->pipeline()->remove(m_srcBin);
+        }
         m_srcBin.clear();
     }
 }
@@ -244,6 +247,7 @@ bool TfAudioContentHandler::createSrcBin(const QGst::ElementPtr & src)
 
     bin->addPad(QGst::GhostPad::create(queue->getStaticPad("src"), "src"));
 
+    qCDebug(LIBKTPCALL) << "create bin name " << bin->name();
     m_srcBin = bin;
     return true;
 }

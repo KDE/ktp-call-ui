@@ -1,3 +1,3 @@
 [D-BUS Service]
 Name=org.freedesktop.Telepathy.Client.KTp.CallUi
-Exec=@LIBEXEC_INSTALL_DIR@/ktp-call-ui
+Exec=@CMAKE_INSTALL_FULL_LIBEXECDIR@/ktp-call-ui

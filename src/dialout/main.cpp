@@ -26,6 +26,9 @@
 
 int main(int argc, char **argv)
 {
+    QApplication app(argc, argv);
+    KLocalizedString::setApplicationDomain("ktp-call-ui");
+
     KAboutData aboutData("ktp-dialout-ui", i18n("KDE Telepathy Dialout Ui"),
                         KTP_CALL_UI_VERSION,
                         i18n("VoIP client by KDE"), KAboutLicense::GPL,
@@ -35,8 +38,6 @@ int main(int argc, char **argv)
                          "kiagiadakis.george@gmail.com");
     aboutData.setProductName("telepathy/call-ui"); //set the correct name for bug reporting
     KAboutData::setApplicationData(aboutData);
-
-    QApplication app(argc, argv);
 
     app.setWindowIcon(QIcon::fromTheme("internet-telephony"));
 

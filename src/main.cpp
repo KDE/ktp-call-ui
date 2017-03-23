@@ -36,6 +36,8 @@
 int main(int argc, char **argv)
 {
     KTp::TelepathyHandlerApplication app(argc, argv);
+    KLocalizedString::setApplicationDomain("ktp-call-ui");
+
     KAboutData aboutData("ktp-call-ui", i18n("KDE Telepathy Call Ui"),
                           KTP_CALL_UI_VERSION,
                           i18n("VoIP client by KDE"), KAboutLicense::GPL,

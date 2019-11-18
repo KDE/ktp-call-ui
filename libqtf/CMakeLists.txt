@@ -20,6 +20,10 @@ add_definitions(
 
 add_library(qtf STATIC qtf.cpp)
 
+if (TARGET TelepathyQt5::Farstream) # telepathy-qt 0.9.8
+    set (TELEPATHY_QT5_FARSTREAM_LIBRARIES TelepathyQt5::Farstream)
+endif()
+
 target_link_libraries(qtf
     ${QTGSTREAMER_LIBRARIES}
     ${TP_FARSTREAM_LDFLAGS}

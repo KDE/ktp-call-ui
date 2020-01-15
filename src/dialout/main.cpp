@@ -42,8 +42,6 @@ int main(int argc, char **argv)
     app.setWindowIcon(QIcon::fromTheme("internet-telephony"));
 
     QCommandLineParser parser;
-    parser.addVersionOption();
-    parser.addHelpOption();
     aboutData.setupCommandLine(&parser);
 
     parser.addPositionalArgument("+[number]", i18n("The number to call"));

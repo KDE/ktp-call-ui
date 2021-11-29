@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: None
+# SPDX-License-Identifier: CC0-1.0
+
+Dependencies:
+- 'on': ['@all']
+  'require':
+    'frameworks/extra-cmake-modules': '@stable'
+    'frameworks/kconfig': '@stable'
+    'frameworks/kdeclarative': '@stable'
+    'frameworks/kiconthemes': '@stable'
+    'frameworks/ki18n': '@stable'
+    'frameworks/knotifications': '@stable'
+    'frameworks/kxmlgui': '@stable'
+    'frameworks/kcmutils': '@stable'
+    'network/kaccounts-integration': '@same'
+    'network/ktp-common-internals': '@same'
+    'libraries/phonon': '@stable'

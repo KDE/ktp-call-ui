@@ -1,12 +1,13 @@
-project(ktp-call-ui)
+cmake_minimum_required(VERSION 3.16)
 
-cmake_minimum_required(VERSION 2.8.12)
-if (POLICY CMP0063)
-  cmake_policy(SET CMP0063 NEW)
-endif()
+# KDE Gear Version, managed by release script
+set (RELEASE_SERVICE_VERSION_MAJOR "22")
+set (RELEASE_SERVICE_VERSION_MINOR "03")
+set (RELEASE_SERVICE_VERSION_MICRO "70")
 
-set(KTP_CALL_UI_VERSION "0.8.80")
-set(IS_KTP_INTERNAL_MODULE TRUE)
+set(KTP_CALL_UI_VERSION "${RELEASE_SERVICE_VERSION_MAJOR}.${RELEASE_SERVICE_VERSION_MINOR}.${RELEASE_SERVICE_VERSION_MICRO}")
+
+project(ktp-call-ui VERSION ${KTP_CALL_UI_VERSION})
 
 find_package(ECM 1.3.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
@@ -25,7 +26,7 @@ add_definitions( ${QTGSTREAMER_DEFINITIONS} )
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)
-include(KDECompilerSettings)
+include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMSetupVersion)
 include(FeatureSummary)
 

@@ -39,4 +39,6 @@ add_subdirectory(libqtf)
 add_subdirectory(libktpcall)
 add_subdirectory(src)
 
+ki18n_install(po)
+
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

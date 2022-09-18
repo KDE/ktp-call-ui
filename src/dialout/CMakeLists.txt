@@ -17,4 +17,4 @@ target_link_libraries(ktp-dialout-ui
     KF5::XmlGui
 )
 
-install(TARGETS ktp-dialout-ui DESTINATION ${BIN_INSTALL_DIR})
+install(TARGETS ktp-dialout-ui DESTINATION ${KDE_INSTALL_BINDIR})

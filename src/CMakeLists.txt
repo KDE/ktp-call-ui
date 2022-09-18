@@ -30,21 +30,21 @@ target_link_libraries(ktp-call-ui
     ktpcall
 )
 
-install(TARGETS ktp-call-ui DESTINATION ${LIBEXEC_INSTALL_DIR})
-install(FILES callwindowui.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/ktp-call-ui)
+install(TARGETS ktp-call-ui DESTINATION ${KDE_INSTALL_LIBEXECDIR})
+install(FILES callwindowui.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/ktp-call-ui)
 
 install( FILES
         qml/Main.qml
-        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
+        DESTINATION ${KDE_INSTALL_DATADIR}/ktp-call-ui
 )
 install(DIRECTORY
         qml/core
-        DESTINATION ${DATA_INSTALL_DIR}/ktp-call-ui
+        DESTINATION ${KDE_INSTALL_DATADIR}/ktp-call-ui
 )
 
 configure_file(org.freedesktop.Telepathy.Client.KTp.CallUi.service.in
                 org.freedesktop.Telepathy.Client.KTp.CallUi.service)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.Client.KTp.CallUi.service
-        DESTINATION ${DBUS_SERVICES_INSTALL_DIR})
+        DESTINATION ${KDE_INSTALL_DBUSSERVICEDIR})
 
-install(FILES KTp.CallUi.client DESTINATION ${SHARE_INSTALL_PREFIX}/telepathy/clients/)
+install(FILES KTp.CallUi.client DESTINATION ${KDE_INSTALL_DATAROOTDIR}/telepathy/clients/)

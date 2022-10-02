@@ -1,0 +1,476 @@
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Yuri Efremov <yur.arh@gmail.com>, 2012, 2013.
+# Alexander Potashev <aspotashev@gmail.com>, 2019.
+# Olesya Gerasimenko <translation-team@basealt.ru>, 2022.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2022-02-17 16:45+0300\n"
+"Last-Translator: Olesya Gerasimenko <translation-team@basealt.ru>\n"
+"Language-Team: Basealt Translation Team\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 21.12.1\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Environment: kde\n"
+"X-Accelerator-Marker: &\n"
+"X-Text-Markup: kde4\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Юрий Ефремов"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "yur.arh@gmail.com"
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr "Входящий видеовызов"
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr "<p>%1 приглашает на видеобеседу</p>"
+
+#: src/approver.cpp:43
+#, kde-format
+msgid "Incoming call"
+msgstr "Входящий вызов"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr "<p>Вас вызывает %1</p>"
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr "Ответить"
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr "Отклонить"
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr "Разговор с %1"
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "Соединение..."
+
+#: src/call-window.cpp:131
+#, kde-format
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "Вызов..."
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr "Собеседник принял вызов, ожидание соединения..."
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "Разговор..."
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr "Собеседник закончил разговор"
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr "Собеседник отклонил вызов."
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr "Собеседник не отвечает."
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr "Неверный номер или адрес контакта."
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr "На вашем балансе недостаточно средств для осуществления этого звонка."
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr "У вас нет прав на осуществление этого звонка."
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr "Собеседник занят."
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr "Ошибка внутреннего компонента."
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr "Ошибка удалённой службы."
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr "Ошибка сети."
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr "Не удалось согласовать кодеки."
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr "Неподдерживаемый тип мультимедиа."
+
+#: src/call-window.cpp:207
+#, kde-format
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "Ошибка подключения."
+
+#: src/call-window.cpp:211
+#, kde-format
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "Неизвестная ошибка."
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "Отключено."
+
+#: src/call-window.cpp:220
+#, kde-format
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "Отключено: %1"
+
+#: src/call-window.cpp:366
+#, kde-format
+msgctxt "@action"
+msgid "Show my video"
+msgstr "Показать моё видео"
+
+#: src/call-window.cpp:372
+#, kde-format
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "Показать номеронабиратель"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr "Скрыть окно"
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr "Восстановить окно"
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "Отправить видео"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr "Выключить звук"
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr "Удержать вызов"
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr "Повесить трубку"
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr "Во весь экран"
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr "При попытке приостановить вызов произошла ошибка"
+
+#: src/call-window.cpp:508
+#, kde-format
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "Удержание вызова"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr ""
+"Не удалось перевести вызов с удержания: Некоторые устройства не доступны Не "
+"удалось восстановить вызов: некоторые устройства недоступны"
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, kde-format
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "Неизвестная ошибка"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr "Удержание вызова..."
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr "Возобновление вызова..."
+
+#: src/call-window.cpp:548
+#, kde-format
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr "Внутренняя ошибка"
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "Вызов"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr "Окно"
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr "Загрузка учётных записей..."
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr "Ошибка: не удалось загрузить учётные записи"
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+"Не найдено соответствующих учётных записей. Убедитесь, что вы в сети и что "
+"учётные записи, которые вы настроили, имеют поддержку аудио- и/или "
+"видеозвонков."
+
+#: src/dialout/dialout-widget.cpp:206
+#, kde-format
+msgid "Failed to start call."
+msgstr "Не удалось начать вызов."
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, kde-format
+msgid "Account:"
+msgstr "Учётная запись:"
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr "Номер или адрес контакта:"
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr "Аудиовызов"
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr "Видеовызов"
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr "Позвонить"
+
+#: src/dialout/main.cpp:32
+#, kde-format
+msgid "KDE Telepathy Dialout Ui"
+msgstr "Интерфейс исходящих звонков KDE Telepathy"
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, kde-format
+msgid "VoIP client by KDE"
+msgstr "Клиент VoIP от KDE"
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, kde-format
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr ""
+"© George Kiagiadakis, 2009–2012\n"
+"© Collabora Ltd., 2010–2011"
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr "Номер для вызова"
+
+#: src/dtmf-qml.cpp:45
+#, kde-format
+msgid "Dialpad"
+msgstr "Номеронабиратель"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr "Интерфейс звонков KDE Telepathy"
+
+#: src/qml/core/Toolbar.qml:96
+#, kde-format
+msgid "Hangup"
+msgstr "Повесить трубку"
+
+#: src/qml/core/Toolbar.qml:110
+#, kde-format
+msgid "Hold"
+msgstr "Удержать вызов"
+
+#: src/qml/core/Toolbar.qml:127
+#, kde-format
+msgid "Mute"
+msgstr "Выключить звук"
+
+#: src/qml/core/Toolbar.qml:142
+#, kde-format
+msgid "Show My Video"
+msgstr "Показать моё видео"
+
+#: src/qml/core/Toolbar.qml:159
+#, kde-format
+msgid "Show Dialpad"
+msgstr "Показать номеронабиратель"
+
+#: src/qml/Main.qml:80
+#, kde-format
+msgid "Calling"
+msgstr "Вызов"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""
+"Окно видеовызова было скрыто, но вызов останется активным. Щёлкните для "
+"восстановления."
+
+#~ msgid "Media"
+#~ msgstr "Мультимедиа"
+
+#~ msgid "Main Toolbar"
+#~ msgstr "Основная панель инструментов"
+
+#~ msgid "1"
+#~ msgstr "1"
+
+#~ msgid "2"
+#~ msgstr "2"
+
+#~ msgid "3"
+#~ msgstr "3"
+
+#~ msgid "4"
+#~ msgstr "4"
+
+#~ msgid "5"
+#~ msgstr "5"
+
+#~ msgid "6"
+#~ msgstr "6"
+
+#~ msgid "7"
+#~ msgstr "7"
+
+#~ msgid "8"
+#~ msgstr "8"
+
+#~ msgid "9"
+#~ msgstr "9"
+
+#~ msgid "*"
+#~ msgstr "*"
+
+#~ msgid "0"
+#~ msgstr "0"
+
+#~ msgid "#"
+#~ msgstr "#"

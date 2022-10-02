@@ -1,0 +1,439 @@
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# herop-kde, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2013-04-15 09:39+0800\n"
+"Last-Translator: herop-kde\n"
+"Language-Team: Vietnamese <kde-i18n-vi@kde.org>\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Lokalize 1.5\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Lê Hoàng Phương"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "herophuong93@gmail.com"
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr "Cuộc gọi đến có hình"
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr "<p>%1 đang yêu cầu thoại có hình với bạn</p>"
+
+#: src/approver.cpp:43
+#, kde-format
+msgid "Incoming call"
+msgstr "Cuộc gọi đến"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr "<p>%1 đang gọi bạn</p>"
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr "Trả lời"
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr "Từ chối"
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr "Gọi với %1"
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "Đang kết nối..."
+
+#: src/call-window.cpp:131
+#, kde-format
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "Đang đổ chuông..."
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr "Người dùng bên kia đã chấp nhận cuộc gọi, đang đợi kết nối..."
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "Đang trò chuyện..."
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr "Người bên kia đã ngừng cuộc gọi."
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr "Người bên kia đã từ chối cuộc gọi."
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr "Người bên kia không trả lời."
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr "Liên hệ hoặc số không hợp lệ."
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr "Bạn không có đủ tiền để thực hiện cuộc gọi này."
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr "Bạn không có quyền thực hiện cuộc gọi này."
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr "Người bên kia hiện đang bận."
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr "Lỗi bên trong chương trình."
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr "Lỗi dịch vụ từ xa."
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr "Lỗi mạng."
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr "Thoả hiệp mã nén thất bại."
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr "Kiểu phương tiện truyền không được hỗ trợ."
+
+#: src/call-window.cpp:207
+#, kde-format
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "Lỗi kết nối."
+
+#: src/call-window.cpp:211
+#, kde-format
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "Lỗi không rõ."
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "Đã ngắt kết nối."
+
+#: src/call-window.cpp:220
+#, kde-format
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "Đã ngắt kết nối: %1"
+
+#: src/call-window.cpp:366
+#, kde-format
+msgctxt "@action"
+msgid "Show my video"
+msgstr "Hiện hình của tôi"
+
+#: src/call-window.cpp:372
+#, kde-format
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "Hiện bàn phím số"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr ""
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr ""
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "Gửi video"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr "Tắt tiếng"
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr "Giữ"
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr "Ngắt máy"
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr ""
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr "Đã có lỗi khi đang ngưng cuộc gọi"
+
+#: src/call-window.cpp:508
+#, kde-format
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "Cuộc gọi đã được giữ"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr "Thất bại khi tiếp tục cuộc gọi: Một vài thiết bị không còn sẵn sàng"
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, kde-format
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "Lỗi không rõ"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr "Đang đặt cuộc gọi sang chế độ giữ..."
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr "Đang phục hồi cuộc gọi..."
+
+#: src/call-window.cpp:548
+#, kde-format
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr "Lỗi nội tại"
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "Gọi"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr "Đang nạp các danh khoản..."
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr "Lỗi: Nạp các danh khoản thất bại"
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+"Không tìm thấy danh khoản nào đủ khả năng. Hãy chắc chắn rằng bạn đang trực "
+"tuyến và những danh khoản đã cấu hình của bạn hỗ trợ cuộc gọi thoại hay "
+"thoại có hình"
+
+#: src/dialout/dialout-widget.cpp:206
+#, kde-format
+msgid "Failed to start call."
+msgstr "Bắt đầu cuộc gọi thất bại."
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, kde-format
+msgid "Account:"
+msgstr "Danh khoản:"
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr "Số / URI liên hệ:"
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr "Gọi thoại"
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr "Gọi có hình"
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr "Tạo cuộc gọi"
+
+#: src/dialout/main.cpp:32
+#, fuzzy, kde-format
+#| msgid "KDE Telepathy Call Ui"
+msgid "KDE Telepathy Dialout Ui"
+msgstr "Gọi thoại"
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, fuzzy, kde-format
+#| msgid "VoIP client for KDE"
+msgid "VoIP client by KDE"
+msgstr "Trình khách VoIP cho KDE"
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, kde-format
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr "Số gọi đi"
+
+#: src/dtmf-qml.cpp:45
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Show dialpad"
+msgid "Dialpad"
+msgstr "Hiện bàn phím số"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr "Gọi thoại"
+
+#: src/qml/core/Toolbar.qml:96
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Hangup"
+msgid "Hangup"
+msgstr "Ngắt máy"
+
+#: src/qml/core/Toolbar.qml:110
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Hold"
+msgid "Hold"
+msgstr "Giữ"
+
+#: src/qml/core/Toolbar.qml:127
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Mute"
+msgid "Mute"
+msgstr "Tắt tiếng"
+
+#: src/qml/core/Toolbar.qml:142
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Show my video"
+msgid "Show My Video"
+msgstr "Hiện hình của tôi"
+
+#: src/qml/core/Toolbar.qml:159
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Show dialpad"
+msgid "Show Dialpad"
+msgstr "Hiện bàn phím số"
+
+#: src/qml/Main.qml:80
+#, fuzzy, kde-format
+#| msgid "Call"
+msgid "Calling"
+msgstr "Gọi"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""

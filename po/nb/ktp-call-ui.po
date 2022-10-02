@@ -1,0 +1,427 @@
+# Translation of ktp-call-ui to Norwegian Bokmål
+#
+# Bjørn Steensrud <bjornst@skogkatt.homelinux.org>, 2012, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2014-09-30 11:05+0200\n"
+"Last-Translator: Bjørn Steensrud <bjornst@skogkatt.homelinux.org>\n"
+"Language-Team: Norwegian Bokmål <l10n-no@lister.huftis.org>\n"
+"Language: nb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 1.5\n"
+"X-Environment: kde\n"
+"X-Accelerator-Marker: &\n"
+"X-Text-Markup: kde4\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Bjørn Steensrud"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "bjornst@skogkatt.homelinux.org"
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr "Innkommende video-anrop"
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr "<p>%1 ber om en videosamtale</p>"
+
+#: src/approver.cpp:43
+#, kde-format
+msgid "Incoming call"
+msgstr "Innkommende anrop"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr "<p>%1 anroper deg</p>"
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr "Svar"
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr "Avvis"
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr "Anrop med %1"
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "Kobler til …"
+
+#: src/call-window.cpp:131
+#, kde-format
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "Ringer …"
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr "Nettverksbruker besvarte anropet, venter på forbindelse …"
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "Snakker …"
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr "Nettverkskontakten avsluttet samtalen."
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr "Nettverkskontakten avviste anropet."
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr "Nettverkskontakten svarte ikke."
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr "Ugyldig nummer eller kontakt."
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr "Du har ikke stor nok saldo til å gjøre dette anropet."
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr "Du har ikke tillatelse til å gjøre dette anropet."
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr "Nettverkskontakten er nå opptatt."
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr "Intern komponentfeil."
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr "Feil på nettverkstjenesten."
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr "Nettverksfeil."
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr "Klarte ikke å forhandle fram kodeker."
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr "Mediatypen er ikke støttet."
+
+#: src/call-window.cpp:207
+#, kde-format
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "Forbindelsesfeil."
+
+#: src/call-window.cpp:211
+#, kde-format
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "Ukjent feil."
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "Frakoblet."
+
+#: src/call-window.cpp:220
+#, kde-format
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "Frakoblet: %1"
+
+#: src/call-window.cpp:366
+#, kde-format
+msgctxt "@action"
+msgid "Show my video"
+msgstr "Vis min video"
+
+#: src/call-window.cpp:372
+#, kde-format
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "Vis taster"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr "Skjul vinduet"
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr "Gjenopprett vinduet"
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "Send video"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr "Dempet"
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr "Hold"
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr "Legg på"
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr "Fullskjerm"
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr "Det oppsto en feil mens samtalen ble satt i pause"
+
+#: src/call-window.cpp:508
+#, kde-format
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "Anrop holdt"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr "Klarte ikke å ta samtalen filbake: Noen enheter er ikke tilgjengelige"
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, kde-format
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "Ukjent feil"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr "Setter samtalen på vent …"
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr "Gjenopptar samtalen …"
+
+#: src/call-window.cpp:548
+#, kde-format
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr "Intern feil"
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "Anrop"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr "Vindu"
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr "Laster inn kontoer …"
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr "Feil: Klarte ikke å laste inn kontoer"
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+"Fant ingen kapable kontoer. Se etter at du er tilkoblet og at kontoene du "
+"har satt opp støtter lyd-og/eller video-anrop"
+
+#: src/dialout/dialout-widget.cpp:206
+#, kde-format
+msgid "Failed to start call."
+msgstr "Klarte ikke å starte samtale."
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, kde-format
+msgid "Account:"
+msgstr "Konto:"
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr "Nummer/kontakt-URI:"
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr "Lydanrop"
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr "Videoanrop"
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr "Gjør et anrop"
+
+#: src/dialout/main.cpp:32
+#, kde-format
+msgid "KDE Telepathy Dialout Ui"
+msgstr ""
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, kde-format
+msgid "VoIP client by KDE"
+msgstr ""
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, kde-format
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr ""
+"© 2009-2012 George Kiagiadakis\n"
+"© 2010-2011 Collabora Ltd."
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr "Nummeret som skal ringes opp"
+
+#: src/dtmf-qml.cpp:45
+#, kde-format
+msgid "Dialpad"
+msgstr "Nummerblokk"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr "KDE Telepathy Call Ui"
+
+#: src/qml/core/Toolbar.qml:96
+#, kde-format
+msgid "Hangup"
+msgstr "Legger på"
+
+#: src/qml/core/Toolbar.qml:110
+#, kde-format
+msgid "Hold"
+msgstr "Vent"
+
+#: src/qml/core/Toolbar.qml:127
+#, kde-format
+msgid "Mute"
+msgstr "Demp"
+
+#: src/qml/core/Toolbar.qml:142
+#, kde-format
+msgid "Show My Video"
+msgstr "Vis min video"
+
+#: src/qml/core/Toolbar.qml:159
+#, kde-format
+msgid "Show Dialpad"
+msgstr "Vis nummerblokk"
+
+#: src/qml/Main.qml:80
+#, kde-format
+msgid "Calling"
+msgstr "Kaller opp"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""
+"Vinduet for videoanrop er skjult, men samtalen fortsetter å være aktiv. "
+"Trykk for å gjenopprette."

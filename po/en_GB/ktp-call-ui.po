@@ -1,0 +1,821 @@
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Andrew Coles <andrew_coles@yahoo.co.uk>, 2009.
+# Steve Allewell <steve.allewell@gmail.com>, 2014, 2015, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2018-01-01 19:40+0000\n"
+"Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
+"Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Andrew Coles, Steve Allewell"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "andrew_coles@yahoo.co.uk, steve.allewell@gmail.com"
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr "Incoming video call"
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr "<p>%1 is asking you for a video call</p>"
+
+#: src/approver.cpp:43
+#, kde-format
+msgid "Incoming call"
+msgstr "Incoming call"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr "<p>%1 is calling you</p>"
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr "Answer"
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr "Reject"
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr "Call with %1"
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "Connecting..."
+
+#: src/call-window.cpp:131
+#, kde-format
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "Ringing..."
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr "Remote user accepted the call, waiting for connection..."
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "Talking..."
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr "Remote contact ended the call."
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr "Remote contact rejected the call."
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr "Remote contact didn't answer."
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr "Invalid number or contact."
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr "You do not have enough balance to make this call."
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr "You do not have permission to make this call."
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr "Remote contact is currently busy."
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr "Internal component error."
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr "Remote service error."
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr "Network error."
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr "Failed to negotiate codecs."
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr "Unsupported media type."
+
+#: src/call-window.cpp:207
+#, kde-format
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "Connectivity error."
+
+#: src/call-window.cpp:211
+#, kde-format
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "Unknown error."
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "Disconnected."
+
+#: src/call-window.cpp:220
+#, kde-format
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "Disconnected: %1"
+
+#: src/call-window.cpp:366
+#, kde-format
+msgctxt "@action"
+msgid "Show my video"
+msgstr "Show my video"
+
+#: src/call-window.cpp:372
+#, kde-format
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "Show dialpad"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr "Hide window"
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr "Restore window"
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "Send video"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr "Mute"
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr "Hold"
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr "Hang up"
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr "Full Screen"
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr "There was an error while pausing the call"
+
+#: src/call-window.cpp:508
+#, kde-format
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "Call held"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr "Failed to put the call off hold: Some devices are not available"
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, kde-format
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "Unknown error"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr "Putting the call on hold..."
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr "Resuming the call..."
+
+#: src/call-window.cpp:548
+#, kde-format
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr "Internal Error"
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "Call"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr "Window"
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr "Loading accounts..."
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr "Error: Failed to load accounts"
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+
+#: src/dialout/dialout-widget.cpp:206
+#, kde-format
+msgid "Failed to start call."
+msgstr "Failed to start call."
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, kde-format
+msgid "Account:"
+msgstr "Account:"
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr "Number / Contact URI:"
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr "Audio Call"
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr "Video Call"
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr "Make a call"
+
+#: src/dialout/main.cpp:32
+#, kde-format
+msgid "KDE Telepathy Dialout Ui"
+msgstr "KDE Telepathy Dialout Ui"
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, kde-format
+msgid "VoIP client by KDE"
+msgstr "VoIP client by KDE"
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, kde-format
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr "The number to call"
+
+#: src/dtmf-qml.cpp:45
+#, kde-format
+msgid "Dialpad"
+msgstr "Dialpad"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr "KDE Telepathy Call Ui"
+
+#: src/qml/core/Toolbar.qml:96
+#, kde-format
+msgid "Hangup"
+msgstr "Hang up"
+
+#: src/qml/core/Toolbar.qml:110
+#, kde-format
+msgid "Hold"
+msgstr "Hold"
+
+#: src/qml/core/Toolbar.qml:127
+#, kde-format
+msgid "Mute"
+msgstr "Mute"
+
+#: src/qml/core/Toolbar.qml:142
+#, kde-format
+msgid "Show My Video"
+msgstr "Show My Video"
+
+#: src/qml/core/Toolbar.qml:159
+#, kde-format
+msgid "Show Dialpad"
+msgstr "Show Dialpad"
+
+#: src/qml/Main.qml:80
+#, kde-format
+msgid "Calling"
+msgstr "Calling"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+
+#~ msgid "Media"
+#~ msgstr "Media"
+
+#~ msgid "Main Toolbar"
+#~ msgstr "Main Toolbar"
+
+#~ msgid "1"
+#~ msgstr "1"
+
+#~ msgid "2"
+#~ msgstr "2"
+
+#~ msgid "3"
+#~ msgstr "3"
+
+#~ msgid "4"
+#~ msgstr "4"
+
+#~ msgid "5"
+#~ msgstr "5"
+
+#~ msgid "6"
+#~ msgstr "6"
+
+#~ msgid "7"
+#~ msgstr "7"
+
+#~ msgid "8"
+#~ msgstr "8"
+
+#~ msgid "9"
+#~ msgstr "9"
+
+#~ msgid "*"
+#~ msgstr "*"
+
+#~ msgid "0"
+#~ msgstr "0"
+
+#~ msgid "#"
+#~ msgstr "#"
+
+#~ msgid "Warning: %1"
+#~ msgstr "Warning: %1"
+
+#~ msgid "Error: %1"
+#~ msgstr "Error: %1"
+
+#~ msgid "KCall"
+#~ msgstr "KCall"
+
+#~ msgid "Brightness"
+#~ msgstr "Brightness"
+
+#~ msgid "Contrast"
+#~ msgstr "Contrast"
+
+#~ msgid "Hue"
+#~ msgstr "Hue"
+
+#~ msgid "Saturation"
+#~ msgstr "Saturation"
+
+#~ msgid ""
+#~ "Defines whether the window should close automatically after a timeout "
+#~ "when the call is over."
+#~ msgstr ""
+#~ "Defines whether the window should close automatically after a timeout "
+#~ "when the call is over."
+
+#~ msgid ""
+#~ "Defines how many seconds the call window should remain visible after the "
+#~ "call is over. This option depends on \"CloseOnDisconnect\"."
+#~ msgstr ""
+#~ "Defines how many seconds the call window should remain visible after the "
+#~ "call is over. This option depends on \"CloseOnDisconnect\"."
+
+#~ msgid "The audio input device could not be initialized"
+#~ msgstr "The audio input device could not be initialised"
+
+#, fuzzy
+#~| msgid "The video input device could not be initialized."
+#~ msgid "The video input device could not be initialized"
+#~ msgstr "The video input device could not be initialised."
+
+#, fuzzy
+#~| msgid ""
+#~| "Some gstreamer elements could not be created. Please check your "
+#~| "gstreamer installation."
+#~ msgid ""
+#~ "Could not create some of the required elements. Please check your "
+#~ "GStreamer installation."
+#~ msgstr ""
+#~ "Some gstreamer elements could not be created. Please check your gstreamer "
+#~ "installation."
+
+#~ msgid "The audio output device could not be initialized"
+#~ msgstr "The audio output device could not be initialised"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show participants"
+#~ msgstr "Show participants"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show log"
+#~ msgstr "Show log"
+
+#~ msgctxt "@action"
+#~ msgid "Stop sending video"
+#~ msgstr "Stop sending video"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Status"
+#~ msgstr "Status"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Available"
+#~ msgstr "Available"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Away"
+#~ msgstr "Away"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Be right back"
+#~ msgstr "Be right back"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Busy"
+#~ msgstr "Busy"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Do not disturb"
+#~ msgstr "Do not disturb"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Extended Away"
+#~ msgstr "Extended Away"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Invisible"
+#~ msgstr "Invisible"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Offline"
+#~ msgstr "Offline"
+
+#~ msgctxt "@info:status"
+#~ msgid "Waiting for account information..."
+#~ msgstr "Waiting for account information..."
+
+#~ msgctxt "protocol - display name (Connecting)"
+#~ msgid "%1 - %2 (Connecting)"
+#~ msgstr "%1 - %2 (Connecting)"
+
+#~ msgctxt "protocol - display name"
+#~ msgid "%1 - %2"
+#~ msgstr "%1 - %2"
+
+#~ msgctxt "@title:window"
+#~ msgid "KCall"
+#~ msgstr "KCall"
+
+#~ msgctxt "@info:status"
+#~ msgid "Connected"
+#~ msgstr "Connected"
+
+#~ msgctxt "@action"
+#~ msgid "Disconnect"
+#~ msgstr "Disconnect"
+
+#~ msgctxt "@action"
+#~ msgid "Cancel connection attempt"
+#~ msgstr "Cancel connection attempt"
+
+#~ msgctxt "@action"
+#~ msgid "Connect"
+#~ msgstr "Connect"
+
+#~ msgid ""
+#~ "You have requested to close KCall. Note that KCall will not actually "
+#~ "quit, but it will stay active in the system tray waiting for incoming "
+#~ "calls."
+#~ msgstr ""
+#~ "You have requested to close KCall. Note that KCall will not actually "
+#~ "quit, but it will stay active in the system tray waiting for incoming "
+#~ "calls."
+
+#~ msgid "Volume"
+#~ msgstr "Volume"
+
+#~ msgid "Speakers"
+#~ msgstr "Speakers"
+
+#~ msgid "Microphone"
+#~ msgstr "Microphone"
+
+#~ msgid "Video controls"
+#~ msgstr "Video controls"
+
+#~ msgid "Video input"
+#~ msgstr "Video input"
+
+#~ msgid "Participants"
+#~ msgstr "Participants"
+
+#~ msgctxt "@title:tab"
+#~ msgid "&Contact list"
+#~ msgstr "&Contact list"
+
+#~ msgid "Dial directly"
+#~ msgstr "Dial directly"
+
+#~ msgid "Contact handle"
+#~ msgstr "Contact handle"
+
+#~ msgid "Dial (Audio only)"
+#~ msgstr "Dial (Audio only)"
+
+#~ msgid "Dial (Audio/Video)"
+#~ msgstr "Dial (Audio/Video)"
+
+#~ msgctxt "@info:status"
+#~ msgid "Hanging up..."
+#~ msgstr "Hanging up..."
+
+#~ msgid "Channel closed"
+#~ msgstr "Channel closed"
+
+#~ msgid "Channel closed with error: %1"
+#~ msgstr "Channel closed with error: %1"
+
+#~ msgid "Audio stream created. Stream id: %1."
+#~ msgstr "Audio stream created. Stream id: %1."
+
+#~ msgid "Video stream created. Stream id: %1."
+#~ msgstr "Video stream created. Stream id: %1."
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 direction is: %2."
+#~ msgstr "Stream %1 direction is: %2."
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 removed."
+#~ msgstr "Stream %1 removed."
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 direction changed to: %2."
+#~ msgstr "Stream %1 direction changed to: %2."
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 state changed to: %2."
+#~ msgstr "Stream %1 state changed to: %2."
+
+#~ msgid "User %1 joined the conference."
+#~ msgstr "User %1 joined the conference."
+
+#~ msgid "Awaiting answer from user %1."
+#~ msgstr "Awaiting answer from user %1."
+
+#~ msgid "User %1 left the conference."
+#~ msgstr "User %1 left the conference."
+
+#~ msgid "Audio input device"
+#~ msgstr "Audio input device"
+
+#~ msgid "Audio output device"
+#~ msgstr "Audio output device"
+
+#~ msgid "Video input device"
+#~ msgstr "Video input device"
+
+#~ msgid "Video output driver"
+#~ msgstr "Video output driver"
+
+#~ msgid "Xv video renderer"
+#~ msgstr "Xv video renderer"
+
+#~ msgid "X11 video renderer"
+#~ msgstr "X11 video renderer"
+
+#~ msgid "Autodetect"
+#~ msgstr "Autodetect"
+
+#~ msgid "Test input device"
+#~ msgstr "Test input device"
+
+#~ msgctxt "autodetected audio or video system"
+#~ msgid "Autodetected"
+#~ msgstr "Autodetected"
+
+#~ msgid "ALSA"
+#~ msgstr "ALSA"
+
+#~ msgid "OSS"
+#~ msgstr "OSS"
+
+#~ msgid "JACK"
+#~ msgstr "JACK"
+
+#~ msgid "PULSE"
+#~ msgstr "PULSE"
+
+#~ msgid "Video4Linux"
+#~ msgstr "Video4Linux"
+
+#~ msgid "Device name"
+#~ msgstr "Device name"
+
+#~ msgid "Sound system"
+#~ msgstr "Sound system"
+
+#~ msgid "Video system"
+#~ msgstr "Video system"
+
+#~ msgid "Gstreamer element"
+#~ msgstr "Gstreamer element"
+
+#~ msgid "Driver-specific handle"
+#~ msgstr "Driver-specific handle"
+
+#~ msgctxt "test the device"
+#~ msgid "Test"
+#~ msgstr "Test"
+
+#~ msgid "Add custom device..."
+#~ msgstr "Add custom device..."
+
+#~ msgid ""
+#~ "The gstreamer element for the selected device could not be created. "
+#~ "Please check your gstreamer installation."
+#~ msgstr ""
+#~ "The gstreamer element for the selected device could not be created. "
+#~ "Please check your gstreamer installation."
+
+#~ msgid ""
+#~ "The selected device could not be initialized. Please select another "
+#~ "device."
+#~ msgstr ""
+#~ "The selected device could not be initialised. Please select another "
+#~ "device."
+
+#~ msgid ""
+#~ "The gstreamer element for the audio output device could not be created. "
+#~ "Please check your gstreamer installation"
+#~ msgstr ""
+#~ "The gstreamer element for the audio output device could not be created. "
+#~ "Please check your gstreamer installation"
+
+#~ msgid "The audio output device could not be initialized."
+#~ msgstr "The audio output device could not be initialised."
+
+#~ msgid "The video output driver could not be initialized."
+#~ msgstr "The video output driver could not be initialised."
+
+#~ msgid ""
+#~ "The selected video output driver could not be initialized. Please select "
+#~ "another driver."
+#~ msgstr ""
+#~ "The selected video output driver could not be initialised. Please select "
+#~ "another driver."
+
+#~ msgctxt "stop audio/video test"
+#~ msgid "Stop test"
+#~ msgstr "Stop test"
+
+#~ msgid "Hide details"
+#~ msgstr "Hide details"
+
+#~ msgid "Automatically close the call window after a timeout"
+#~ msgstr "Automatically close the call window after a timeout"
+
+#~ msgid "Timeout in seconds:"
+#~ msgstr "Timeout in seconds:"
+
+#~ msgid ""
+#~ "The gstreamer element for the audio input device could not be created. "
+#~ "Please check your gstreamer installation"
+#~ msgstr ""
+#~ "The gstreamer element for the audio input device could not be created. "
+#~ "Please check your gstreamer installation"
+
+#~ msgid ""
+#~ "The gstreamer element for the video input device could not be created. "
+#~ "Please check your gstreamer installation."
+#~ msgstr ""
+#~ "The gstreamer element for the video input device could not be created. "
+#~ "Please check your gstreamer installation."
+
+#~ msgid "Could not initialize the channel"
+#~ msgstr "Could not initialise the channel"
+
+#~ msgid "Ignore"
+#~ msgstr "Ignore"

@@ -1,0 +1,818 @@
+# translation of ktp-call-ui.po to Swedish
+# Copyright (C) 2012 This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Stefan Asserhäll <stefan.asserhall@bredband.net>, 2009.
+# Stefan Asserhall <stefan.asserhall@bredband.net>, 2010, 2011, 2012, 2014, 2015, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: ktp\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2017-03-14 16:24+0100\n"
+"Last-Translator: Stefan Asserhäll <stefan.asserhall@bredband.net>\n"
+"Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 2.0\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Stefan Asserhäll"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "stefan.asserhall@bredband.net"
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr "Inkommande videosamtal"
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr "<p>%1 ber om ett videosamtal</p>"
+
+#: src/approver.cpp:43
+#, kde-format
+msgid "Incoming call"
+msgstr "Inkommande samtal"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr "<p>%1 ringer till dig</p>"
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr "Svara"
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr "Avslå"
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr "Samtal med %1"
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "Ansluter..."
+
+#: src/call-window.cpp:131
+#, kde-format
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "Ringer upp..."
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr "Samtalspartnern accepterade samtalet, väntar på anslutning..."
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "Pratar..."
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr "Samtalspartnern avslutade samtalet."
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr "Samtalspartnern avslog samtalet."
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr "Samtalspartnern svarade inte."
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr "Felaktigt nummer eller kontakt."
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr "Du har inte tillräcklig behållning för att ringa samtalet."
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr "Du har inte rättighet att ringa samtalet."
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr "Samtalspartnern är för närvarande upptagen."
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr "Internt komponentfel."
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr "Fjärrtjänstfel."
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr "Nätverksfel."
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr "Misslyckades förhandla kodning."
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr "Mediatypen stöds inte."
+
+#: src/call-window.cpp:207
+#, kde-format
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "Anslutningsfel."
+
+#: src/call-window.cpp:211
+#, kde-format
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "Okänt fel."
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "Nerkopplad."
+
+#: src/call-window.cpp:220
+#, kde-format
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "Nerkopplad: %1"
+
+#: src/call-window.cpp:366
+#, kde-format
+msgctxt "@action"
+msgid "Show my video"
+msgstr "Visa min video"
+
+#: src/call-window.cpp:372
+#, kde-format
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "Visa knappsats"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr "Dölj fönster"
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr "Återställ fönster"
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "Skicka video"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr "Tyst"
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr "Parkera"
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr "Lägg på"
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr "Fullskärm"
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr "Ett fel uppstod vid försök att hålla samtalet"
+
+#: src/call-window.cpp:508
+#, kde-format
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "Samtal parkerat"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr ""
+"Misslyckades återuppta parkerat samtal: Vissa enheter är inte tillgängliga."
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, kde-format
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "Okänt fel"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr "Parkerar samtalet..."
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr "Återupptar samtalet..."
+
+#: src/call-window.cpp:548
+#, kde-format
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr "Internt fel"
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "Samtal"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr "Fönster"
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr "Läser in konton..."
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr "Fel: Misslyckades läsa in konton"
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+"Inga användbara konton hittades. Försäkra dig om att du är uppkopplad och "
+"att de konton du har skapat stöder röst- och/eller videosamtal."
+
+#: src/dialout/dialout-widget.cpp:206
+#, kde-format
+msgid "Failed to start call."
+msgstr "Misslyckades ringa samtal."
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, kde-format
+msgid "Account:"
+msgstr "Konto:"
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr "Nummer eller kontaktens webbadress:"
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr "Röstsamtal"
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr "Videosamtal"
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr "Ring samtal"
+
+#: src/dialout/main.cpp:32
+#, kde-format
+msgid "KDE Telepathy Dialout Ui"
+msgstr "KDE Telepathy uppringningsgränssnitt"
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, kde-format
+msgid "VoIP client by KDE"
+msgstr "IP-telefonprogram av KDE"
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, kde-format
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr ""
+"© 2009-2012, George Kiagiadakis\n"
+"© 2010-2011, Collabora Ltd."
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr "Nummer att ringa"
+
+#: src/dtmf-qml.cpp:45
+#, kde-format
+msgid "Dialpad"
+msgstr "Knappsats"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr "KDE Telepathy samtalsgränssnitt"
+
+#: src/qml/core/Toolbar.qml:96
+#, kde-format
+msgid "Hangup"
+msgstr "Lägg på"
+
+#: src/qml/core/Toolbar.qml:110
+#, kde-format
+msgid "Hold"
+msgstr "Parkera"
+
+#: src/qml/core/Toolbar.qml:127
+#, kde-format
+msgid "Mute"
+msgstr "Tyst"
+
+#: src/qml/core/Toolbar.qml:142
+#, kde-format
+msgid "Show My Video"
+msgstr "Visa min video"
+
+#: src/qml/core/Toolbar.qml:159
+#, kde-format
+msgid "Show Dialpad"
+msgstr "Visa knappsats"
+
+#: src/qml/Main.qml:80
+#, kde-format
+msgid "Calling"
+msgstr "Ringer"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""
+"Fönstret för videosamtal har dolts, men samtalet förblir aktivt. Klicka för "
+"att återställa."
+
+#~ msgid "Media"
+#~ msgstr "Medier"
+
+#~ msgid "Main Toolbar"
+#~ msgstr "Huvudverktygsrad"
+
+#~ msgid "1"
+#~ msgstr "1"
+
+#~ msgid "2"
+#~ msgstr "2"
+
+#~ msgid "3"
+#~ msgstr "3"
+
+#~ msgid "4"
+#~ msgstr "4"
+
+#~ msgid "5"
+#~ msgstr "5"
+
+#~ msgid "6"
+#~ msgstr "6"
+
+#~ msgid "7"
+#~ msgstr "7"
+
+#~ msgid "8"
+#~ msgstr "8"
+
+#~ msgid "9"
+#~ msgstr "9"
+
+#~ msgid "*"
+#~ msgstr "*"
+
+#~ msgid "0"
+#~ msgstr "0"
+
+#~ msgid "#"
+#~ msgstr "#"
+
+#~ msgid "Warning: %1"
+#~ msgstr "Varning: %1"
+
+#~ msgid "Error: %1"
+#~ msgstr "Fel: %1"
+
+#~ msgid "KCall"
+#~ msgstr "Kcall"
+
+#~ msgid "Brightness"
+#~ msgstr "Ljusstyrka"
+
+#~ msgid "Contrast"
+#~ msgstr "Kontrast"
+
+#~ msgid "Hue"
+#~ msgstr "Färgton"
+
+#~ msgid "Saturation"
+#~ msgstr "Färgmättnad"
+
+#~ msgid ""
+#~ "Defines whether the window should close automatically after a timeout "
+#~ "when the call is over."
+#~ msgstr ""
+#~ "Definierar om fönstret ska stängas automatiskt när en tidsgräns går ut "
+#~ "efter samtalet är klart."
+
+#~ msgid ""
+#~ "Defines how many seconds the call window should remain visible after the "
+#~ "call is over. This option depends on \"CloseOnDisconnect\"."
+#~ msgstr ""
+#~ "Definierar hur många sekunder samtalsfönstret ska förbli synligt efter "
+#~ "samtalet är klart. Alternativet beror på \"stäng vid nerkoppling\"."
+
+#~ msgid "The audio input device could not be initialized"
+#~ msgstr "Ljudinenheten kunde inte initieras"
+
+#~ msgid "The video input device could not be initialized"
+#~ msgstr "Videoinenheten kunde inte initieras"
+
+#~ msgid ""
+#~ "Could not create some of the required elements. Please check your "
+#~ "GStreamer installation."
+#~ msgstr ""
+#~ "Vissa nödvändiga element kunde inte skapas. Kontrollera installationen av "
+#~ "Gstreamer."
+
+#~ msgid "The audio output device could not be initialized"
+#~ msgstr "Ljudutenheten kunde inte initieras"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show participants"
+#~ msgstr "Visa deltagare"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show log"
+#~ msgstr "Visa logg"
+
+#~ msgctxt "@action"
+#~ msgid "Stop sending video"
+#~ msgstr "Stoppa skicka video"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Status"
+#~ msgstr "Status"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Available"
+#~ msgstr "Tillgänglig"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Away"
+#~ msgstr "Borta"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Be right back"
+#~ msgstr "Snart tillbaka"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Busy"
+#~ msgstr "Upptagen"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Do not disturb"
+#~ msgstr "Stör inte"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Extended Away"
+#~ msgstr "Borta en längre tid"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Invisible"
+#~ msgstr "Osynlig"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Offline"
+#~ msgstr "Nerkopplad"
+
+#~ msgctxt "@info:status"
+#~ msgid "Waiting for account information..."
+#~ msgstr "Väntar på kontoinformation..."
+
+#~ msgctxt "protocol - display name (Connecting)"
+#~ msgid "%1 - %2 (Connecting)"
+#~ msgstr "%1 - %2 (ansluter)"
+
+#~ msgctxt "protocol - display name"
+#~ msgid "%1 - %2"
+#~ msgstr "%1 - %2"
+
+#~ msgctxt "@title:window"
+#~ msgid "KCall"
+#~ msgstr "Kcall"
+
+#~ msgctxt "@info:status"
+#~ msgid "Connected"
+#~ msgstr "Ansluten"
+
+#~ msgctxt "@action"
+#~ msgid "Disconnect"
+#~ msgstr "Koppla ner"
+
+#~ msgctxt "@action"
+#~ msgid "Cancel connection attempt"
+#~ msgstr "Avbryt anslutningsförsök"
+
+#~ msgctxt "@action"
+#~ msgid "Connect"
+#~ msgstr "Anslut"
+
+#~ msgid ""
+#~ "You have requested to close KCall. Note that KCall will not actually "
+#~ "quit, but it will stay active in the system tray waiting for incoming "
+#~ "calls."
+#~ msgstr ""
+#~ "Du har begärt att avsluta Kcall. Observera att Kcall inte verkligen "
+#~ "avslutas, utan förblir aktivt i systembrickan och väntar på inkommande "
+#~ "samtal."
+
+#~ msgid "Volume"
+#~ msgstr "Volym"
+
+#~ msgid "Speakers"
+#~ msgstr "Högtalare"
+
+#~ msgid "Microphone"
+#~ msgstr "Mikrofon"
+
+#~ msgid "Video controls"
+#~ msgstr "Videokontroller"
+
+#~ msgid "Video input"
+#~ msgstr "Videoinmatning"
+
+#~ msgid "Participants"
+#~ msgstr "Deltagare"
+
+#~ msgctxt "@title:tab"
+#~ msgid "&Contact list"
+#~ msgstr "&Kontaktlista"
+
+#~ msgid "Dial directly"
+#~ msgstr "Ring direkt"
+
+#~ msgid "Contact handle"
+#~ msgstr "Kontaktgrepp"
+
+#~ msgid "Dial (Audio only)"
+#~ msgstr "Ring (bara ljud)"
+
+#~ msgid "Dial (Audio/Video)"
+#~ msgstr "Ring (ljud och video)"
+
+#~ msgctxt "@info:status"
+#~ msgid "Hanging up..."
+#~ msgstr "Lägger på..."
+
+#~ msgid "Channel closed"
+#~ msgstr "Kanal stängd"
+
+#~ msgid "Channel closed with error: %1"
+#~ msgstr "Kanal stängd med fel: %1"
+
+#~ msgid "Audio stream created. Stream id: %1."
+#~ msgstr "Ljudström skapad. Strömidentifierare: %1."
+
+#~ msgid "Video stream created. Stream id: %1."
+#~ msgstr "Videoström skapad. Strömidentifierare: %1."
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 direction is: %2."
+#~ msgstr "Riktning för ström %1 är: %2"
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 removed."
+#~ msgstr "Ström %1 borttagen."
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 direction changed to: %2."
+#~ msgstr "Riktning för ström %1 ändrad till: %2"
+
+#~ msgctxt "1 is the stream's id"
+#~ msgid "Stream %1 state changed to: %2."
+#~ msgstr "Tillstånd för ström %1 ändrad till: %2"
+
+#~ msgid "User %1 joined the conference."
+#~ msgstr "Användaren %1 gick med i konferensen."
+
+#~ msgid "Awaiting answer from user %1."
+#~ msgstr "Väntar på svar från användaren %1."
+
+#~ msgid "User %1 left the conference."
+#~ msgstr "Användaren %1 lämnade konferensen."
+
+#~ msgid "Audio input device"
+#~ msgstr "Ljudinenhet"
+
+#~ msgid "Audio output device"
+#~ msgstr "Ljudutenhet"
+
+#~ msgid "Video input device"
+#~ msgstr "Videoinenhet"
+
+#~ msgid "Video output driver"
+#~ msgstr "Drivrutin för videoutmatning"
+
+#~ msgid "Xv video renderer"
+#~ msgstr "Xv-videoåtergivning"
+
+#~ msgid "X11 video renderer"
+#~ msgstr "X11-videoåtergivning"
+
+#~ msgid "Autodetect"
+#~ msgstr "Detektera automatiskt"
+
+#~ msgid "Test input device"
+#~ msgstr "Prova inenhet"
+
+#~ msgctxt "autodetected audio or video system"
+#~ msgid "Autodetected"
+#~ msgstr "Automatiskt detekterat"
+
+#~ msgid "ALSA"
+#~ msgstr "ALSA"
+
+#~ msgid "OSS"
+#~ msgstr "OSS"
+
+#~ msgid "JACK"
+#~ msgstr "JACK"
+
+#~ msgid "PULSE"
+#~ msgstr "PULSE"
+
+#~ msgid "Video4Linux"
+#~ msgstr "Video4Linux"
+
+#~ msgid "Device name"
+#~ msgstr "Enhetsnamn"
+
+#~ msgid "Sound system"
+#~ msgstr "Ljudsystem"
+
+#~ msgid "Video system"
+#~ msgstr "Videosystem"
+
+#~ msgid "Gstreamer element"
+#~ msgstr "Gstreamer-element"
+
+#~ msgid "Driver-specific handle"
+#~ msgstr "Drivrutinspecifik hantering"
+
+#~ msgctxt "test the device"
+#~ msgid "Test"
+#~ msgstr "Prova"
+
+#~ msgid "Add custom device..."
+#~ msgstr "Lägg till egen enhet..."
+
+#~ msgid ""
+#~ "The gstreamer element for the selected device could not be created. "
+#~ "Please check your gstreamer installation."
+#~ msgstr ""
+#~ "Gstreamer-elementet för vald enhet kunde inte skapas. Kontrollera "
+#~ "installationen av Gstreamer."
+
+#~ msgid ""
+#~ "The selected device could not be initialized. Please select another "
+#~ "device."
+#~ msgstr "Den valda enheten kunde inte initieras. Välj en annan enhet."
+
+#~ msgid ""
+#~ "The gstreamer element for the audio output device could not be created. "
+#~ "Please check your gstreamer installation"
+#~ msgstr ""
+#~ "Gstreamer-elementet för ljudutenheten kunde inte skapas. Kontrollera "
+#~ "installationen av Gstreamer."
+
+#~ msgid "The audio output device could not be initialized."
+#~ msgstr "Ljudutenheten kunde inte initieras."
+
+#~ msgid "The video output driver could not be initialized."
+#~ msgstr "Drivrutinen för videoutmatning kunde inte initieras."
+
+#~ msgid ""
+#~ "The selected video output driver could not be initialized. Please select "
+#~ "another driver."
+#~ msgstr ""
+#~ "Den valda drivrutinen för videoutmatning kunde inte initieras. Välj en "
+#~ "annan enhet."
+
+#~ msgctxt "stop audio/video test"
+#~ msgid "Stop test"
+#~ msgstr "Stoppa prov"
+
+#~ msgid "Hide details"
+#~ msgstr "Dölj detaljinformation"
+
+#~ msgid "Automatically close the call window after a timeout"
+#~ msgstr "Stäng automatiskt samtalsfönstret efter tidsgräns gått ut"
+
+#~ msgid "Timeout in seconds:"
+#~ msgstr "Tidsgräns i sekunder:"
+
+#~ msgid ""
+#~ "The gstreamer element for the audio input device could not be created. "
+#~ "Please check your gstreamer installation"
+#~ msgstr ""
+#~ "Gstreamer-elementet för ljudinenheten kunde inte skapas. Kontrollera "
+#~ "installationen av Gstreamer."
+
+#~ msgid ""
+#~ "The gstreamer element for the video input device could not be created. "
+#~ "Please check your gstreamer installation."
+#~ msgstr ""
+#~ "Gstreamer-elementet för videoinenheten kunde inte skapas. Kontrollera "
+#~ "installationen av Gstreamer."
+
+#~ msgid "Could not initialize the channel"
+#~ msgstr "Kunde inte initiera kanalen"
+
+#~ msgid "Ignore"
+#~ msgstr "Ignorera"
+
+#~ msgid "Form"
+#~ msgstr "Formulär"

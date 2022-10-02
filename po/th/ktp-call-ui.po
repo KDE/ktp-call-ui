@@ -1,0 +1,643 @@
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Phuwanat Sakornsakolpat <narachai@gmail.com>, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2010-12-06 14:47+0700\n"
+"Last-Translator: Phuwanat Sakornsakolpat <narachai@gmail.com>\n"
+"Language-Team: Thai <thai-l10n@googlegroups.com>\n"
+"Language: th\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr ""
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr ""
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr ""
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr ""
+
+#: src/approver.cpp:43
+#, fuzzy, kde-format
+#| msgctxt "@action:inmenu"
+#| msgid "Voice call"
+msgid "Incoming call"
+msgstr "โทรศัพท์"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr ""
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr ""
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr ""
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr ""
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "กำลังเชื่อมต่อ..."
+
+#: src/call-window.cpp:131
+#, fuzzy, kde-format
+#| msgctxt "@info:status"
+#| msgid "Ringing..."
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "มีสายเข้า..."
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr ""
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "กำลังพูด..."
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr ""
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr ""
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr ""
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr ""
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr ""
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr ""
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr ""
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr ""
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr ""
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr ""
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr ""
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr ""
+
+#: src/call-window.cpp:207
+#, fuzzy, kde-format
+#| msgctxt "@info:status"
+#| msgid "Disconnected with error."
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "ยุติการเชื่อมต่อเพราะมีข้อผิดพลาด"
+
+#: src/call-window.cpp:211
+#, fuzzy, kde-format
+#| msgctxt "Unknown audio or video system"
+#| msgid "Unknown"
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "ไม่ทราบ"
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "ถูกตัดการเชื่อมต่อ"
+
+#: src/call-window.cpp:220
+#, fuzzy, kde-format
+#| msgctxt "@info:status"
+#| msgid "Disconnected"
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "ถูกตัดการเชื่อมต่อ"
+
+#: src/call-window.cpp:366
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Send video"
+msgctxt "@action"
+msgid "Show my video"
+msgstr "ส่งวิดีโอ"
+
+#: src/call-window.cpp:372
+#, fuzzy, kde-format
+#| msgid "Show details"
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "แสดงรายละเอียด"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr ""
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr ""
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "ส่งวิดีโอ"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr ""
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr ""
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr ""
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr ""
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr ""
+
+#: src/call-window.cpp:508
+#, fuzzy, kde-format
+#| msgid "Call log"
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "บันทึกการสนทนา"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr ""
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, fuzzy, kde-format
+#| msgctxt "Unknown audio or video system"
+#| msgid "Unknown"
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "ไม่ทราบ"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr ""
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr ""
+
+#: src/call-window.cpp:548
+#, kde-format
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr ""
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "โทร"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:206
+#, kde-format
+msgid "Failed to start call."
+msgstr ""
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, fuzzy, kde-format
+#| msgid "Account"
+msgid "Account:"
+msgstr "บัญชี"
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr ""
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr ""
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr ""
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr ""
+
+#: src/dialout/main.cpp:32
+#, kde-format
+msgid "KDE Telepathy Dialout Ui"
+msgstr ""
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, fuzzy, kde-format
+#| msgid "VoIP client for KDE"
+msgid "VoIP client by KDE"
+msgstr "ลูกข่าย VoIP สำหรับ KDE"
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, fuzzy, kde-format
+#| msgid "(C) 2009, George Kiagiadakis"
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr "สงวนลิขสิทธิ์ 2552 โดย George Kiagiadakis"
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr ""
+
+#: src/dtmf-qml.cpp:45
+#, kde-format
+msgid "Dialpad"
+msgstr "แป้นหมุน"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr ""
+
+#: src/qml/core/Toolbar.qml:96
+#, kde-format
+msgid "Hangup"
+msgstr ""
+
+#: src/qml/core/Toolbar.qml:110
+#, kde-format
+msgid "Hold"
+msgstr ""
+
+#: src/qml/core/Toolbar.qml:127
+#, kde-format
+msgid "Mute"
+msgstr ""
+
+#: src/qml/core/Toolbar.qml:142
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Send video"
+msgid "Show My Video"
+msgstr "ส่งวิดีโอ"
+
+#: src/qml/core/Toolbar.qml:159
+#, fuzzy, kde-format
+#| msgid "Show details"
+msgid "Show Dialpad"
+msgstr "แสดงรายละเอียด"
+
+#: src/qml/Main.qml:80
+#, fuzzy, kde-format
+#| msgid "Call"
+msgid "Calling"
+msgstr "โทร"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""
+
+#~ msgid "Main Toolbar"
+#~ msgstr "แถบเครื่องมือหลัก"
+
+#~ msgid "Warning: %1"
+#~ msgstr "คำเตือน: %1"
+
+#~ msgid "Error: %1"
+#~ msgstr "ข้อผิดพลาด: %1"
+
+#~ msgid "KCall"
+#~ msgstr "KCall"
+
+#~ msgid "Brightness"
+#~ msgstr "ความสว่าง"
+
+#~ msgid "Contrast"
+#~ msgstr "ความเปรียบต่าง"
+
+#~ msgid "Hue"
+#~ msgstr "ความเข้มสี"
+
+#~ msgid "Saturation"
+#~ msgstr "ความอิ่มสี"
+
+#~ msgid "The audio input device could not be initialized"
+#~ msgstr "ไม่สามารถเริ่มอุปกรณ์นำเข้าเสียงได้"
+
+#, fuzzy
+#~| msgid "The video input device could not be initialized."
+#~ msgid "The video input device could not be initialized"
+#~ msgstr "ไม่สามารถเริ่มอุปกรณ์นำเข้าวิดีโอได้"
+
+#~ msgid "The audio output device could not be initialized"
+#~ msgstr "ไม่สามารถเริ่มอุปกรณ์ส่งออกเสียงได้"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show participants"
+#~ msgstr "แสดงผู้เข้าร่วม"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show log"
+#~ msgstr "แสดงบันทึก"
+
+#~ msgctxt "@action"
+#~ msgid "Stop sending video"
+#~ msgstr "หยุดการส่งวิดีโอ"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Status"
+#~ msgstr "สถานะ"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Available"
+#~ msgstr "ว่าง"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Away"
+#~ msgstr "ไม่อยู่"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Be right back"
+#~ msgstr "เดี๋ยวกลับมา"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Busy"
+#~ msgstr "ยังไม่ว่าง"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Do not disturb"
+#~ msgstr "ห้ามรบกวน"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Invisible"
+#~ msgstr "ไม่ปรากฎตัว"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Offline"
+#~ msgstr "ออฟไลน์"
+
+#~ msgctxt "@info:status"
+#~ msgid "Waiting for account information..."
+#~ msgstr "กำลังรอข้อมูลบัญชี..."
+
+#~ msgctxt "protocol - display name (Connecting)"
+#~ msgid "%1 - %2 (Connecting)"
+#~ msgstr "%1 - %2 (กำลังเชื่อมต่อ)"
+
+#~ msgctxt "protocol - display name"
+#~ msgid "%1 - %2"
+#~ msgstr "%1 - %2"
+
+#~ msgctxt "@title:window"
+#~ msgid "KCall"
+#~ msgstr "KCall"
+
+#~ msgctxt "@info:status"
+#~ msgid "Connected"
+#~ msgstr "เชื่อมต่อแล้ว"
+
+#~ msgctxt "@action"
+#~ msgid "Disconnect"
+#~ msgstr "ยุติการเชื่อมต่อ"
+
+#~ msgctxt "@action"
+#~ msgid "Cancel connection attempt"
+#~ msgstr "ยกเลิกการพยายามเชื่อมต่อ"
+
+#~ msgctxt "@action"
+#~ msgid "Connect"
+#~ msgstr "ติดต่อ"
+
+#~ msgid "Volume"
+#~ msgstr "ระดับเสียง"
+
+#~ msgid "Video controls"
+#~ msgstr "ควบคุมวิดีโอ"
+
+#~ msgid "Video input"
+#~ msgstr "รับวิดีโอ"
+
+#~ msgid "Participants"
+#~ msgstr "ผู้เข้าร่วม"
+
+#~ msgctxt "@title:tab"
+#~ msgid "&Contact list"
+#~ msgstr "&รายชื่อผู้ติดต่อ"
+
+#~ msgid "Channel closed"
+#~ msgstr "ช่องถูกปิด"
+
+#~ msgid "Channel closed with error: %1"
+#~ msgstr "ช่องถูกปิดด้วยข้อผิดพลาด: %1"
+
+#~ msgid "User %1 joined the conference."
+#~ msgstr "ผู้ใช้ %1 เข้าร่วมการสนทนา"
+
+#~ msgid "Awaiting answer from user %1."
+#~ msgstr "รอคำตอบจากผู้ใช้ %1"
+
+#~ msgid "User %1 left the conference."
+#~ msgstr "ผู้ใช้ %1 ออกจากการสนทนา"
+
+#~ msgid "Audio input device"
+#~ msgstr "อุปกรณ์นำเข้าเสียง"
+
+#~ msgid "Audio output device"
+#~ msgstr "อุปกรณ์ส่งออกเสียง"
+
+#~ msgid "Video input device"
+#~ msgstr "อุปกรณ์นำเข้าวิดีโอ"
+
+#~ msgid "Video output driver"
+#~ msgstr "ไดรเวอร์การแสดงผลวิดีโอ"
+
+#~ msgid "Autodetect"
+#~ msgstr "ตรวจหาอัตโนมัติ"
+
+#~ msgid "Test input device"
+#~ msgstr "ทดสอบอุปกรณ์นำเข้า"
+
+#~ msgctxt "autodetected audio or video system"
+#~ msgid "Autodetected"
+#~ msgstr "ตรวจหาอัตโนมัติ"
+
+#~ msgid "Device name"
+#~ msgstr "ชื่ออุปกรณ์"
+
+#~ msgid "Sound system"
+#~ msgstr "ระบบเสียง"
+
+#~ msgid "Video system"
+#~ msgstr "ระบบวิดีโอ"
+
+#~ msgctxt "test the device"
+#~ msgid "Test"
+#~ msgstr "ทดสอบ"
+
+#~ msgid "Add custom device..."
+#~ msgstr "เพิ่มอุปกรณ์เอง..."
+
+#~ msgid "The audio output device could not be initialized."
+#~ msgstr "ไม่สามารถเริ่มอุปกรณ์ส่งออกเสียงได้"
+
+#~ msgid "The video output driver could not be initialized."
+#~ msgstr "ไม่สามารถเริ่มไดรเวอร์การแสดงผลวิดีโอได้"
+
+#~ msgid ""
+#~ "The selected video output driver could not be initialized. Please select "
+#~ "another driver."
+#~ msgstr "ไม่สามารถเริ่มไดรเวอร์การแสดงผลวิดีโอที่เลือก กรุณาเลือกอุปกรณ์อื่น"
+
+#~ msgctxt "stop audio/video test"
+#~ msgid "Stop test"
+#~ msgstr "ยุติการทดสอบ"
+
+#~ msgid "Hide details"
+#~ msgstr "ซ่อนรายละเอียด"
+
+#~ msgid "Timeout in seconds:"
+#~ msgstr "หมดเวลาอีก (วินาที):"

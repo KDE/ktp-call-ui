@@ -1,0 +1,637 @@
+# translation of ktp-call-ui.po to Italian
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+# Pino Toscano <toscano.pino@tiscali.it>, 2011, 2012, 2014, 2015, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ktp-call-ui\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2017-07-15 16:04+0200\n"
+"Last-Translator: Pino Toscano <toscano.pino@tiscali.it>\n"
+"Language-Team: Italian <kde-i18n-it@kde.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Pino Toscano"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "toscano.pino@tiscali.it"
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr "Videochiamata in arrivo"
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr "<p>%1 ti sta chiedendo di effettuare una videochiamata</p>"
+
+#: src/approver.cpp:43
+#, kde-format
+msgid "Incoming call"
+msgstr "Chiamata in arrivo"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr "<p>%1 ti sta chiamando</p>"
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr "Rispondi"
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr "Rifiuta"
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr "Chiamata con %1"
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "Connessione..."
+
+#: src/call-window.cpp:131
+#, kde-format
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "Sta squillando..."
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr "L'utente remoto ha accettato la chiamata, in attesa di connessione..."
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "In conversazione..."
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr "Il contatto remoto ha terminato la chiamata."
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr "Il contatto remoto ha rifiutato la chiamata."
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr "Il contatto remoto non ha risposto."
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr "Numero o contatto non valido."
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr "Non hai abbastanza credito per effettuare questa chiamata."
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr "Non hai i permessi per effettuare questa chiamata."
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr "Il contatto remoto al momento è occupato."
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr "Errore interno di un componente."
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr "Errore del servizio remoto."
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr "Errore di rete."
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr "Non è stato possibile negoziare i codificatori."
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr "Tipo multimediale non supportato."
+
+#: src/call-window.cpp:207
+#, kde-format
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "Errore di connessione."
+
+#: src/call-window.cpp:211
+#, kde-format
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "Errore sconosciuto."
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "Disconnesso."
+
+#: src/call-window.cpp:220
+#, kde-format
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "Disconnesso: %1"
+
+#: src/call-window.cpp:366
+#, kde-format
+msgctxt "@action"
+msgid "Show my video"
+msgstr "Mostra il mio video"
+
+#: src/call-window.cpp:372
+#, kde-format
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "Mostra tastierino"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr "Nascondi finestra"
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr "Ripristina finestra"
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "Invia video"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr "Muto"
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr "Trattieni"
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr "Termina"
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr "A tutto schermo"
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr "Si è verificato un errore mettendo in pausa la chiamata"
+
+#: src/call-window.cpp:508
+#, kde-format
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "Chiamata trattenuta"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr ""
+"Non è stato possibile ripristinare la chiamata: alcuni dispositivi non sono "
+"disponibili"
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, kde-format
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "Errore sconosciuto"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr "La chiamata viene messa in attesa..."
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr "Ripristino della chiamata..."
+
+#: src/call-window.cpp:548
+#, kde-format
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr "Errore interno"
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "Chiamata"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr "Finestra"
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr "Caricamento account..."
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr "Errore: non è stato possibile caricare gli account"
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+"Nessun account trovato. Assicurati di essere in linea e che gli account "
+"configurati supportano chiamate vocali e/o videochiamate"
+
+#: src/dialout/dialout-widget.cpp:206
+#, kde-format
+msgid "Failed to start call."
+msgstr "Non è stato possibile avviare la chiamata."
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, kde-format
+msgid "Account:"
+msgstr "Account:"
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr "Numero / URI del contatto:"
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr "Chiamata vocale"
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr "Videochiamata"
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr "Effettua una chiamata"
+
+#: src/dialout/main.cpp:32
+#, kde-format
+msgid "KDE Telepathy Dialout Ui"
+msgstr "Interfaccia di chiamata Telepathy KDE"
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, kde-format
+msgid "VoIP client by KDE"
+msgstr "Client VoIP di KDE"
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, kde-format
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr "Il numero da chiamare"
+
+#: src/dtmf-qml.cpp:45
+#, kde-format
+msgid "Dialpad"
+msgstr "Tastierino"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr "Interfaccia di chiamata Telepathy KDE"
+
+#: src/qml/core/Toolbar.qml:96
+#, kde-format
+msgid "Hangup"
+msgstr "Termina"
+
+#: src/qml/core/Toolbar.qml:110
+#, kde-format
+msgid "Hold"
+msgstr "Trattieni"
+
+#: src/qml/core/Toolbar.qml:127
+#, kde-format
+msgid "Mute"
+msgstr "Muto"
+
+#: src/qml/core/Toolbar.qml:142
+#, kde-format
+msgid "Show My Video"
+msgstr "Mostra il mio video"
+
+#: src/qml/core/Toolbar.qml:159
+#, kde-format
+msgid "Show Dialpad"
+msgstr "Mostra tastierino"
+
+#: src/qml/Main.qml:80
+#, kde-format
+msgid "Calling"
+msgstr "Chiamata"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""
+"La finestra della videochiamata è stata nascosta, ma la chiamata rimarrà "
+"attiva. Fai clic per ripristinare."
+
+#~ msgid "Media"
+#~ msgstr "Media"
+
+#~ msgid "Main Toolbar"
+#~ msgstr "Barra principale"
+
+#~ msgid "1"
+#~ msgstr "1"
+
+#~ msgid "2"
+#~ msgstr "2"
+
+#~ msgid "3"
+#~ msgstr "3"
+
+#~ msgid "4"
+#~ msgstr "4"
+
+#~ msgid "5"
+#~ msgstr "5"
+
+#~ msgid "6"
+#~ msgstr "6"
+
+#~ msgid "7"
+#~ msgstr "7"
+
+#~ msgid "8"
+#~ msgstr "8"
+
+#~ msgid "9"
+#~ msgstr "9"
+
+#~ msgid "*"
+#~ msgstr "*"
+
+#~ msgid "0"
+#~ msgstr "0"
+
+#~ msgid "#"
+#~ msgstr "#"
+
+#~ msgid "Warning: %1"
+#~ msgstr "Avviso: %1"
+
+#~ msgid "Error: %1"
+#~ msgstr "Errore: %1"
+
+#~ msgid "Brightness"
+#~ msgstr "Luminosità"
+
+#~ msgid "Contrast"
+#~ msgstr "Contrasto"
+
+#~ msgid "Hue"
+#~ msgstr "Tonalità"
+
+#~ msgid "Saturation"
+#~ msgstr "Saturazione"
+
+#~ msgid ""
+#~ "Defines whether the window should close automatically after a timeout "
+#~ "when the call is over."
+#~ msgstr ""
+#~ "Definisce se la finestra dovrebbe chiudersi automaticamente dopo un tempo "
+#~ "prestabilito alla fine di una chiamata."
+
+#~ msgid ""
+#~ "Defines how many seconds the call window should remain visible after the "
+#~ "call is over. This option depends on \"CloseOnDisconnect\"."
+#~ msgstr ""
+#~ "Definisce quanti secondi la finestra dovrebbe rimanere visibile alla fine "
+#~ "di una chiamata. Questa opzione dipende da «CloseOnDisconnect»."
+
+#~ msgid "The audio input device could not be initialized"
+#~ msgstr ""
+#~ "Non è stato possibile inizializzare il dispositivo audio in ingresso"
+
+#~ msgid "The video input device could not be initialized"
+#~ msgstr ""
+#~ "Non è stato possibile inizializzare il dispositivo video in ingresso"
+
+#~ msgid ""
+#~ "Could not create some of the required elements. Please check your "
+#~ "GStreamer installation."
+#~ msgstr ""
+#~ "Non è stato possibile creare alcuni degli elementi richiesti. Controlla "
+#~ "la tua installazione di GStreamer."
+
+#~ msgid "The audio output device could not be initialized"
+#~ msgstr "Non è stato possibile inizializzare il dispositivo audio in uscita"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show participants"
+#~ msgstr "Mostra partecipanti"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Show log"
+#~ msgstr "Mostra registro"
+
+#~ msgctxt "@action"
+#~ msgid "Stop sending video"
+#~ msgstr "Interrompi l'invio del video"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Status"
+#~ msgstr "Stato"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Available"
+#~ msgstr "Disponibile"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Away"
+#~ msgstr "Assente"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Be right back"
+#~ msgstr "Torno subito"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Busy"
+#~ msgstr "Occupato"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Do not disturb"
+#~ msgstr "Non disturbare"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Extended Away"
+#~ msgstr "Assente a lungo"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Invisible"
+#~ msgstr "Invisibile"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "Offline"
+#~ msgstr "Non in linea"
+
+#~ msgctxt "@info:status"
+#~ msgid "Waiting for account information..."
+#~ msgstr "In attesa di informazioni dell'account..."
+
+#~ msgctxt "protocol - display name (Connecting)"
+#~ msgid "%1 - %2 (Connecting)"
+#~ msgstr "%1 - %2 (connessione)"
+
+#~ msgctxt "protocol - display name"
+#~ msgid "%1 - %2"
+#~ msgstr "%1 - %2"
+
+#~ msgctxt "@info:status"
+#~ msgid "Connected"
+#~ msgstr "Connesso"
+
+#~ msgctxt "@action"
+#~ msgid "Disconnect"
+#~ msgstr "Disconnesso"
+
+#~ msgctxt "@action"
+#~ msgid "Cancel connection attempt"
+#~ msgstr "Annulla tentativo di connessione"
+
+#~ msgctxt "@action"
+#~ msgid "Connect"
+#~ msgstr "Connetti"
+
+#~ msgid ""
+#~ "You have requested to close KCall. Note that KCall will not actually "
+#~ "quit, but it will stay active in the system tray waiting for incoming "
+#~ "calls."
+#~ msgstr ""
+#~ "Hai richiesto di chiudere KCall. Nota che KCall non verrà chiuso, ma "
+#~ "rimarrà attivo nel vassoio di sistema in attesa di chiamate in arrivo."
+
+#~ msgid "Volume"
+#~ msgstr "Volume"
+
+#~ msgid "Speakers"
+#~ msgstr "Altoparlanti"
+
+#~ msgid "Microphone"
+#~ msgstr "Microfono"
+
+#~ msgid "Video controls"
+#~ msgstr "Controlli del video"
+
+#~ msgid "Video input"
+#~ msgstr "Ingresso del video"
+
+#~ msgid "Participants"
+#~ msgstr "Partecipanti"
+
+#~ msgctxt "@title:tab"
+#~ msgid "&Contact list"
+#~ msgstr "Lista dei &contatti"
+
+#~ msgid "Dial directly"
+#~ msgstr "Chiama direttamente"
+
+#~ msgid "Contact handle"
+#~ msgstr "Identificativo contatto"
+
+#~ msgid "Dial (Audio only)"
+#~ msgstr "Chiama (solo audio)"
+
+#~ msgid "Dial (Audio/Video)"
+#~ msgstr "Chiama (audio e video)"

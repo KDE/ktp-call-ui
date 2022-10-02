@@ -1,0 +1,491 @@
+# translation of telepathy-kde-call-ui.po to Khmer
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+# Khoem Sokhem <khoemsokhem@khmeros.info>, 2011.
+# Sophea <sophea@khmeros.info>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: telepathy-kde-call-ui\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2020-01-16 03:16+0100\n"
+"PO-Revision-Date: 2012-06-20 11:39+0700\n"
+"Last-Translator: Sophea <sophea@khmeros.info>\n"
+"Language-Team: Khmer <>\n"
+"Language: km\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: WordForge 0.8 RC1\n"
+"X-Language: km-KH\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "ខឹម សុខែម, ម៉ន ម៉េត, សេង សុត្ថា, ចាន់ សម្បត្តិរតនៈ, សុខ សុភា"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr ""
+"khoemsokhem@khmeros.info,​​mornmet@khmeros.info,sutha@khmeros.info,"
+"ratanak@khmeros.info,sophea@khmeros.info"
+
+#: src/approver.cpp:40
+#, kde-format
+msgid "Incoming video call"
+msgstr "មាន​ការ​ហៅ​ជា​វីដេអូ"
+
+#: src/approver.cpp:41
+#, kde-format
+msgid "<p>%1 is asking you for a video call</p>"
+msgstr "<p>%1 កំពុង​ស្នើសុំ​អ្នក​សម្រាប់​ការ​ហៅ​ជា​វីដេអូ</p>"
+
+#: src/approver.cpp:43
+#, kde-format
+msgid "Incoming call"
+msgstr "កំពុង​ហៅ​ចូល"
+
+#: src/approver.cpp:44
+#, kde-format
+msgid "<p>%1 is calling you</p>"
+msgstr "<p>%1 កំពុង​ហៅ​អ្នក</p>"
+
+#: src/approver.cpp:59 src/approver.cpp:81
+#, kde-format
+msgctxt "action, answers the incoming call"
+msgid "Answer"
+msgstr "ឆ្លើយ"
+
+#: src/approver.cpp:60 src/approver.cpp:83
+#, kde-format
+msgctxt "action, rejects the incoming call"
+msgid "Reject"
+msgstr "បដិសេធ"
+
+#: src/call-window.cpp:111 src/call-window.cpp:112
+#, kde-format
+msgid "Call with %1"
+msgstr "ហៅ​ជាមួយ %1"
+
+#: src/call-window.cpp:127
+#, kde-format
+msgctxt "@info:status"
+msgid "Connecting..."
+msgstr "កំពុង​តភ្ជាប់..."
+
+#: src/call-window.cpp:131
+#, kde-format
+msgctxt "@info:status the remote user's phone is ringing"
+msgid "Ringing..."
+msgstr "កំពុង​រោទ៍..."
+
+#: src/call-window.cpp:135
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote user accepted the call, waiting for connection..."
+msgstr "អ្នកប្រើ​ពី​ចម្ងាយ​ព្រម​ទទួល​ការ​ហៅ និង​កំពុង​រង់ចាំ​ការ​តភ្ជាប់..."
+
+#: src/call-window.cpp:138 src/call-window.cpp:523
+#, kde-format
+msgctxt "@info:status"
+msgid "Talking..."
+msgstr "កំពុង​ជជែក..."
+
+#: src/call-window.cpp:160
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact ended the call."
+msgstr "ទំនាក់ទំនង​ពី​ចម្ងាយ​បាន​បញ្ចប់​ការ​ហៅ ។"
+
+#: src/call-window.cpp:167
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact rejected the call."
+msgstr "ទំនាក់ទំនង​ពី​ចម្ងាយ​បាន​បដិសេធ​ការ​ហៅ ។"
+
+#: src/call-window.cpp:172
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact didn't answer."
+msgstr "ទំនាក់ទំនង​ពី​ចម្ងាយ​មិន​បាន​ឆ្លើយ​ទេ ។"
+
+#: src/call-window.cpp:176
+#, kde-format
+msgctxt "@info:status"
+msgid "Invalid number or contact."
+msgstr "លេខ ឬ​ទំនាក់ទំនង​មិន​ត្រឹមត្រូវ ។"
+
+#: src/call-window.cpp:180
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have enough balance to make this call."
+msgstr "អ្នក​មិន​មាន​សមតុល្យ​គ្រប់គ្រាន់​សម្រាប់​ការ​ហៅ​នេះ​ទេ ។"
+
+#: src/call-window.cpp:182
+#, kde-format
+msgctxt "@info:status"
+msgid "You don't have permission to make this call."
+msgstr "អ្នក​គ្មាន​សិទ្ធិ​ក្នុង​ការ​ហៅ​ទេ ។"
+
+#: src/call-window.cpp:187
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote contact is currently busy."
+msgstr "ទំនាក់ទំនង​ពី​ចម្ងាយ​កំពុង​ជាប់​រវល់ ។"
+
+#: src/call-window.cpp:191
+#, kde-format
+msgctxt "@info:status"
+msgid "Internal component error."
+msgstr "កំហុស​សមាសភាគ​ខាងក្នុង ។"
+
+#: src/call-window.cpp:194
+#, kde-format
+msgctxt "@info:status"
+msgid "Remote service error."
+msgstr "កំហុស​សេវាកម្ម​ពី​ចម្ងាយ ។"
+
+#: src/call-window.cpp:197
+#, kde-format
+msgctxt "@info:status"
+msgid "Network error."
+msgstr "កំហុស​បណ្ដាញ ។"
+
+#: src/call-window.cpp:201
+#, kde-format
+msgctxt "@info:status"
+msgid "Failed to negotiate codecs."
+msgstr "បាន​បរាជ័យ​ក្នុង​ការ​ចរចា​កូដិក ។"
+
+#: src/call-window.cpp:203
+#, kde-format
+msgctxt "@info:status"
+msgid "Unsupported media type."
+msgstr "មិន​គាំទ្រ​ប្រភេទ​មេឌៀ ។"
+
+#: src/call-window.cpp:207
+#, kde-format
+msgctxt "@info:status"
+msgid "Connectivity error."
+msgstr "កំហុស​ការ​តភ្ជាប់ ។"
+
+#: src/call-window.cpp:211
+#, kde-format
+msgctxt "@info:status"
+msgid "Unknown error."
+msgstr "មិន​ស្គាល់​កំហុស ។"
+
+#: src/call-window.cpp:216
+#, kde-format
+msgctxt "@info:status"
+msgid "Disconnected."
+msgstr "បាន​ផ្ដាច់ ។"
+
+#: src/call-window.cpp:220
+#, kde-format
+msgctxt "@info:status the call was disconnected because..."
+msgid "Disconnected: %1"
+msgstr "បាន​ផ្ដាច់ ៖ %1"
+
+#: src/call-window.cpp:366
+#, kde-format
+msgctxt "@action"
+msgid "Show my video"
+msgstr "បង្ហាញ​វីដេអូ​របស់​ខ្ញុំ"
+
+#: src/call-window.cpp:372
+#, kde-format
+msgctxt "@action"
+msgid "Show dialpad"
+msgstr "បង្ហាញ​បន្ទះ​លេខ"
+
+#: src/call-window.cpp:378
+#, kde-format
+msgctxt "@action"
+msgid "Hide window"
+msgstr ""
+
+#: src/call-window.cpp:383
+#, kde-format
+msgctxt "@action"
+msgid "Restore window"
+msgstr ""
+
+#: src/call-window.cpp:388
+#, kde-format
+msgctxt "@action"
+msgid "Send video"
+msgstr "ផ្ញើ​វីដេអូ"
+
+#: src/call-window.cpp:393 src/call-window.cpp:394
+#, kde-format
+msgctxt "@action"
+msgid "Mute"
+msgstr "បិទ​សំឡេង"
+
+#: src/call-window.cpp:399
+#, kde-format
+msgctxt "@action"
+msgid "Hold"
+msgstr "រង់ចាំ"
+
+#: src/call-window.cpp:405
+#, kde-format
+msgctxt "@action"
+msgid "Hangup"
+msgstr "ដាក់ចុះ"
+
+#: src/call-window.cpp:409
+#, kde-format
+msgctxt "@action"
+msgid "Full Screen"
+msgstr ""
+
+#: src/call-window.cpp:495
+#, kde-format
+msgctxt "@info:error"
+msgid "There was an error while pausing the call"
+msgstr ""
+
+#: src/call-window.cpp:508
+#, fuzzy, kde-format
+#| msgid "Call"
+msgctxt "@info:status"
+msgid "Call held"
+msgstr "ហៅ"
+
+#: src/call-window.cpp:510
+#, kde-format
+msgctxt "@info:error"
+msgid "Failed to put the call off hold: Some devices are not available"
+msgstr ""
+
+#: src/call-window.cpp:512 src/call-window.cpp:526
+#, fuzzy, kde-format
+#| msgctxt "@info:status"
+#| msgid "Unknown error."
+msgctxt "@info:error"
+msgid "Unknown error"
+msgstr "មិន​ស្គាល់​កំហុស ។"
+
+#: src/call-window.cpp:536
+#, kde-format
+msgctxt "@info:status"
+msgid "Putting the call on hold..."
+msgstr ""
+
+#: src/call-window.cpp:542
+#, kde-format
+msgctxt "@info:status"
+msgid "Resuming the call..."
+msgstr ""
+
+#: src/call-window.cpp:548
+#, fuzzy, kde-format
+#| msgctxt "@info:status"
+#| msgid "Internal component error."
+msgctxt "@info:error"
+msgid "Internal Error"
+msgstr "កំហុស​សមាសភាគ​ខាងក្នុង ។"
+
+#. i18n: ectx: Menu (call)
+#: src/callwindowui.rc:11
+#, kde-format
+msgid "Call"
+msgstr "ហៅ"
+
+#. i18n: ectx: Menu (window)
+#: src/callwindowui.rc:22
+#, kde-format
+msgid "Window"
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:80
+#, kde-format
+msgid "Loading accounts..."
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:100
+#, kde-format
+msgid "Error: Failed to load accounts"
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:127
+#, kde-format
+msgid ""
+"No capable accounts found. Please make sure that you are online and that the "
+"accounts that you have configured support audio and/or video calls"
+msgstr ""
+
+#: src/dialout/dialout-widget.cpp:206
+#, fuzzy, kde-format
+#| msgctxt "@info:status"
+#| msgid "Failed to negotiate codecs."
+msgid "Failed to start call."
+msgstr "បាន​បរាជ័យ​ក្នុង​ការ​ចរចា​កូដិក ។"
+
+#. i18n: ectx: property (text), widget (QLabel, accountLabel)
+#: src/dialout/dialout-widget.ui:35
+#, kde-format
+msgid "Account:"
+msgstr ""
+
+#. i18n: ectx: property (text), widget (QLabel, numberContactURILabel)
+#: src/dialout/dialout-widget.ui:42
+#, kde-format
+msgid "Number / Contact URI:"
+msgstr ""
+
+#. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
+#: src/dialout/dialout-widget.ui:77
+#, kde-format
+msgid "Audio Call"
+msgstr ""
+
+#. i18n: ectx: property (text), widget (QPushButton, videoCallButton)
+#: src/dialout/dialout-widget.ui:87
+#, kde-format
+msgid "Video Call"
+msgstr ""
+
+#: src/dialout/main-window.cpp:28
+#, kde-format
+msgid "Make a call"
+msgstr ""
+
+#: src/dialout/main.cpp:32
+#, fuzzy, kde-format
+#| msgid "KDE Telepathy Call Ui"
+msgid "KDE Telepathy Dialout Ui"
+msgstr "KDE Telepathy Call Ui"
+
+#: src/dialout/main.cpp:34 src/main.cpp:43
+#, fuzzy, kde-format
+#| msgid "VoIP client for KDE"
+msgid "VoIP client by KDE"
+msgstr "ម៉ាស៊ីន​ភ្ញៀវ VoIP សម្រាប់ KDE"
+
+#: src/dialout/main.cpp:35 src/main.cpp:44
+#, fuzzy, kde-format
+#| msgid "(C) 2009, George Kiagiadakis"
+msgid ""
+"(C) 2009-2012, George Kiagiadakis\n"
+"(C) 2010-2011, Collabora Ltd."
+msgstr "រក្សាសិទ្ធិ​ឆ្នាំ ២០០៩ ដោយ George Kiagiadakis"
+
+#: src/dialout/main.cpp:37 src/main.cpp:46
+#, kde-format
+msgctxt "@info:credit"
+msgid "George Kiagiadakis"
+msgstr "George Kiagiadakis"
+
+#: src/dialout/main.cpp:47
+#, kde-format
+msgid "The number to call"
+msgstr ""
+
+#: src/dtmf-qml.cpp:45
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Show dialpad"
+msgid "Dialpad"
+msgstr "បង្ហាញ​បន្ទះ​លេខ"
+
+#: src/main.cpp:41
+#, kde-format
+msgid "KDE Telepathy Call Ui"
+msgstr "KDE Telepathy Call Ui"
+
+#: src/qml/core/Toolbar.qml:96
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Hangup"
+msgid "Hangup"
+msgstr "ដាក់ចុះ"
+
+#: src/qml/core/Toolbar.qml:110
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Hold"
+msgid "Hold"
+msgstr "រង់ចាំ"
+
+#: src/qml/core/Toolbar.qml:127
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Mute"
+msgid "Mute"
+msgstr "បិទ​សំឡេង"
+
+#: src/qml/core/Toolbar.qml:142
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Show my video"
+msgid "Show My Video"
+msgstr "បង្ហាញ​វីដេអូ​របស់​ខ្ញុំ"
+
+#: src/qml/core/Toolbar.qml:159
+#, fuzzy, kde-format
+#| msgctxt "@action"
+#| msgid "Show dialpad"
+msgid "Show Dialpad"
+msgstr "បង្ហាញ​បន្ទះ​លេខ"
+
+#: src/qml/Main.qml:80
+#, fuzzy, kde-format
+#| msgid "Call"
+msgid "Calling"
+msgstr "ហៅ"
+
+#: src/systemtray-icon.cpp:34
+#, kde-format
+msgid ""
+"The video call window has been hidden, but the call will remain active. "
+"Click to restore."
+msgstr ""
+
+#~ msgid "Media"
+#~ msgstr "មេឌៀ"
+
+#~ msgid "Main Toolbar"
+#~ msgstr "របារ​ឧបករណ៍​មេ"
+
+#~ msgid "1"
+#~ msgstr "១"
+
+#~ msgid "2"
+#~ msgstr "២"
+
+#~ msgid "3"
+#~ msgstr "៣"
+
+#~ msgid "4"
+#~ msgstr "៤"
+
+#~ msgid "5"
+#~ msgstr "៥"
+
+#~ msgid "6"
+#~ msgstr "៦"
+
+#~ msgid "7"
+#~ msgstr "៧"
+
+#~ msgid "8"
+#~ msgstr "៨"
+
+#~ msgid "9"
+#~ msgstr "៩"
+
+#~ msgid "*"
+#~ msgstr "*"
+
+#~ msgid "0"
+#~ msgstr "០"
+
+#~ msgid "#"
+#~ msgstr "#"
+
+#~ msgid "The audio input device could not be initialized"
+#~ msgstr " "

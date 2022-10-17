@@ -379,7 +379,7 @@ msgstr "George Kiagiadakis"
 #: src/dialout/main.cpp:47
 #, kde-format
 msgid "The number to call"
-msgstr "El número que es tocarà"
+msgstr "El número al que s'ha de tocar"
 
 #: src/dtmf-qml.cpp:45
 #, kde-format

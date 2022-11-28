@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: ktp-call-ui\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2020-01-16 03:16+0100\n"
-"PO-Revision-Date: 2022-09-27 14:57+0200\n"
+"PO-Revision-Date: 2022-11-27 06:41+0100\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.2\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -255,7 +255,7 @@ msgstr "შეყოვნებული ზარი"
 #, kde-format
 msgctxt "@info:error"
 msgid "Failed to put the call off hold: Some devices are not available"
-msgstr ""
+msgstr "ზარის დაყოვნების შეცდომა: ზოგიერთი მოწყობილობა მიუწვდომელია"
 
 #: src/call-window.cpp:512 src/call-window.cpp:526
 #, kde-format
@@ -309,6 +309,8 @@ msgid ""
 "No capable accounts found. Please make sure that you are online and that the "
 "accounts that you have configured support audio and/or video calls"
 msgstr ""
+"შესაბამისი ანგარიშები ვერ ვიპოვე. დარწმუნდით, რომ ონლაინ ბრძანდებით და "
+"ანგარიშებს, რომლებიც მოირგეთ, ხმოვანი და ვიდეოზარების მხარდაჭერა გააჩნიათ"
 
 #: src/dialout/dialout-widget.cpp:206
 #, kde-format
@@ -420,3 +422,5 @@ msgid ""
 "The video call window has been hidden, but the call will remain active. "
 "Click to restore."
 msgstr ""
+"ვიდეოზარის ფანჯარა დამალულია, მაგრამ ზარი ჯერ კიდევ მიმდინარეობს. აღსადგენად "
+"დააწკაპუნეთ."

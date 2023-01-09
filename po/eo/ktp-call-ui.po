@@ -1,13 +1,15 @@
-# Translation of kcall into esperanto.
+# Translation of ktp-call-ui.pot into esperanto.
+# Copyright (C) 2003 Free Software Foundation, Inc.
 # Axel Rousseau <axel@esperanto-jeunes.org>, 2009.
+# Oliver Kellogg <okellogg@users.sourceforge.net>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kcall\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2020-01-16 03:16+0100\n"
-"PO-Revision-Date: 2009-11-15 12:06+0100\n"
-"Last-Translator: Axel Rousseau <axel@esperanto-jeunes.org>\n"
+"PO-Revision-Date: 2023-01-08 12:30+0100\n"
+"Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
 "Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
@@ -19,17 +21,17 @@ msgstr ""
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
 msgid "Your names"
-msgstr "Axel Rousseau"
+msgstr "Axel Rousseau, Oliver Kellogg"
 
 #, kde-format
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
-msgstr "axel@esperanto-jeunes.org"
+msgstr "axel@esperanto-jeunes.org, okellogg@users.sourceforge.net"
 
 #: src/approver.cpp:40
 #, kde-format
 msgid "Incoming video call"
-msgstr ""
+msgstr "Envenanta video-voko"
 
 #: src/approver.cpp:41
 #, kde-format
@@ -39,12 +41,12 @@ msgstr ""
 #: src/approver.cpp:43
 #, kde-format
 msgid "Incoming call"
-msgstr ""
+msgstr "Envenanta voko"
 
 #: src/approver.cpp:44
 #, kde-format
 msgid "<p>%1 is calling you</p>"
-msgstr ""
+msgstr "<p>%1 estas vokanta vin</p>"
 
 #: src/approver.cpp:59 src/approver.cpp:81
 #, kde-format
@@ -61,19 +63,19 @@ msgstr "Malakcepti"
 #: src/call-window.cpp:111 src/call-window.cpp:112
 #, kde-format
 msgid "Call with %1"
-msgstr ""
+msgstr "Voki kun %1"
 
 #: src/call-window.cpp:127
 #, kde-format
 msgctxt "@info:status"
 msgid "Connecting..."
-msgstr "Konektante..."
+msgstr "Konektanta..."
 
 #: src/call-window.cpp:131
 #, kde-format
 msgctxt "@info:status the remote user's phone is ringing"
 msgid "Ringing..."
-msgstr ""
+msgstr "Sonoriganta..."
 
 #: src/call-window.cpp:135
 #, kde-format
@@ -85,7 +87,7 @@ msgstr ""
 #, kde-format
 msgctxt "@info:status"
 msgid "Talking..."
-msgstr ""
+msgstr "Parolanta..."
 
 #: src/call-window.cpp:160
 #, kde-format
@@ -187,7 +189,7 @@ msgstr ""
 #, kde-format
 msgctxt "@action"
 msgid "Show my video"
-msgstr ""
+msgstr "Montri mian videon"
 
 #: src/call-window.cpp:372
 #, kde-format
@@ -199,25 +201,25 @@ msgstr ""
 #, kde-format
 msgctxt "@action"
 msgid "Hide window"
-msgstr ""
+msgstr "Kaŝi fenestron"
 
 #: src/call-window.cpp:383
 #, kde-format
 msgctxt "@action"
 msgid "Restore window"
-msgstr ""
+msgstr "Restarigi fenestron"
 
 #: src/call-window.cpp:388
 #, kde-format
 msgctxt "@action"
 msgid "Send video"
-msgstr ""
+msgstr "Sendi videon"
 
 #: src/call-window.cpp:393 src/call-window.cpp:394
 #, kde-format
 msgctxt "@action"
 msgid "Mute"
-msgstr ""
+msgstr "Silentigi"
 
 #: src/call-window.cpp:399
 #, kde-format
@@ -244,11 +246,10 @@ msgid "There was an error while pausing the call"
 msgstr ""
 
 #: src/call-window.cpp:508
-#, fuzzy, kde-format
-#| msgid "Call"
+#, kde-format
 msgctxt "@info:status"
 msgid "Call held"
-msgstr "Voko"
+msgstr "Voko atendanta"
 
 #: src/call-window.cpp:510
 #, kde-format
@@ -266,13 +267,13 @@ msgstr "Nekonata eraro"
 #, kde-format
 msgctxt "@info:status"
 msgid "Putting the call on hold..."
-msgstr ""
+msgstr "Metanta la vokon en atendo..."
 
 #: src/call-window.cpp:542
 #, kde-format
 msgctxt "@info:status"
 msgid "Resuming the call..."
-msgstr ""
+msgstr "Reaktivanta la vokon..."
 
 #: src/call-window.cpp:548
 #, kde-format
@@ -394,7 +395,7 @@ msgstr "Teni"
 #: src/qml/core/Toolbar.qml:127
 #, kde-format
 msgid "Mute"
-msgstr ""
+msgstr "Silentigi"
 
 #: src/qml/core/Toolbar.qml:142
 #, kde-format
@@ -407,10 +408,9 @@ msgid "Show Dialpad"
 msgstr ""
 
 #: src/qml/Main.qml:80
-#, fuzzy, kde-format
-#| msgid "Call"
+#, kde-format
 msgid "Calling"
-msgstr "Voko"
+msgstr "Vokanta"
 
 #: src/systemtray-icon.cpp:34
 #, kde-format
@@ -418,85 +418,3 @@ msgid ""
 "The video call window has been hidden, but the call will remain active. "
 "Click to restore."
 msgstr ""
-
-#~ msgid "Main Toolbar"
-#~ msgstr "Ĉefa ilobreto"
-
-#~ msgid "1"
-#~ msgstr "1"
-
-#~ msgid "2"
-#~ msgstr "2"
-
-#~ msgid "3"
-#~ msgstr "3"
-
-#~ msgid "4"
-#~ msgstr "4"
-
-#~ msgid "5"
-#~ msgstr "5"
-
-#~ msgid "6"
-#~ msgstr "6"
-
-#~ msgid "7"
-#~ msgstr "7"
-
-#~ msgid "8"
-#~ msgstr "8"
-
-#~ msgid "9"
-#~ msgstr "9"
-
-#~ msgid "*"
-#~ msgstr "*"
-
-#~ msgid "0"
-#~ msgstr "0"
-
-#~ msgid "#"
-#~ msgstr "#"
-
-#~ msgid "Error: %1"
-#~ msgstr "Eraro: %1"
-
-#~ msgid "Contrast"
-#~ msgstr "Kontrasto"
-
-#~ msgid "Hue"
-#~ msgstr "Nuanco"
-
-#~ msgid "Saturation"
-#~ msgstr "Satureco"
-
-#~ msgctxt "protocol - display name"
-#~ msgid "%1 - %2"
-#~ msgstr "%1 - %2"
-
-#~ msgid "Volume"
-#~ msgstr "Laŭteco"
-
-#~ msgid "Microphone"
-#~ msgstr "Mikrofono"
-
-#~ msgid "ALSA"
-#~ msgstr "ALSA"
-
-#~ msgid "OSS"
-#~ msgstr "OSS"
-
-#~ msgid "JACK"
-#~ msgstr "JACK"
-
-#~ msgid "PULSE"
-#~ msgstr "PULSE"
-
-#~ msgid "Video4Linux"
-#~ msgstr "Video4Linux"
-
-#~ msgid "Device name"
-#~ msgstr "Aparatnomo"
-
-#~ msgid "Ignore"
-#~ msgstr "Ignori"

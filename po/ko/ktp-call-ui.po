@@ -110,7 +110,7 @@ msgstr "원격 대화 상대가 응답하지 않았습니다."
 #, kde-format
 msgctxt "@info:status"
 msgid "Invalid number or contact."
-msgstr "전화 번호나 대화 상대가 잘못되었습니다."
+msgstr "전화번호나 대화 상대가 잘못되었습니다."
 
 #: src/call-window.cpp:180
 #, kde-format
@@ -326,7 +326,7 @@ msgstr "계정:"
 #: src/dialout/dialout-widget.ui:42
 #, kde-format
 msgid "Number / Contact URI:"
-msgstr "전화 번호/대화 상대 URI:"
+msgstr "전화번호/대화 상대 URI:"
 
 #. i18n: ectx: property (text), widget (QPushButton, audioCallButton)
 #: src/dialout/dialout-widget.ui:77
